@@ -8,6 +8,9 @@ DerivedData/
 *.dSYM
 build/
 
+# Design assets (local reference only)
+design/
+
 # macOS
 .DS_Store
 **/.DS_Store
