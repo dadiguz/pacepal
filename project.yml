@@ -20,6 +20,11 @@ targets:
       - path: PacePal
         excludes:
           - "**/*.md"
+          - "**/*.entitlements"
+    dependencies:
+      - sdk: HealthKit.framework
+    entitlements:
+      path: PacePal/PacePal.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.dallio.PacePal
@@ -28,3 +33,4 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: 1.0
+        CODE_SIGN_ENTITLEMENTS: PacePal/PacePal.entitlements

@@ -12,12 +12,14 @@
 		19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */; };
 		22F7078482F7F38ACE247A3B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5A75F746E634E6BCD06CA /* AppState.swift */; };
 		269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65341C429AB45D652AA38A5F /* PacePalApp.swift */; };
+		360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BA961F360AE4AF019E95A4 /* HealthManager.swift */; };
 		4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */; };
 		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
 		BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58890193F6371973206A045 /* PetTypes.swift */; };
 		C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6B36493681662021AFF9C /* PetCanvasView.swift */; };
 		DAC94EA3AF550765B246BBAE /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AE8746E4391066F5188BED /* PetGridBuilder.swift */; };
+		FA1E6F53FDF8345C973D1F44 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F759D677411C5C4DC1C62FE /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +29,7 @@
 		55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		65341C429AB45D652AA38A5F /* PacePalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacePalApp.swift; sourceTree = "<group>"; };
 		67AE8746E4391066F5188BED /* PetGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetGridBuilder.swift; sourceTree = "<group>"; };
+		8F759D677411C5C4DC1C62FE /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		9081C4182BF0A09B1C883C51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		9EA663C5F1B3C352D42194FD /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		BAF6B36493681662021AFF9C /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
@@ -34,9 +37,29 @@
 		CC042BB7D13E16DBC6124016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
 		E58890193F6371973206A045 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
+		E8BA961F360AE4AF019E95A4 /* HealthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		1D505F84BF6EB39E672D19EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FA1E6F53FDF8345C973D1F44 /* HealthKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
+		10735A370388A54DB60D7D24 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8F759D677411C5C4DC1C62FE /* HealthKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		6C0015C7B64EAB0DF0200676 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
@@ -63,10 +86,19 @@
 				34A316E70EDFBA8CF37CD726 /* Info.plist */,
 				65341C429AB45D652AA38A5F /* PacePalApp.swift */,
 				71E97D3A78301B2AA85A6ED4 /* Engine */,
+				72BD9FF1293235679B14A7D2 /* Health */,
 				6C0015C7B64EAB0DF0200676 /* Persistence */,
 				A76D46D26070036A64995A0E /* Views */,
 			);
 			path = PacePal;
+			sourceTree = "<group>";
+		};
+		72BD9FF1293235679B14A7D2 /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				E8BA961F360AE4AF019E95A4 /* HealthManager.swift */,
+			);
+			path = Health;
 			sourceTree = "<group>";
 		};
 		A6138F8376C06B6E03961BE4 /* Products */ = {
@@ -92,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				726C04807C275F96733AD6C8 /* PacePal */,
+				10735A370388A54DB60D7D24 /* Frameworks */,
 				A6138F8376C06B6E03961BE4 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,6 +137,7 @@
 			buildConfigurationList = B6050DF811F3E9505145E137 /* Build configuration list for PBXNativeTarget "PacePal" */;
 			buildPhases = (
 				1053C4278BC78BAF9DB618E3 /* Sources */,
+				1D505F84BF6EB39E672D19EA /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -156,6 +190,7 @@
 			files = (
 				22F7078482F7F38ACE247A3B /* AppState.swift in Sources */,
 				19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */,
+				360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */,
 				0CBE54890412CB1379286A4B /* HomeView.swift in Sources */,
 				269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */,
 				C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */,
@@ -239,6 +274,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PacePal/PacePal.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = PacePal/Info.plist;
@@ -259,6 +295,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PacePal/PacePal.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = PacePal/Info.plist;

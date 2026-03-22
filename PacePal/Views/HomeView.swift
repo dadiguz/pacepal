@@ -3,6 +3,7 @@ import SwiftData
 
 struct HomeView: View {
     @Environment(AppState.self) private var appState
+    @Environment(HealthManager.self) private var health
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
     @State private var showResetConfirm = false
@@ -41,9 +42,12 @@ struct HomeView: View {
         }
     }
 
-    // Pose reacts lightly to energy
+    @State private var isHurt = false
+
+    // Pose reacts lightly to energy; .hurt overrides temporarily on tap
     private var pose: PetPose {
-        energy < 0.25 ? .sad : .idle
+        if isHurt { return .hurt }
+        return energy < 0.25 ? .sad : .idle
     }
 
     var body: some View {
@@ -75,6 +79,12 @@ struct HomeView: View {
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
         ) { date in
             now = date
+            health.fetchToday()
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+        ) { _ in
+            health.fetchToday()
         }
     }
 
@@ -139,6 +149,14 @@ struct HomeView: View {
 
                     PetAnimationView(dna: dna, pose: pose, pixelSize: 10.5)
                         .id(dna.id)
+                        .onTapGesture {
+                            guard !isHurt else { return }
+                            isHurt = true
+                            // 4 frames at 6 fps = ~0.67s
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                                isHurt = false
+                            }
+                        }
                 }
                 .padding(.top, 20)
 
@@ -169,9 +187,11 @@ struct HomeView: View {
                     .foregroundStyle(.white.opacity(0.65))
 
                 HStack(alignment: .lastTextBaseline, spacing: 3) {
-                    Text("0.0")
+                    Text(String(format: "%.1f", health.todayKm))
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
+                        .contentTransition(.numericText())
+                        .animation(.spring(duration: 0.5), value: health.todayKm)
                     Text("km")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.75))

@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct PacePalApp: App {
     @State private var appState = AppState()
+    @State private var health = HealthManager()
     @State private var showSplash = true
 
     var body: some Scene {
@@ -18,8 +19,10 @@ struct PacePalApp: App {
                 }
             }
             .environment(appState)
+            .environment(health)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .task {
+                health.requestAuthorizationAndFetch()
                 try? await Task.sleep(for: .seconds(2.4))
                 showSplash = false
             }
