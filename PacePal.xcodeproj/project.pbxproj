@@ -26,7 +26,7 @@
 		67AE8746E4391066F5188BED /* PetGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetGridBuilder.swift; sourceTree = "<group>"; };
 		9EA663C5F1B3C352D42194FD /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		BAF6B36493681662021AFF9C /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
-		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC042BB7D13E16DBC6124016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
 		E58890193F6371973206A045 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
@@ -110,11 +110,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					01B2CF2B1350781F6978E222 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = E9416ECD8D99A6458A815BF5 /* Build configuration list for PBXProject "PacePal" */;
 			developmentRegion = en;
@@ -225,6 +220,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -245,6 +241,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
