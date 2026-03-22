@@ -12,6 +12,7 @@
 		19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */; };
 		22F7078482F7F38ACE247A3B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5A75F746E634E6BCD06CA /* AppState.swift */; };
 		269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65341C429AB45D652AA38A5F /* PacePalApp.swift */; };
+		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
 		BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58890193F6371973206A045 /* PetTypes.swift */; };
 		C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6B36493681662021AFF9C /* PetCanvasView.swift */; };
@@ -24,9 +25,10 @@
 		34A316E70EDFBA8CF37CD726 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		65341C429AB45D652AA38A5F /* PacePalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacePalApp.swift; sourceTree = "<group>"; };
 		67AE8746E4391066F5188BED /* PetGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetGridBuilder.swift; sourceTree = "<group>"; };
+		9081C4182BF0A09B1C883C51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		9EA663C5F1B3C352D42194FD /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		BAF6B36493681662021AFF9C /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
-		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC042BB7D13E16DBC6124016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
 		E58890193F6371973206A045 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */,
 				CC042BB7D13E16DBC6124016 /* HomeView.swift */,
 				BAF6B36493681662021AFF9C /* PetCanvasView.swift */,
+				9081C4182BF0A09B1C883C51 /* SplashView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -110,6 +113,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					01B2CF2B1350781F6978E222 = {
+						DevelopmentTeam = "";
+					};
+				};
 			};
 			buildConfigurationList = E9416ECD8D99A6458A815BF5 /* Build configuration list for PBXProject "PacePal" */;
 			developmentRegion = en;
@@ -144,6 +152,7 @@
 				DAC94EA3AF550765B246BBAE /* PetGridBuilder.swift in Sources */,
 				0E0DFCCC0C6767F04E633C18 /* PetPalette.swift in Sources */,
 				BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */,
+				88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,7 +229,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -241,7 +249,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -3,11 +3,25 @@ import SwiftUI
 @main
 struct PacePalApp: App {
     @State private var appState = AppState()
+    @State private var showSplash = true
 
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environment(appState)
+            ZStack {
+                RootView()
+
+                if showSplash {
+                    SplashView()
+                        .transition(.opacity)
+                        .zIndex(1)
+                }
+            }
+            .environment(appState)
+            .animation(.easeInOut(duration: 0.45), value: showSplash)
+            .task {
+                try? await Task.sleep(for: .seconds(2.4))
+                showSplash = false
+            }
         }
     }
 }
