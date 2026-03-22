@@ -52,9 +52,9 @@ struct PetDNA: Identifiable {
 
         let animalType: PetAnimalType
         if earTopY >= 5 {
-            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .dog, .mouse, .smooth])
+            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .dog, .mouse, .axolotl, .smooth])
         } else if earTopY >= 3 {
-            animalType = pick([.bear, .bear, .dog, .dog, .frog, .duck, .smooth])
+            animalType = pick([.bear, .bear, .dog, .dog, .frog, .duck, .axolotl, .smooth])
         } else {
             animalType = pick([.frog, .frog, .dog, .duck, .smooth])
         }
@@ -64,15 +64,15 @@ struct PetDNA: Identifiable {
         let bearEarR  = animalType == .bear ? (earTopY >= 4 ? 2.2 : 1.6) : 0.0
 
         let armStyle   = rndInt(0, 2)
-        let eyeSp      = animalType == .frog ? Double(rndInt(3, 4)) : Double(rndInt(2, 3))
+        let eyeSp      = Double(rndInt(3, 4))  // updated: always 3–4 px spacing
         let eyeStyle   = rndInt(0, 3)
-        let hasMuzzle  = animalType != .frog && chance(0.6)
+        let hasMuzzle  = animalType != .frog && animalType != .axolotl && chance(0.6)
         let mouthStyle = rndInt(0, 3)
-        let hasNose    = !hasMuzzle && animalType != .frog && chance(0.4)
+        let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && chance(0.4)
         let hasCheeks  = chance(0.6)
         let hasMarking = chance(0.3)
         let markingStyle = rndInt(0, 1)
-        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .dog
+        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .dog && animalType != .axolotl
         let hasTail    = chance(0.2)
         let tailOffset = rndInt(0, 3)
 
@@ -157,12 +157,22 @@ struct PetDNA: Identifiable {
             // Mouse – berry (pink-red)
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
                    animalType: .mouse, earSp: 3, bunnyEarH: 0, bearEarR: 0,
-                   armStyle: 0, eyeSp: 2, eyeStyle: 2, hasMuzzle: false, mouthStyle: 0,
+                   armStyle: 0, eyeSp: 3, eyeStyle: 2, hasMuzzle: false, mouthStyle: 0,
                    hasNose: true, hasCheeks: true, hasMarking: false, markingStyle: 0,
                    hasBow: true, hasTail: true, tailOffset: 0,
                    spots: [(2,1,0),(-2,3,1),(3,0,0),(-1,-2,1),(1,2,0),(-3,1,1)],
                    palette: { var p = PALETTES[9]; p.accent1 = "#F191C1"; p.accent2 = "#FADB5F"; return p }(),
                    name: "Xochipilli"),
+
+            // Axolotl – seafoam (teal/cyan)
+            PetDNA(bodyCx: 12, bodyShape: .chubby, bodyRy: 6, bodyRx: 7, bodyCy: 12, earTopY: 6,
+                   animalType: .axolotl, earSp: 3, bunnyEarH: 0, bearEarR: 0,
+                   armStyle: 0, eyeSp: 3, eyeStyle: 2, hasMuzzle: false, mouthStyle: 2,
+                   hasNose: false, hasCheeks: true, hasMarking: false, markingStyle: 0,
+                   hasBow: false, hasTail: false, tailOffset: 1,
+                   spots: [(2,1,0),(-2,2,1),(3,-1,0),(-3,1,1),(0,3,0),(1,-2,1)],
+                   palette: { var p = PALETTES[0]; p.accent1 = "#DA127D"; p.accent2 = "#62F4EB"; return p }(),
+                   name: "Axolitl"),
         ]
     }
 

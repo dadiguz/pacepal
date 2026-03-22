@@ -53,7 +53,7 @@ enum PetPose: String, CaseIterable, Identifiable {
 
 // MARK: - Animal type
 enum PetAnimalType: String, CaseIterable {
-    case bunny, cat, bear, dog, mouse, frog, duck, smooth
+    case bunny, cat, bear, dog, mouse, frog, duck, axolotl, smooth
 }
 
 // MARK: - Body shape
