@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Palette
-struct PetPalette {
+struct PetPalette: Codable {
     let name: String
     let body: String
     let shade: String

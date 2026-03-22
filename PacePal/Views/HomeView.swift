@@ -1,179 +1,235 @@
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     @Environment(AppState.self) private var appState
-    @State private var currentPose: PetPose = .idle
-    @State private var showCharacterSelect = false
+    @Environment(\.modelContext) private var modelContext
+    @Query private var saved: [SavedCharacter]
+    @State private var showResetConfirm = false
+
+    // Tick every minute to keep energy level current
+    @State private var now: Date = Date()
 
     private var dna: PetDNA { appState.selectedCharacter! }
-    private var accentColor: Color { Color(hex: dna.palette.body) }
+
+    // MARK: – Energy (100% at 6 AM → 1% at 11:59 PM)
+    private var energy: Double {
+        let cal = Calendar.current
+        let h   = cal.component(.hour,   from: now)
+        let m   = cal.component(.minute, from: now)
+        let total = h * 60 + m
+        let start = 6 * 60   // 360  (6:00 AM)
+        let end   = 24 * 60  // 1440 (midnight)
+        guard total >= start else { return 0.01 }
+        let ratio = Double(total - start) / Double(end - start)  // 0 → 1
+        return max(0.01, 1.0 - ratio * 0.99)  // 100% → 1%
+    }
+
+    private var energyColor: Color {
+        switch energy {
+        case 0.60...: return Color(hex: "#4ADE80")  // green
+        case 0.30...: return Color(hex: "#A3E635")  // lime
+        default:      return Color(hex: "#FCD34D")  // warm yellow
+        }
+    }
+
+    private var moodText: String {
+        switch energy {
+        case 0.70...: return "\(dna.name) está listo para correr"
+        case 0.40...: return "\(dna.name) sigue aquí, ¿corremos?"
+        default:      return "La energía se acaba... ¡sal a correr!"
+        }
+    }
+
+    // Pose reacts lightly to energy
+    private var pose: PetPose {
+        energy < 0.25 ? .sad : .idle
+    }
 
     var body: some View {
         ZStack {
             Color(hex: "#F5F7FA").ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // ── Top bar ──────────────────────────────────────────────────
                 topBar
                     .padding(.horizontal, 24)
                     .padding(.top, 60)
 
-                Spacer()
+                Spacer(minLength: 12)
 
-                // ── Companion stage ──────────────────────────────────────────
-                companionStage
+                companionCard
                     .padding(.horizontal, 24)
 
-                // ── Pose label ───────────────────────────────────────────────
-                poseLabel
-                    .padding(.top, 12)
+                Spacer(minLength: 16)
 
-                Spacer()
-
-                // ── Pose buttons (for prototype testing) ─────────────────────
-                poseButtonsSection
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 32)
+                // Stats row
+                HStack(spacing: 12) {
+                    kmCard
+                    energyCard
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 48)
             }
+        }
+        .onReceive(
+            Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+        ) { date in
+            now = date
         }
     }
 
     // MARK: – Top bar
     private var topBar: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("PacePal")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                Text("Day 1 / 66")
+                Text("Día 1 / 66")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#616E7C"))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
             }
             Spacer()
             Button {
-                showCharacterSelect = true
+                showResetConfirm = true
             } label: {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 18, weight: .medium))
+                Image(systemName: "person.crop.circle")
+                    .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(Color(hex: "#616E7C"))
                     .padding(10)
                     .background(Color(hex: "#EDF0F4"))
                     .clipShape(Circle())
             }
+            .confirmationDialog("Perfil", isPresented: $showResetConfirm) {
+                Button("Reiniciar compañero", role: .destructive) {
+                    saved.forEach { modelContext.delete($0) }
+                    withAnimation(.spring(duration: 0.4)) {
+                        appState.selectedCharacter = nil
+                    }
+                }
+                Button("Cancelar", role: .cancel) {}
+            } message: {
+                Text("¿Quieres elegir un nuevo compañero?")
+            }
         }
     }
 
-    // MARK: – Companion stage
-    private var companionStage: some View {
+    // MARK: – Companion card
+    private var companionCard: some View {
         ZStack {
-            // Stage card
             RoundedRectangle(cornerRadius: 28)
                 .fill(.white)
-                .shadow(color: .black.opacity(0.06), radius: 20, y: 6)
+                .shadow(color: .black.opacity(0.05), radius: 18, y: 5)
 
             VStack(spacing: 0) {
-                // Pose name chip
-                Text(currentPose.rawValue.uppercased())
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .tracking(1.5)
-                    .foregroundStyle(accentColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    .background(accentColor.opacity(0.1))
-                    .clipShape(Capsule())
-                    .padding(.top, 20)
+                ZStack(alignment: .bottom) {
+                    // Foot glow
+                    Ellipse()
+                        .fill(
+                            RadialGradient(
+                                colors: [Color(hex: dna.palette.body).opacity(0.35), .clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 60
+                            )
+                        )
+                        .frame(width: 130, height: 22)
+                        .blur(radius: 10)
+                        .padding(.bottom, 30)
 
-                // Character (big, ~260pt canvas → 260/24 ≈ 10.8 pt per pixel)
-                PetAnimationView(dna: dna, pose: currentPose, pixelSize: 10.8)
-                    .id(dna.id)
-                    .padding(.vertical, 12)
+                    PetAnimationView(dna: dna, pose: pose, pixelSize: 10.5)
+                        .id(dna.id)
+                }
+                .padding(.top, 20)
 
-                // Mood description
                 Text(moodText)
-                    .font(.system(size: 14, weight: .regular, design: .rounded))
-                    .foregroundStyle(Color(hex: "#616E7C"))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 20)
+                    .padding(.top, 4)
+                    .animation(.easeInOut(duration: 0.4), value: energy)
             }
         }
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: – Pose label
-    private var poseLabel: some View {
-        HStack(spacing: 6) {
-            Text(currentPose.emoji)
-            Text("Animation: \(currentPose.label)")
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
-        }
-    }
+    // MARK: – KM counter card
+    private var kmCard: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "#F9703E"))
+                .shadow(color: Color(hex: "#F9703E").opacity(0.30), radius: 12, y: 5)
 
-    // MARK: – Pose buttons
-    private var poseButtonsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("PREVIEW ANIMATIONS")
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .tracking(1.5)
-                .foregroundStyle(Color(hex: "#9AA5B4"))
+            VStack(alignment: .leading, spacing: 4) {
+                Text("HOY")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.65))
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                ForEach(PetPose.allCases) { pose in
-                    PoseButton(pose: pose, isActive: currentPose == pose, accentColor: accentColor) {
-                        withAnimation(.spring(duration: 0.25)) {
-                            currentPose = pose
-                        }
-                    }
+                HStack(alignment: .lastTextBaseline, spacing: 3) {
+                    Text("0.0")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text("km")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .padding(.bottom, 4)
                 }
             }
-        }
-        .padding(16)
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: .black.opacity(0.05), radius: 12, y: 4)
-    }
-
-    // MARK: – Mood text
-    private var moodText: String {
-        switch currentPose {
-        case .idle:    return "\(dna.name) is waiting for you..."
-        case .happy:   return "\(dna.name) is full of energy!"
-        case .sad:     return "\(dna.name) misses running..."
-        case .running: return "\(dna.name) is on the move!"
-        case .jump:    return "\(dna.name) is jumping for joy!"
-        case .dead:    return "Oh no... \(dna.name) is resting."
-        case .hurt:    return "\(dna.name) took a hit. Don't miss more days!"
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
         }
     }
-}
 
-// MARK: - Pose button component
-private struct PoseButton: View {
-    let pose: PetPose
-    let isActive: Bool
-    let accentColor: Color
-    let action: () -> Void
+    // MARK: – Energy bar card
+    private var energyCard: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.white)
+                .shadow(color: .black.opacity(0.05), radius: 10, y: 4)
 
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Text(pose.emoji)
-                    .font(.system(size: 20))
-                Text(pose.label)
-                    .font(.system(size: 10, weight: isActive ? .semibold : .regular, design: .rounded))
-                    .foregroundStyle(isActive ? accentColor : Color(hex: "#9AA5B4"))
+            VStack(alignment: .leading, spacing: 10) {
+                // Header
+                HStack(alignment: .firstTextBaseline) {
+                    Text("ENERGÍA")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .tracking(1.2)
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                    Spacer()
+                    Text("\(Int(energy * 100))%")
+                        .font(.system(size: 15, weight: .black, design: .rounded))
+                        .foregroundStyle(energyColor)
+                        .animation(.easeInOut(duration: 0.4), value: energy)
+                }
+
+                // Bar track
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(Color(hex: "#EDF0F4"))
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(energyColor)
+                            .frame(width: geo.size.width * energy)
+                            .animation(.spring(duration: 0.9), value: energy)
+                    }
+                }
+                .frame(height: 8)
+
+                // Time range labels
+                HStack {
+                    Text("6 AM")
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Color(hex: "#CBD2D9"))
+                    Spacer()
+                    Text("12 AM")
+                        .font(.system(size: 9, design: .rounded))
+                        .foregroundStyle(Color(hex: "#CBD2D9"))
+                }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(isActive ? accentColor.opacity(0.1) : Color(hex: "#F5F7FA"))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(isActive ? accentColor.opacity(0.4) : .clear, lineWidth: 1.5)
-            )
+            .padding(16)
         }
-        .buttonStyle(.plain)
     }
 }
 

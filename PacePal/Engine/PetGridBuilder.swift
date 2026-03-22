@@ -490,10 +490,10 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     default: break
     }
 
-    for (dx, dy, ci) in dna.spots {
-        let px = Int(bodyCx)+dx, py = Int(bodyCy)+dy
+    for spot in dna.spots {
+        let px = Int(bodyCx)+spot.dx, py = Int(bodyCy)+spot.dy
         let c = pget(g, x: px, y: py)
-        if c == .body || c == .outline { pset(&g, x: px, y: py, cell: ci == 0 ? .accent1 : .accent2) }
+        if c == .body || c == .outline { pset(&g, x: px, y: py, cell: spot.colorIndex == 0 ? .accent1 : .accent2) }
     }
 
     return g

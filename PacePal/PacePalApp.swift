@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct PacePalApp: App {
@@ -23,25 +24,35 @@ struct PacePalApp: App {
                 showSplash = false
             }
         }
+        .modelContainer(for: SavedCharacter.self)
     }
 }
 
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.modelContext) private var modelContext
+    @Query private var saved: [SavedCharacter]
 
     var body: some View {
-        if appState.selectedCharacter != nil {
-            HomeView()
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing),
-                    removal: .move(edge: .leading)
-                ))
-        } else {
-            CharacterSelectView()
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading),
-                    removal: .move(edge: .trailing)
-                ))
+        Group {
+            if appState.selectedCharacter != nil {
+                HomeView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
+            } else {
+                CharacterSelectView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading),
+                        removal: .move(edge: .trailing)
+                    ))
+            }
+        }
+        .onAppear {
+            if appState.selectedCharacter == nil, let first = saved.first, let dna = first.dna {
+                appState.selectedCharacter = dna
+            }
         }
     }
 }

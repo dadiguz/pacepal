@@ -1,7 +1,10 @@
 import SwiftUI
+import SwiftData
 
 struct CharacterSelectView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.modelContext) private var modelContext
+    @Query private var saved: [SavedCharacter]
 
     @State private var characters: [PetDNA] = PetDNA.presets()
     @State private var selectedIndex: Int = 0
@@ -91,6 +94,7 @@ struct CharacterSelectView: View {
 
                     // Select
                     Button {
+                        saveCharacter(selected)
                         withAnimation(.spring(duration: 0.4)) {
                             appState.selectedCharacter = selected
                         }
@@ -144,6 +148,14 @@ struct CharacterSelectView: View {
             }
         }
         .frame(height: 128)
+    }
+
+    // MARK: – Persistence
+    private func saveCharacter(_ dna: PetDNA) {
+        saved.forEach { modelContext.delete($0) }
+        if let data = try? JSONEncoder().encode(dna) {
+            modelContext.insert(SavedCharacter(dnaData: data))
+        }
     }
 
     // MARK: – Page dots

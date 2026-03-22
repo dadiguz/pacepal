@@ -12,6 +12,7 @@
 		19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */; };
 		22F7078482F7F38ACE247A3B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5A75F746E634E6BCD06CA /* AppState.swift */; };
 		269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65341C429AB45D652AA38A5F /* PacePalApp.swift */; };
+		4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */; };
 		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
 		BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58890193F6371973206A045 /* PetTypes.swift */; };
@@ -23,6 +24,7 @@
 		0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
 		29D5A75F746E634E6BCD06CA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		34A316E70EDFBA8CF37CD726 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		65341C429AB45D652AA38A5F /* PacePalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacePalApp.swift; sourceTree = "<group>"; };
 		67AE8746E4391066F5188BED /* PetGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetGridBuilder.swift; sourceTree = "<group>"; };
 		9081C4182BF0A09B1C883C51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
@@ -35,6 +37,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		6C0015C7B64EAB0DF0200676 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 		71E97D3A78301B2AA85A6ED4 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,6 +63,7 @@
 				34A316E70EDFBA8CF37CD726 /* Info.plist */,
 				65341C429AB45D652AA38A5F /* PacePalApp.swift */,
 				71E97D3A78301B2AA85A6ED4 /* Engine */,
+				6C0015C7B64EAB0DF0200676 /* Persistence */,
 				A76D46D26070036A64995A0E /* Views */,
 			);
 			path = PacePal;
@@ -152,6 +163,7 @@
 				DAC94EA3AF550765B246BBAE /* PetGridBuilder.swift in Sources */,
 				0E0DFCCC0C6767F04E633C18 /* PetPalette.swift in Sources */,
 				BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */,
+				4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */,
 				88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
