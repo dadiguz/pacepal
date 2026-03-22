@@ -1,12 +1,13 @@
 import SwiftUI
+import SwiftData
 
 struct SplashView: View {
-    @Environment(AppState.self) private var appState
+    @Query private var saved: [SavedCharacter]
 
-    // Random generated once at init; overridden by selected character if it exists
+    // Fallback if nothing is saved yet
     @State private var randomDNA: PetDNA = PetDNA.random()
 
-    private var dna: PetDNA { appState.selectedCharacter ?? randomDNA }
+    private var dna: PetDNA { saved.first?.dna ?? randomDNA }
 
     @State private var appeared = false
     @State private var textScale: CGFloat = 0.85
