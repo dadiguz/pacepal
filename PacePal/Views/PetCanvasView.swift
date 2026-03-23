@@ -160,38 +160,23 @@ struct PetPreviewCard: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(
-                                isSelected ? bodyColor : Color.clear,
-                                lineWidth: 2.5
-                            )
+            ZStack(alignment: .bottom) {
+                // Foot glow — only when selected
+                Ellipse()
+                    .fill(
+                        RadialGradient(
+                            colors: [bodyColor.opacity(isSelected ? 0.55 : 0), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: size * 0.35
+                        )
                     )
-                    .shadow(color: isSelected ? bodyColor.opacity(0.35) : .black.opacity(0.06),
-                            radius: isSelected ? 14 : 6, y: 4)
+                    .frame(width: size * 0.75, height: size * 0.22)
+                    .blur(radius: 6)
+                    .padding(.bottom, footOffset - 4)
+                    .animation(.spring(duration: 0.3), value: isSelected)
 
-                ZStack(alignment: .bottom) {
-                    // Foot glow for selected card
-                    if isSelected {
-                        Ellipse()
-                            .fill(
-                                RadialGradient(
-                                    colors: [bodyColor.opacity(0.55), .clear],
-                                    center: .center,
-                                    startRadius: 0,
-                                    endRadius: size * 0.35
-                                )
-                            )
-                            .frame(width: size * 0.75, height: size * 0.22)
-                            .blur(radius: 6)
-                            .padding(.bottom, footOffset - 4)
-                    }
-
-                    PetAnimationView(dna: dna, pose: .idle, pixelSize: pixelSize)
-                }
+                PetAnimationView(dna: dna, pose: .idle, pixelSize: pixelSize)
             }
             .frame(width: size + 24, height: size + 24)
 
