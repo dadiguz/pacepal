@@ -4,4 +4,34 @@ import Observation
 @Observable
 final class AppState {
     var selectedCharacter: PetDNA?
+
+    // Date when energy was last set to 100%
+    private(set) var energyResetDate: Date
+
+    init() {
+        self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
+    }
+
+    // 100% on reset → 0% after 48 hours
+    func energy(at date: Date) -> Double {
+        let elapsed = date.timeIntervalSince(energyResetDate)
+        return max(0, min(1, 1.0 - elapsed / (36 * 3600)))
+    }
+
+    func resetEnergy() {
+        energyResetDate = Date()
+        UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
+    }
+
+    /// Sets energy to a specific fraction 0–1 (for testing)
+    func setEnergy(_ fraction: Double) {
+        let elapsed = (1.0 - max(0, min(1, fraction))) * 36 * 3600
+        energyResetDate = Date().addingTimeInterval(-elapsed)
+        UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
+    }
+
+    /// Call when a character is selected — starts at 60% to invite a first run
+    func onCharacterSelected() {
+        setEnergy(0.60)
+    }
 }

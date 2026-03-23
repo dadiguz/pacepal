@@ -136,6 +136,21 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
 
     if dna.animalType != .duck {
         switch pose {
+        case .hype:
+            switch frame {
+            case 0: // charging: fists raised near shoulders
+                pset(&g,x:lX,   y:aY-2,cell:.body); pset(&g,x:lX,   y:aY-1,cell:.body)
+                pset(&g,x:rX,   y:aY-2,cell:.body); pset(&g,x:rX,   y:aY-1,cell:.body)
+            case 1: // building power: arms spread diagonal upward
+                pset(&g,x:lX-1,y:aY-2,cell:.body); pset(&g,x:lX-2,y:aY-1,cell:.body)
+                pset(&g,x:rX+1,y:aY-2,cell:.body); pset(&g,x:rX+2,y:aY-1,cell:.body)
+            case 2: // peak power scream: arms thrust high and wide
+                pset(&g,x:lX-1,y:aY-3,cell:.body); pset(&g,x:lX,   y:aY-2,cell:.body)
+                pset(&g,x:rX+1,y:aY-3,cell:.body); pset(&g,x:rX,   y:aY-2,cell:.body)
+            default: // sustained: classic flex — arms bent outward
+                pset(&g,x:lX-1,y:aY-2,cell:.body); pset(&g,x:lX-1,y:aY-1,cell:.body)
+                pset(&g,x:rX+1,y:aY-2,cell:.body); pset(&g,x:rX+1,y:aY-1,cell:.body)
+            }
         case .happy:
             let hi = frame % 2 == 0
             pset(&g, x: lX, y: hi ? aY-2 : aY-1, cell: .body); pset(&g, x: lX, y: hi ? aY-1 : aY, cell: .body)
@@ -228,6 +243,11 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
             pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
         }
+    case .hype:
+        pset(&g,x:7, y:19,cell:.body); pset(&g,x:9, y:19,cell:.body)
+        pset(&g,x:7, y:20,cell:.body); pset(&g,x:9, y:20,cell:.body); pset(&g,x:8, y:21,cell:.body)
+        pset(&g,x:15,y:19,cell:.body); pset(&g,x:17,y:19,cell:.body)
+        pset(&g,x:15,y:20,cell:.body); pset(&g,x:17,y:20,cell:.body); pset(&g,x:16,y:21,cell:.body)
     case .dead: break
     case .hurt:
         let sh = (frame == 1 || frame == 2) ? 1 : 0
@@ -281,6 +301,20 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     }}
 
     switch pose {
+    case .hype:
+        if frame == 0 || frame == 3 {
+            // Intense wide 2×2 eyes
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        } else {
+            // Fierce squint bars (frames 1&2) — thick pressed bars
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        }
     case .dead:
         for (ex, ey) in [(eyeLX, eyeYI), (eyeRX, eyeYI)] {
             pset(&g,x:ex-1,y:ey-1,cell:.eyePupil); pset(&g,x:ex+1,y:ey-1,cell:.eyePupil)
@@ -288,14 +322,19 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:ex-1,y:ey+1,cell:.eyePupil); pset(&g,x:ex+1,y:ey+1,cell:.eyePupil)
         }
     case .happy:
-        pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
-        pset(&g,x:eyeRX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
+        // Squint U-arc: top curve + bottom corners (no center)
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil);                                              pset(&g,x:eyeLX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX-1,y:eyeYI+1,cell:.eyePupil);                                              pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
     case .sad:
+        // 2×2 shifted down; frame 3 → tiny single pupil
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
         if frame == 3 {
             pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,cell:.eyePupil)
-        } else {
-            pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil)
-            pset(&g,x:eyeRX,  y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
         }
     case .hurt:
         if frame < 2 {
@@ -309,19 +348,13 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             }
         }
     default:
-        switch dna.eyeStyle {
-        case 0:
-            pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,cell:.eyePupil)
-        case 1:
-            pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil)
-            pset(&g,x:eyeRX,  y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
-        case 2:
-            pset(&g,x:eyeLX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
-            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX-1,y:eyeYI-1,cell:.eyeShine)
-        default:
-            pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
-            pset(&g,x:eyeRX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
-        }
+        // Kirby-style 2×2 blocks with shine — faithful to JS
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
     }
 
     if dna.hasNose && pose != .dead {
@@ -335,6 +368,11 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     let fCx = Int(faceCx)
 
     switch pose {
+    case .hype:
+        // Huge excited open smile
+        pset(&g,x:fCx-3,y:mY,cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth); pset(&g,x:fCx+3,y:mY,cell:.mouth)
     case .happy:
         pset(&g,x:fCx-2,y:mY,cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
         pset(&g,x:fCx,  y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY,cell:.mouth)
@@ -402,6 +440,64 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         for (sx, sy) in sets[frame % 4] {
             pset(&g,x:sx,  y:sy-1,cell:.gold); pset(&g,x:sx-1,y:sy,cell:.gold)
             pset(&g,x:sx,  y:sy,  cell:.gold); pset(&g,x:sx+1,y:sy,cell:.gold); pset(&g,x:sx,y:sy+1,cell:.gold)
+        }
+    }
+
+    // ── Hype aura — 11 spiky rays + lightning (faithful port of JS) ─────────────
+    if pose == .hype {
+        let bTop   = Int((bodyCy - bodyRy).rounded()) - 1
+        let bBot   = Int((bodyCy + bodyRy).rounded()) + 1
+        let bLeft  = Int((bodyCx - bodyRx).rounded()) - 1
+        let bRight = Int((bodyCx + bodyRx).rounded()) + 1
+        let cx = Int(bodyCx), cy = Int(bodyCy)
+
+        let len = [2, 3, 5, 3][frame]
+
+        // 11 rays: (startX, startY, dirX, dirY)
+        let rays: [(Int,Int,Int,Int)] = [
+            (cx,     bTop,    0, -1),
+            (cx - 1, bTop,   -1, -1),
+            (cx + 1, bTop,    1, -1),
+            (bLeft,  cy - 1, -1, -1),
+            (bLeft,  cy,     -1,  0),
+            (bLeft,  cy + 1, -1,  1),
+            (bRight, cy - 1,  1, -1),
+            (bRight, cy,      1,  0),
+            (bRight, cy + 1,  1,  1),
+            (cx - 1, bBot,   -1,  1),
+            (cx + 1, bBot,    1,  1),
+        ]
+
+        for (sx, sy, dx, dy) in rays {
+            for i in 1...len {
+                let px = sx + dx * i, py = sy + dy * i
+                if pget(g, x: px, y: py) == .empty { pset(&g, x: px, y: py, cell: .speedLine) }
+                if i == 1 {
+                    let p1x = px - dy, p1y = py + dx
+                    let p2x = px + dy, p2y = py - dx
+                    if pget(g, x: p1x, y: p1y) == .empty { pset(&g, x: p1x, y: p1y, cell: .speedLine) }
+                    if pget(g, x: p2x, y: p2y) == .empty { pset(&g, x: p2x, y: p2y, cell: .speedLine) }
+                }
+            }
+            if frame >= 1 {
+                pset(&g, x: sx + dx * len, y: sy + dy * len, cell: .gold)
+            }
+        }
+
+        // Lightning bolts (electric blue) at ray tips
+        let lTip   = bLeft  - len
+        let rTip   = bRight + len
+        let topTip = bTop   - len
+
+        if frame == 1 || frame == 3 {
+            pset(&g,x:lTip-1,y:cy-1,cell:.lightning); pset(&g,x:lTip-2,y:cy-2,cell:.lightning); pset(&g,x:lTip-1,y:cy-3,cell:.lightning)
+            pset(&g,x:rTip+1,y:cy-1,cell:.lightning); pset(&g,x:rTip+2,y:cy-2,cell:.lightning); pset(&g,x:rTip+1,y:cy-3,cell:.lightning)
+        } else if frame == 2 {
+            pset(&g,x:lTip-1,y:cy-1,cell:.lightning); pset(&g,x:lTip-2,y:cy-2,cell:.lightning)
+            pset(&g,x:lTip-1,y:cy-3,cell:.lightning); pset(&g,x:lTip-2,y:cy-4,cell:.lightning)
+            pset(&g,x:rTip+1,y:cy-1,cell:.lightning); pset(&g,x:rTip+2,y:cy-2,cell:.lightning)
+            pset(&g,x:rTip+1,y:cy-3,cell:.lightning); pset(&g,x:rTip+2,y:cy-4,cell:.lightning)
+            pset(&g,x:cx-1,y:topTip-1,cell:.lightning); pset(&g,x:cx,y:topTip-2,cell:.lightning); pset(&g,x:cx+1,y:topTip-1,cell:.lightning)
         }
     }
 

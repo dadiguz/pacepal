@@ -80,6 +80,7 @@ func colorForCell(_ cell: PetCell, gx: Int, gy: Int, dna: PetDNA) -> Color? {
     case .gold:      return Color(hex: "#ffcc00")
     case .speedLine: return Color(hex: "#ff7700")
     case .gray:      return Color(hex: "#888888")
+    case .lightning: return Color(hex: "#00cfff")
     }
 }
 

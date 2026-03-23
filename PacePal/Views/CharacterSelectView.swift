@@ -95,6 +95,7 @@ struct CharacterSelectView: View {
                     // Select
                     Button {
                         saveCharacter(selected)
+                        appState.onCharacterSelected()
                         withAnimation(.spring(duration: 0.4)) {
                             appState.selectedCharacter = selected
                         }

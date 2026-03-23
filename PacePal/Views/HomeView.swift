@@ -6,48 +6,61 @@ struct HomeView: View {
     @Environment(HealthManager.self) private var health
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
-    @State private var showResetConfirm = false
 
-    // Tick every minute to keep energy level current
+    @State private var showResetConfirm = false
     @State private var now: Date = Date()
 
-    private var dna: PetDNA { appState.selectedCharacter! }
+    // Pose state machine
+    @State private var currentPose: PetPose = .idle
+    @State private var isAnimating = false
 
-    // MARK: – Energy (100% at 6 AM → 1% at 11:59 PM)
-    private var energy: Double {
-        let cal = Calendar.current
-        let h   = cal.component(.hour,   from: now)
-        let m   = cal.component(.minute, from: now)
-        let total = h * 60 + m
-        let start = 6 * 60   // 360  (6:00 AM)
-        let end   = 24 * 60  // 1440 (midnight)
-        guard total >= start else { return 0.01 }
-        let ratio = Double(total - start) / Double(end - start)  // 0 → 1
-        return max(0.01, 1.0 - ratio * 0.99)  // 100% → 1%
-    }
+    // KM counter (animated display value)
+    @State private var displayedKm: Double = 0.0
+    @State private var lastKnownKm: Double = 0.0
+
+    private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
+
+    // Energy: 100% on reset → 0% after 48h
+    private var energy: Double { appState.energy(at: now) }
 
     private var energyColor: Color {
+        if energy <= 0    { return Color(hex: "#E12D39") }  // red — dead
         switch energy {
-        case 0.60...: return Color(hex: "#4ADE80")  // green
-        case 0.30...: return Color(hex: "#A3E635")  // lime
-        default:      return Color(hex: "#FCD34D")  // warm yellow
+        case 0.60...: return Color(hex: "#4ADE80")          // green
+        case 0.30...: return Color(hex: "#A3E635")          // lime
+        default:      return Color(hex: "#FCD34D")          // warm yellow
         }
     }
 
     private var moodText: String {
-        switch energy {
-        case 0.70...: return "\(dna.name) está listo para correr"
-        case 0.40...: return "\(dna.name) sigue aquí, ¿corremos?"
-        default:      return "La energía se acaba... ¡sal a correr!"
+        switch normalPose {
+        case .hype:  return "¡\(dna.name) está en su mejor momento!"
+        case .happy: return "\(dna.name) está feliz, ¡sigamos!"
+        case .jump:  return "\(dna.name) tiene energía, ¿corremos?"
+        case .idle:  return "\(dna.name) está listo para correr"
+        case .sad:   return "La energía se acaba... ¡sal a correr!"
+        case .dead:  return "\(dna.name) está exhausto... ¡ve a correr!"
+        default:     return "\(dna.name) está listo"
         }
     }
 
-    @State private var isHurt = false
+    private var energyTimeLabel: String {
+        let minutes = Int(36.0 * 60.0 * energy)
+        guard minutes > 0 else { return "Sin energía" }
+        let h = minutes / 60
+        let m = minutes % 60
+        if h == 0 { return "\(m)m restantes" }
+        if m == 0 { return "\(h)h restantes" }
+        return "\(h)h \(m)m restantes"
+    }
 
-    // Pose reacts lightly to energy; .hurt overrides temporarily on tap
-    private var pose: PetPose {
-        if isHurt { return .hurt }
-        return energy < 0.25 ? .sad : .idle
+    private var normalPose: PetPose {
+        if energy <= 0    { return .dead  }
+        if energy >= 0.99 { return .hype  }   // ~100% — primeros ~29 min tras reset
+        if energy > 0.95  { return .happy }   // 95–99%
+        if energy > 0.90  { return .jump  }   // 90–95%
+        if energy > 0.50  { return .idle  }   // 50–90%
+        return .sad                           // 0–50%
     }
 
     var body: some View {
@@ -66,26 +79,89 @@ struct HomeView: View {
 
                 Spacer(minLength: 16)
 
-                // Stats row
                 HStack(spacing: 12) {
                     kmCard
                     energyCard
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 48)
+
+                testButtons
+                    .padding(.top, 12)
+                    .padding(.bottom, 48)
             }
+        }
+        .onAppear {
+            displayedKm = health.todayKm
+            lastKnownKm = health.todayKm
+            currentPose = normalPose
+        }
+        .onChange(of: health.todayKm) { _, newVal in
+            let delta = newVal - lastKnownKm
+            guard delta > 0.01 else {
+                if newVal < lastKnownKm { // new day reset
+                    lastKnownKm = newVal
+                    displayedKm = newVal
+                }
+                return
+            }
+            guard !isAnimating else { return }
+            Task { @MainActor in await runKmAnimation(delta: delta, newTotal: newVal) }
         }
         .onReceive(
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
         ) { date in
             now = date
             health.fetchToday()
+            if !isAnimating { currentPose = normalPose }
         }
         .onReceive(
             NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
         ) { _ in
             health.fetchToday()
         }
+    }
+
+    // MARK: – KM animation state machine
+    @MainActor
+    private func runKmAnimation(delta: Double, newTotal: Double) async {
+        // If dead and not enough km to revive, skip
+        if energy <= 0 && delta < 0.5 {
+            lastKnownKm = newTotal
+            displayedKm = newTotal
+            return
+        }
+
+        isAnimating = true
+        let startKm = displayedKm
+        currentPose = .running
+
+        // Count up by 0.1 increments (max ~3s total)
+        let steps = max(1, Int((delta / 0.1).rounded()))
+        let stepDelay = min(0.12, 3.0 / Double(steps))
+        for i in 1...steps {
+            displayedKm = min(startKm + Double(i) * 0.1, newTotal)
+            try? await Task.sleep(for: .seconds(stepDelay))
+        }
+        displayedKm = newTotal
+        lastKnownKm = newTotal
+
+        // Boost energy if >= 0.5 km
+        if delta >= 0.5 {
+            appState.resetEnergy()
+            now = Date()
+        }
+
+        // Celebration pose
+        if delta > 1.0 {
+            currentPose = .hype
+            try? await Task.sleep(for: .seconds(1.6))
+        } else if delta >= 0.5 {
+            currentPose = .jump
+            try? await Task.sleep(for: .seconds(0.8))
+        }
+
+        isAnimating = false
+        currentPose = normalPose
     }
 
     // MARK: – Top bar
@@ -133,7 +209,6 @@ struct HomeView: View {
 
             VStack(spacing: 0) {
                 ZStack(alignment: .bottom) {
-                    // Foot glow
                     Ellipse()
                         .fill(
                             RadialGradient(
@@ -147,14 +222,14 @@ struct HomeView: View {
                         .blur(radius: 10)
                         .padding(.bottom, 30)
 
-                    PetAnimationView(dna: dna, pose: pose, pixelSize: 10.5)
+                    PetAnimationView(dna: dna, pose: currentPose, pixelSize: 10.5)
                         .id(dna.id)
                         .onTapGesture {
-                            guard !isHurt else { return }
-                            isHurt = true
-                            // 4 frames at 6 fps = ~0.67s
+                            guard !isAnimating && currentPose != .dead else { return }
+                            let savedPose = currentPose
+                            currentPose = .hurt
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-                                isHurt = false
+                                if currentPose == .hurt { currentPose = savedPose }
                             }
                         }
                 }
@@ -187,11 +262,11 @@ struct HomeView: View {
                     .foregroundStyle(.white.opacity(0.65))
 
                 HStack(alignment: .lastTextBaseline, spacing: 3) {
-                    Text(String(format: "%.1f", health.todayKm))
+                    Text(String(format: "%.1f", displayedKm))
                         .font(.system(size: 44, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .contentTransition(.numericText())
-                        .animation(.spring(duration: 0.5), value: health.todayKm)
+                        .animation(.spring(duration: 0.3), value: displayedKm)
                     Text("km")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.75))
@@ -211,7 +286,6 @@ struct HomeView: View {
                 .shadow(color: .black.opacity(0.05), radius: 10, y: 4)
 
             VStack(alignment: .leading, spacing: 10) {
-                // Header
                 HStack(alignment: .firstTextBaseline) {
                     Text("ENERGÍA")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -224,7 +298,6 @@ struct HomeView: View {
                         .animation(.easeInOut(duration: 0.4), value: energy)
                 }
 
-                // Bar track
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 5)
@@ -237,18 +310,57 @@ struct HomeView: View {
                 }
                 .frame(height: 8)
 
-                // Time range labels
-                HStack {
-                    Text("6 AM")
-                        .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color(hex: "#CBD2D9"))
-                    Spacer()
-                    Text("12 AM")
-                        .font(.system(size: 9, design: .rounded))
-                        .foregroundStyle(Color(hex: "#CBD2D9"))
-                }
+                Text(energyTimeLabel)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(energy <= 0 ? Color(hex: "#E12D39") : Color(hex: "#9AA5B4"))
+                    .animation(.easeInOut(duration: 0.4), value: energy)
             }
             .padding(16)
+        }
+    }
+
+    // MARK: – Test buttons
+    private var testButtons: some View {
+        VStack(spacing: 8) {
+            // Energy presets — one per zone
+            HStack(spacing: 6) {
+                ForEach([
+                    ("100%", 1.00),
+                    ("96%",  0.96),
+                    ("92%",  0.92),
+                    ("70%",  0.70),
+                    ("25%",  0.25),
+                    ("0%",   0.00),
+                ], id: \.0) { label, value in
+                    Button {
+                        appState.setEnergy(value)
+                        now = Date()
+                        if !isAnimating { currentPose = normalPose }
+                    } label: {
+                        Text(label)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 7)
+                            .background(Color(hex: "#EDF0F4"))
+                            .foregroundStyle(Color(hex: "#3E4C59"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+
+            // KM button
+            Button {
+                health.addTestKm()
+            } label: {
+                Text("➕ 1 km")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 7)
+                    .background(Color(hex: "#EDF0F4"))
+                    .foregroundStyle(Color(hex: "#3E4C59"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
         }
     }
 }
@@ -260,4 +372,5 @@ struct HomeView: View {
             s.selectedCharacter = PetDNA.presets()[0]
             return s
         }())
+        .environment(HealthManager())
 }
