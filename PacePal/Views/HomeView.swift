@@ -11,6 +11,10 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var now: Date = Date()
 
+    @State private var showTutorial = false
+    @State private var tutorialStep = 0
+    @State private var tutorialFrames: [String: CGRect] = [:]
+
     @State private var currentPose: PetPose = .idle
     @State private var isAnimating = false
     @State private var displayedKm: Double = 0.0
@@ -66,7 +70,6 @@ struct HomeView: View {
             Color(hex: "#FFF8F2").ignoresSafeArea()
 
             VStack(spacing: 0) {
-
                 // ── Top bar ──────────────────────────────────────────────
                 topBar
                     .padding(.horizontal, 24)
@@ -77,6 +80,10 @@ struct HomeView: View {
                 // ── Energy bar ───────────────────────────────────────────
                 energySection
                     .padding(.horizontal, 28)
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: TutorialFrameKey.self,
+                            value: ["energy": geo.frame(in: .global)])
+                    })
 
                 Spacer(minLength: 28)
 
@@ -90,6 +97,10 @@ struct HomeView: View {
                     retrySection
                 } else {
                     kmSection
+                        .background(GeometryReader { geo in
+                            Color.clear.preference(key: TutorialFrameKey.self,
+                                value: ["km": geo.frame(in: .global)])
+                        })
                 }
 
                 Spacer(minLength: 24)
@@ -98,10 +109,34 @@ struct HomeView: View {
                 testButtons
                     .padding(.bottom, 48)
             }
+
+            // ── Tutorial overlay ──────────────────────────────────────────
+            if showTutorial {
+                TutorialOverlayView(
+                    step: tutorialStep,
+                    frames: tutorialFrames,
+                    onNext: {
+                        if tutorialStep < tutorialSteps.count - 1 {
+                            withAnimation { tutorialStep += 1 }
+                        } else {
+                            finishTutorial()
+                        }
+                    },
+                    onSkip: { finishTutorial() }
+                )
+                .transition(.opacity)
+                .zIndex(10)
+            }
         }
+        .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
         .onAppear {
             isInitialLoad = true
             currentPose = normalPose
+            if !UserDefaults.standard.bool(forKey: "hasSeenTutorial") {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation { showTutorial = true }
+                }
+            }
         }
         .onChange(of: health.todayKm) { _, newVal in
             guard energy > 0 else { return }
@@ -136,6 +171,17 @@ struct HomeView: View {
         ) { _ in
             if energy > 0 { health.fetchToday() }
         }
+    }
+
+    // MARK: – Tutorial
+    func startTutorial() {
+        tutorialStep = 0
+        withAnimation { showTutorial = true }
+    }
+
+    private func finishTutorial() {
+        withAnimation { showTutorial = false }
+        UserDefaults.standard.set(true, forKey: "hasSeenTutorial")
     }
 
     // MARK: – KM animation state machine
@@ -203,9 +249,14 @@ struct HomeView: View {
                     .clipShape(Circle())
             }
             .sheet(isPresented: $showSettings) {
-                SettingsView()
-                    .environment(appState)
-                    .environment(health)
+                SettingsView(onShowTutorial: {
+                    showSettings = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        startTutorial()
+                    }
+                })
+                .environment(appState)
+                .environment(health)
             }
         }
     }

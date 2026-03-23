@@ -164,12 +164,19 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 pset(&g, x: rX, y: aY+droop, cell: .body); pset(&g, x: rX, y: aY+droop+1, cell: .body)
             }
         case .running:
-            if frame % 2 == 0 {
-                pset(&g, x: lX, y: aY+1, cell: .body); pset(&g, x: lX, y: aY+2, cell: .body)
-                pset(&g, x: rX, y: aY-2, cell: .body); pset(&g, x: rX, y: aY-1, cell: .body)
-            } else {
-                pset(&g, x: lX, y: aY-2, cell: .body); pset(&g, x: lX, y: aY-1, cell: .body)
-                pset(&g, x: rX, y: aY+1, cell: .body); pset(&g, x: rX, y: aY+2, cell: .body)
+            switch frame {
+            case 0: // left arm far back/low, right arm far forward/high
+                pset(&g, x: lX-1, y: aY+2, cell: .body); pset(&g, x: lX,   y: aY+3, cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
+            case 1: // arms crossing mid
+                pset(&g, x: lX,   y: aY+1, cell: .body); pset(&g, x: lX,   y: aY+2, cell: .body)
+                pset(&g, x: rX,   y: aY-1, cell: .body); pset(&g, x: rX,   y: aY,   cell: .body)
+            case 2: // left arm far forward/high, right arm far back/low
+                pset(&g, x: lX,   y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY+2, cell: .body); pset(&g, x: rX,   y: aY+3, cell: .body)
+            default: // arms crossing mid (other direction)
+                pset(&g, x: lX,   y: aY-1, cell: .body); pset(&g, x: lX,   y: aY,   cell: .body)
+                pset(&g, x: rX,   y: aY+1, cell: .body); pset(&g, x: rX,   y: aY+2, cell: .body)
             }
         case .jump:
             switch frame {
@@ -233,11 +240,18 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
 
     switch pose {
     case .running:
-        let leftUp = frame == 0, rightUp = frame == 2
-        if leftUp  { pset(&g,x:8,y:17,cell:.body);pset(&g,x:10,y:17,cell:.body);pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body);pset(&g,x:9,y:19,cell:.body) }
-        else       { pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body) }
-        if rightUp { pset(&g,x:14,y:17,cell:.body);pset(&g,x:16,y:17,cell:.body);pset(&g,x:14,y:18,cell:.body);pset(&g,x:16,y:18,cell:.body);pset(&g,x:15,y:19,cell:.body) }
-        else       { pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body) }
+        // Left foot: frame 0=UP, frame 1=MID, frames 2-3=DOWN
+        switch frame {
+        case 0: pset(&g,x:8,y:17,cell:.body);pset(&g,x:10,y:17,cell:.body);pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body);pset(&g,x:9,y:19,cell:.body)
+        case 1: pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body);pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:9,y:20,cell:.body)
+        default:pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
+        }
+        // Right foot: frames 0-1=DOWN, frame 2=UP, frame 3=MID
+        switch frame {
+        case 2: pset(&g,x:14,y:17,cell:.body);pset(&g,x:16,y:17,cell:.body);pset(&g,x:14,y:18,cell:.body);pset(&g,x:16,y:18,cell:.body);pset(&g,x:15,y:19,cell:.body)
+        case 3: pset(&g,x:14,y:18,cell:.body);pset(&g,x:16,y:18,cell:.body);pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body)
+        default:pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
+        }
     case .jump:
         if frame == 0 || frame == 3 {
             pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
@@ -537,13 +551,21 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         }
     }
 
-    // ── Running speed lines ──────────────────────────────────────────────────────
+    // ── Running speed lines + dust ───────────────────────────────────────────────
     if pose == .running {
-        let lineYs = [Int(bodyCy)-1, Int(bodyCy)+1, Int(bodyCy)+3]
-        let lenTable = [[3,1,3],[1,3,1],[3,1,3],[1,3,1]]
+        let lineYs = [Int(bodyCy)-2, Int(bodyCy), Int(bodyCy)+2, Int(bodyCy)+4]
+        let lenTable = [[4,1,3,1],[2,3,1,2],[3,1,4,1],[1,2,2,3]]
         let xShift = frame % 2
         for (i, ly) in lineYs.enumerated() {
-            for dx in 0..<lenTable[frame % 4][i] { pset(&g, x: rX+1+xShift+dx, y: ly, cell: .speedLine) }
+            for dx in 0..<lenTable[frame][i] { pset(&g, x: rX+1+xShift+dx, y: ly, cell: .speedLine) }
+        }
+        // Dust puff on foot strike
+        if frame == 0 { // right foot just planted
+            pset(&g,x:13,y:22,cell:.shade); pset(&g,x:14,y:22,cell:.shade); pset(&g,x:15,y:22,cell:.shade); pset(&g,x:16,y:22,cell:.shade)
+            pset(&g,x:12,y:21,cell:.shade); pset(&g,x:17,y:21,cell:.shade)
+        } else if frame == 2 { // left foot just planted
+            pset(&g,x:7,y:22,cell:.shade); pset(&g,x:8,y:22,cell:.shade); pset(&g,x:9,y:22,cell:.shade); pset(&g,x:10,y:22,cell:.shade)
+            pset(&g,x:6,y:21,cell:.shade); pset(&g,x:11,y:21,cell:.shade)
         }
     }
 

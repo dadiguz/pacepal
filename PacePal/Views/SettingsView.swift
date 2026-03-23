@@ -10,6 +10,8 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showResetConfirm = false
 
+    var onShowTutorial: (() -> Void)? = nil
+
     var body: some View {
         ZStack {
             Color(hex: "#FFF8F2").ignoresSafeArea()
@@ -35,7 +37,17 @@ struct SettingsView: View {
                 .padding(.bottom, 24)
 
                 // Options list
-                VStack(spacing: 1) {
+                VStack(spacing: 10) {
+                    settingsRow(
+                        icon: "questionmark.circle",
+                        iconColor: "#F9703E",
+                        title: "Ver tutorial",
+                        subtitle: "Repasa cómo funciona la energía"
+                    ) {
+                        onShowTutorial?()
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
                         iconColor: "#E12D39",
@@ -44,8 +56,8 @@ struct SettingsView: View {
                     ) {
                         showResetConfirm = true
                     }
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal, 24)
 
                 Spacer()
