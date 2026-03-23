@@ -81,11 +81,11 @@ struct PetDNA: Identifiable, Codable {
 
         let animalType: PetAnimalType
         if earTopY >= 5 {
-            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .dog, .mouse, .axolotl, .smooth])
+            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .raccoon, .raccoon, .mouse, .axolotl, .smooth])
         } else if earTopY >= 3 {
-            animalType = pick([.bear, .bear, .dog, .dog, .frog, .duck, .axolotl, .smooth])
+            animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .duck, .axolotl, .smooth])
         } else {
-            animalType = pick([.frog, .frog, .dog, .duck, .smooth])
+            animalType = pick([.frog, .frog, .raccoon, .duck, .smooth])
         }
 
         let earSp     = (bodyRx * 0.5).rounded()
@@ -95,13 +95,13 @@ struct PetDNA: Identifiable, Codable {
         let armStyle   = rndInt(0, 2)
         let eyeSp      = Double(rndInt(3, 4))
         let eyeStyle   = rndInt(0, 3)
-        let hasMuzzle  = animalType != .frog && animalType != .axolotl && chance(0.6)
+        let hasMuzzle  = animalType != .frog && animalType != .axolotl && animalType != .raccoon && chance(0.6)
         let mouthStyle = rndInt(0, 3)
         let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && chance(0.4)
         let hasCheeks  = chance(0.6)
         let hasMarking = chance(0.3)
         let markingStyle = rndInt(0, 1)
-        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .dog && animalType != .axolotl
+        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .raccoon && animalType != .axolotl
         let hasTail    = chance(0.2)
         let tailOffset = rndInt(0, 3)
 
@@ -195,17 +195,17 @@ struct PetDNA: Identifiable, Codable {
                    palette: { var p = PALETTES[3]; p.accent1 = "#5CB70B"; p.accent2 = "#27AB83"; return p }(),
                    name: "Quetzalco"),
 
-            // Dog – ocean
-            PetDNA(bodyCx: 12, bodyShape: .slim, bodyRy: 7, bodyRx: 4, bodyCy: 11, earTopY: 4,
-                   animalType: .dog, earSp: 2, bunnyEarH: 0, bearEarR: 0,
-                   armStyle: 1, eyeSp: 2, eyeStyle: 2, hasMuzzle: true, mouthStyle: 3,
-                   hasNose: true, hasCheeks: false, hasMarking: true, markingStyle: 0,
-                   hasBow: false, hasTail: true, tailOffset: 2,
+            // Raccoon – slate
+            PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
+                   animalType: .raccoon, earSp: 3, bunnyEarH: 0, bearEarR: 0,
+                   armStyle: 2, eyeSp: 3, eyeStyle: 1, hasMuzzle: false, mouthStyle: 1,
+                   hasNose: false, hasCheeks: false, hasMarking: false, markingStyle: 0,
+                   hasBow: false, hasTail: false, tailOffset: 0,
                    spots: [PetSpot(dx:-1,dy:2,colorIndex:0), PetSpot(dx:2,dy:-1,colorIndex:1),
                            PetSpot(dx:-3,dy:0,colorIndex:0), PetSpot(dx:1,dy:3,colorIndex:1),
                            PetSpot(dx:-2,dy:-2,colorIndex:0), PetSpot(dx:3,dy:2,colorIndex:1)],
-                   palette: { var p = PALETTES[1]; p.accent1 = "#2CB1BC"; p.accent2 = "#F191C1"; return p }(),
-                   name: "Moctli"),
+                   palette: { var p = PALETTES[13]; p.accent1 = "#9AA5B4"; p.accent2 = "#E2E8F0"; return p }(),
+                   name: "Mixtli"),
 
             // Mouse – berry
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
