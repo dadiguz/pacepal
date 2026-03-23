@@ -336,11 +336,13 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:ex-1,y:ey+1,cell:.eyePupil); pset(&g,x:ex+1,y:ey+1,cell:.eyePupil)
         }
     case .happy:
-        // Squint U-arc: top curve + bottom corners (no center)
-        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,  cell:.eyePupil)
-        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil);                                              pset(&g,x:eyeLX+1,y:eyeYI+1,cell:.eyePupil)
-        pset(&g,x:eyeRX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI-1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
-        pset(&g,x:eyeRX-1,y:eyeYI+1,cell:.eyePupil);                                              pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        // Kirby 2×2 + shine — same as idle so it looks consistent
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
     case .sad:
         // 2×2 shifted down; frame 3 → tiny single pupil
         pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
