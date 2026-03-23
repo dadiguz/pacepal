@@ -30,6 +30,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>NSHealthShareUsageDescription</key>
-	<string>PacePal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
+	<string>Pacepal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
 </dict>
 </plist>

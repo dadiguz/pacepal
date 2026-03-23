@@ -1,4 +1,4 @@
-name: PacePal
+name: Pacepal
 options:
   bundleIdPrefix: io.dallio
   deploymentTarget:
@@ -12,7 +12,7 @@ settings:
     DEVELOPMENT_TEAM: ""
 
 targets:
-  PacePal:
+  Pacepal:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
@@ -25,6 +25,10 @@ targets:
       - sdk: HealthKit.framework
     entitlements:
       path: PacePal/PacePal.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access:
+          - health-records
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.dallio.PacePal

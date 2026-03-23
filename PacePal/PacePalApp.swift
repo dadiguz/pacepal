@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct PacePalApp: App {
+struct PacepalApp: App {
     @State private var appState = AppState()
     @State private var health = HealthManager()
     @State private var showSplash = true
@@ -22,7 +22,11 @@ struct PacePalApp: App {
             .environment(health)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .task {
-                health.requestAuthorizationAndFetch()
+                // Only auto-request for returning users who already completed
+                // the health permission screen — new users see it explicitly.
+                if appState.healthPermissionDone {
+                    health.requestAuthorizationAndFetch()
+                }
                 try? await Task.sleep(for: .seconds(2.4))
                 showSplash = false
             }
@@ -47,6 +51,12 @@ struct RootView: View {
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
+            } else if !appState.healthPermissionDone {
+                HealthPermissionView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
             } else if appState.selectedCharacter != nil {
                 HomeView()
                     .transition(.asymmetric(
@@ -63,6 +73,7 @@ struct RootView: View {
         }
         .animation(.easeInOut(duration: 0.4), value: appState.onboardingCompleted)
         .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
+        .animation(.easeInOut(duration: 0.4), value: appState.healthPermissionDone)
         .onAppear {
             if appState.selectedCharacter == nil, let first = saved.first, let dna = first.dna {
                 appState.selectedCharacter = dna

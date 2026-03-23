@@ -14,12 +14,14 @@ final class AppState {
     // Onboarding & paywall state
     private(set) var onboardingCompleted: Bool
     private(set) var paywallDismissed: Bool
+    private(set) var healthPermissionDone: Bool
 
     init() {
         self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
         self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
+        self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")
     }
 
     func completeOnboarding() {
@@ -30,6 +32,11 @@ final class AppState {
     func dismissPaywall() {
         paywallDismissed = true
         UserDefaults.standard.set(true, forKey: "paywallDismissed")
+    }
+
+    func completeHealthPermission() {
+        healthPermissionDone = true
+        UserDefaults.standard.set(true, forKey: "healthPermissionDone")
     }
 
     // 100% on reset → 0% after 48 hours

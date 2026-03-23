@@ -10,15 +10,38 @@ final class HealthManager {
 
     var isAuthorized = false
 
+    enum AuthState { case idle, requesting, authorized, denied, unavailable }
+    var authState: AuthState = .idle
+
     private let store = HKHealthStore()
     private let distanceType = HKQuantityType(.distanceWalkingRunning)
 
+    /// Called on re-launch for users who already completed the health setup screen.
     func requestAuthorizationAndFetch() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-
+        guard HKHealthStore.isHealthDataAvailable() else {
+            authState = .unavailable
+            return
+        }
         store.requestAuthorization(toShare: [], read: [distanceType]) { [weak self] granted, _ in
             DispatchQueue.main.async {
                 self?.isAuthorized = granted
+                self?.authState = granted ? .authorized : .denied
+                if granted { self?.fetchToday() }
+            }
+        }
+    }
+
+    /// Called from HealthPermissionView — same logic, exposes state for the UI.
+    func requestFromPermissionScreen() {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            authState = .unavailable
+            return
+        }
+        authState = .requesting
+        store.requestAuthorization(toShare: [], read: [distanceType]) { [weak self] granted, error in
+            DispatchQueue.main.async {
+                self?.isAuthorized = granted
+                self?.authState = (granted && error == nil) ? .authorized : .denied
                 if granted { self?.fetchToday() }
             }
         }
