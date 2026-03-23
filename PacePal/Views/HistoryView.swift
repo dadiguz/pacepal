@@ -31,11 +31,11 @@ struct HistoryView: View {
         return min(max(days, 0), totalDays - 1)
     }
 
-    private var completedCount: Int { (0..<todayIndex).filter { state(for: $0) == .completed }.count }
+    private var completedCount: Int { (0...todayIndex).filter { state(for: $0) == .completed }.count }
     private var missedCount: Int    { (0..<todayIndex).filter { state(for: $0) == .missed   }.count }
     private var streakCount: Int {
         var streak = 0
-        var i = todayIndex - 1
+        var i = todayIndex
         while i >= 0 && state(for: i) == .completed { streak += 1; i -= 1 }
         return streak
     }
@@ -64,7 +64,9 @@ struct HistoryView: View {
 
     private func state(for dayIndex: Int) -> DayState {
         if dayIndex > todayIndex { return .future }
-        if dayIndex == todayIndex { return .today }
+        if dayIndex == todayIndex {
+            return health.todayKm >= runThreshold ? .completed : .today
+        }
         let km = dailyKm[dayIndex] ?? 0
         return km >= runThreshold ? .completed : .missed
     }
@@ -121,19 +123,6 @@ struct HistoryView: View {
             .frame(height: 6)
             .padding(.top, 4)
 
-            // Hearts (lives) — 3 misses allowed before it's "broken"
-            HStack(spacing: 2) {
-                Spacer()
-                ForEach(0..<3, id: \.self) { i in
-                    Image(systemName: i < (3 - min(missedCount, 3)) ? "heart.fill" : "heart")
-                        .font(.system(size: 12))
-                        .foregroundStyle(i < (3 - min(missedCount, 3)) ? Color(hex: "#F9703E") : Color(hex: "#CBD2D9"))
-                }
-                Text(missedCount > 3 ? "\(missedCount) faltas" : "")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#E12D39"))
-            }
-            .padding(.top, 2)
         }
     }
 

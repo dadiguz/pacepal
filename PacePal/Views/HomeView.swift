@@ -84,8 +84,12 @@ struct HomeView: View {
 
                 Spacer(minLength: 16)
 
-                // ── KM counter ───────────────────────────────────────────
-                kmSection
+                // ── KM counter or dead screen ────────────────────────────
+                if energy <= 0 {
+                    retrySection
+                } else {
+                    kmSection
+                }
 
                 Spacer(minLength: 24)
 
@@ -283,6 +287,33 @@ struct HomeView: View {
                 .foregroundStyle(Color(hex: "#B0A090"))
                 .multilineTextAlignment(.center)
                 .animation(.easeInOut(duration: 0.4), value: energy)
+        }
+    }
+
+    // MARK: – Retry section (shown when dead)
+    private var retrySection: some View {
+        VStack(spacing: 12) {
+            Text("\(dna.name) se quedó sin energía...")
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
+                .multilineTextAlignment(.center)
+
+            Button {
+                saved.forEach { modelContext.delete($0) }
+                health.resetKm()
+                withAnimation(.spring(duration: 0.4)) {
+                    appState.selectedCharacter = nil
+                }
+            } label: {
+                Text("Volver a intentarlo")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(hex: "#F9703E"))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding(.horizontal, 40)
         }
     }
 
