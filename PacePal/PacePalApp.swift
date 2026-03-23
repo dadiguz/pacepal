@@ -38,7 +38,16 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if appState.selectedCharacter != nil {
+            if !appState.onboardingCompleted {
+                OnboardingView()
+                    .transition(.opacity)
+            } else if !appState.paywallDismissed {
+                PaywallView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
+            } else if appState.selectedCharacter != nil {
                 HomeView()
                     .transition(.asymmetric(
                         insertion: .move(edge: .trailing),
@@ -52,6 +61,8 @@ struct RootView: View {
                     ))
             }
         }
+        .animation(.easeInOut(duration: 0.4), value: appState.onboardingCompleted)
+        .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
         .onAppear {
             if appState.selectedCharacter == nil, let first = saved.first, let dna = first.dna {
                 appState.selectedCharacter = dna

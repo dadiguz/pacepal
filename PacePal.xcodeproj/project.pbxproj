@@ -20,15 +20,18 @@
 		754DE193A42D27D4282183CC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C7678F792B25B5FD646907 /* SettingsView.swift */; };
 		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
+		AA19D61603098DEE48BBDE4B /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2783FD510589B34568642D4 /* PaywallView.swift */; };
 		BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58890193F6371973206A045 /* PetTypes.swift */; };
 		C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF6B36493681662021AFF9C /* PetCanvasView.swift */; };
 		DAC94EA3AF550765B246BBAE /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AE8746E4391066F5188BED /* PetGridBuilder.swift */; };
 		FA1E6F53FDF8345C973D1F44 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F759D677411C5C4DC1C62FE /* HealthKit.framework */; };
+		FF8F986B705F1F8CF0938985 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2ED5D9316A00AF3660471A /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
 		29D5A75F746E634E6BCD06CA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		2B2ED5D9316A00AF3660471A /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		34A316E70EDFBA8CF37CD726 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		65341C429AB45D652AA38A5F /* PacePalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacePalApp.swift; sourceTree = "<group>"; };
@@ -37,6 +40,7 @@
 		8F759D677411C5C4DC1C62FE /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		9081C4182BF0A09B1C883C51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		9EA663C5F1B3C352D42194FD /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
+		A2783FD510589B34568642D4 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		BAF6B36493681662021AFF9C /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
 		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC042BB7D13E16DBC6124016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -124,6 +128,8 @@
 				0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */,
 				F54F07567F023274744522B8 /* HistoryView.swift */,
 				CC042BB7D13E16DBC6124016 /* HomeView.swift */,
+				2B2ED5D9316A00AF3660471A /* OnboardingView.swift */,
+				A2783FD510589B34568642D4 /* PaywallView.swift */,
 				BAF6B36493681662021AFF9C /* PetCanvasView.swift */,
 				E4C7678F792B25B5FD646907 /* SettingsView.swift */,
 				9081C4182BF0A09B1C883C51 /* SplashView.swift */,
@@ -212,7 +218,9 @@
 				360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */,
 				376F15783F24F6FD7F45082D /* HistoryView.swift in Sources */,
 				0CBE54890412CB1379286A4B /* HomeView.swift in Sources */,
+				FF8F986B705F1F8CF0938985 /* OnboardingView.swift in Sources */,
 				269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */,
+				AA19D61603098DEE48BBDE4B /* PaywallView.swift in Sources */,
 				C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */,
 				91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */,
 				DAC94EA3AF550765B246BBAE /* PetGridBuilder.swift in Sources */,
