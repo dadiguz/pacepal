@@ -26,7 +26,7 @@ let tutorialSteps: [TutorialStep] = [
     TutorialStep(
         frameKey: "km",
         title: "Kilómetros",
-        body: "Corre al menos 0.5 km para que tu compañero recupere la energía al 100%."
+        body: "Cada km que corres recupera un 30% de energía. ¡Con 3-4 km llegas al 100%!"
     ),
 ]
 

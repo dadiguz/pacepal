@@ -129,9 +129,17 @@ struct HomeView: View {
             }
         }
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
+        .onChange(of: appState.selectedCharacter?.id) { _, _ in
+            isInitialLoad = true
+            lastKnownKm  = 0
+            displayedKm  = 0
+            currentPose  = normalPose
+            health.fetchToday()   // establece baseline inmediatamente
+        }
         .onAppear {
             isInitialLoad = true
             currentPose = normalPose
+            health.fetchToday()   // establece baseline al arrancar
             if !UserDefaults.standard.bool(forKey: "hasSeenTutorial") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     withAnimation { showTutorial = true }
@@ -187,7 +195,7 @@ struct HomeView: View {
     // MARK: – KM animation state machine
     @MainActor
     private func runKmAnimation(delta: Double, newTotal: Double) async {
-        if energy <= 0 && delta < 0.5 {
+        if energy <= 0 && delta < 0.1 {
             lastKnownKm = newTotal; displayedKm = newTotal; return
         }
         isAnimating = true
@@ -201,11 +209,11 @@ struct HomeView: View {
         }
         displayedKm = newTotal
         lastKnownKm = newTotal
-        if delta >= 0.5 { appState.resetEnergy(); now = Date() }
+        appState.addEnergy(km: delta); now = Date()
         if delta > 1.0 {
             currentPose = .hype
             try? await Task.sleep(for: .seconds(1.6))
-        } else if delta >= 0.5 {
+        } else if delta >= 0.3 {
             currentPose = .jump
             try? await Task.sleep(for: .seconds(0.8))
         }
