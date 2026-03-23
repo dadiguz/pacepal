@@ -107,7 +107,7 @@ struct PetSpriteView: View {
     }
 }
 
-// MARK: - Animated canvas (cycles 4 frames at fps)
+// MARK: - Animated canvas (cycles frames at pose-dependent fps)
 struct PetAnimationView: View {
     let dna: PetDNA
     let pose: PetPose
@@ -117,26 +117,32 @@ struct PetAnimationView: View {
     @State private var frame: Int = 0
     @State private var grids: [PetGrid]
 
+    // Idle uses 8 frames (frame 6 = parpadeo) a 3 fps → ciclo ~2.67s
+    // Resto usa 4 frames al fps solicitado
+    private static func frameCount(for pose: PetPose) -> Int { pose == .idle ? 8 : 4 }
+    private func interval() -> Double { pose == .idle ? 1.0 / 3.0 : 1.0 / fps }
+
     init(dna: PetDNA, pose: PetPose = .idle, pixelSize: CGFloat, fps: Double = 6) {
         self.dna = dna
         self.pose = pose
         self.pixelSize = pixelSize
         self.fps = fps
-        self._grids = State(initialValue: (0..<4).map {
+        let count = Self.frameCount(for: pose)
+        self._grids = State(initialValue: (0..<count).map {
             buildCharacterGrid(dna: dna, pose: pose, frame: $0)
         })
     }
 
     var body: some View {
-        PetSpriteView(grid: grids[frame], dna: dna, pixelSize: pixelSize)
-            .onReceive(
-                Timer.publish(every: 1.0 / fps, on: .main, in: .common).autoconnect()
-            ) { _ in
-                frame = (frame + 1) % 4
-            }
-            .onChange(of: pose) { _, newPose in
+        PetSpriteView(grid: grids[min(frame, grids.count - 1)], dna: dna, pixelSize: pixelSize)
+            .task(id: pose) {
+                let count = Self.frameCount(for: pose)
                 frame = 0
-                grids = (0..<4).map { buildCharacterGrid(dna: dna, pose: newPose, frame: $0) }
+                grids = (0..<count).map { buildCharacterGrid(dna: dna, pose: pose, frame: $0) }
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(interval()))
+                    frame = (frame + 1) % count
+                }
             }
     }
 }
