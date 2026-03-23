@@ -47,4 +47,10 @@ final class HealthManager {
     func addTestKm() {
         testKmOffset += 1.0
     }
+
+    /// Resets the km counter (called when companion is restarted)
+    func resetKm() {
+        testKmOffset = 0
+        realKm = 0
+    }
 }
