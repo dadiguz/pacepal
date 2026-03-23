@@ -20,7 +20,7 @@ struct CharacterSelectView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#F5F7FA").ignoresSafeArea()
+            Color(hex: "#FFF8F2").ignoresSafeArea()
 
             VStack(spacing: 0) {
                 header.padding(.top, 56)
@@ -104,7 +104,7 @@ struct CharacterSelectView: View {
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(bodyColor)
+                            .background(Color(hex: "#F9703E"))
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
