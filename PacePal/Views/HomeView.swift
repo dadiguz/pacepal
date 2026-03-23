@@ -7,8 +7,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
 
-    @State private var showResetConfirm = false
     @State private var showHistory = false
+    @State private var showSettings = false
     @State private var now: Date = Date()
 
     @State private var currentPose: PetPose = .idle
@@ -104,6 +104,7 @@ struct HomeView: View {
             currentPose = normalPose
         }
         .onChange(of: health.todayKm) { _, newVal in
+            guard energy > 0 else { return }
             let delta = newVal - lastKnownKm
             guard delta > 0.01 else {
                 if newVal < lastKnownKm { lastKnownKm = newVal; displayedKm = newVal }
@@ -116,13 +117,15 @@ struct HomeView: View {
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
         ) { date in
             now = date
-            health.fetchToday()
-            if !isAnimating { currentPose = normalPose }
+            if energy > 0 {
+                health.fetchToday()
+                if !isAnimating { currentPose = normalPose }
+            }
         }
         .onReceive(
             NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
         ) { _ in
-            health.fetchToday()
+            if energy > 0 { health.fetchToday() }
         }
     }
 
@@ -159,9 +162,10 @@ struct HomeView: View {
     private var topBar: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("PacePal")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 44)
                 Text("Día 1 / 66")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#B0A090"))
@@ -181,25 +185,18 @@ struct HomeView: View {
                     .environment(health)
             }
 
-            Button { showResetConfirm = true } label: {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: 20, weight: .medium))
+            Button { showSettings = true } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(Color(hex: "#A09080"))
                     .padding(10)
                     .background(Color(hex: "#F5ECE4"))
                     .clipShape(Circle())
             }
-            .confirmationDialog("Perfil", isPresented: $showResetConfirm) {
-                Button("Reiniciar compañero", role: .destructive) {
-                    saved.forEach { modelContext.delete($0) }
-                    health.resetKm()
-                    withAnimation(.spring(duration: 0.4)) {
-                        appState.selectedCharacter = nil
-                    }
-                }
-                Button("Cancelar", role: .cancel) {}
-            } message: {
-                Text("¿Quieres elegir un nuevo compañero?")
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+                    .environment(appState)
+                    .environment(health)
             }
         }
     }
@@ -270,7 +267,7 @@ struct HomeView: View {
 
     // MARK: – KM section (no card)
     private var kmSection: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 10) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(String(format: "%.1f", displayedKm))
                     .font(.system(size: 52, weight: .black, design: .rounded))
@@ -287,6 +284,22 @@ struct HomeView: View {
                 .foregroundStyle(Color(hex: "#B0A090"))
                 .multilineTextAlignment(.center)
                 .animation(.easeInOut(duration: 0.4), value: energy)
+
+            Button {
+                health.fetchToday()
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text("Sincronizar")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                }
+                .foregroundStyle(Color(hex: "#A09080"))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(Color(hex: "#F5ECE4"))
+                .clipShape(Capsule())
+            }
         }
     }
 

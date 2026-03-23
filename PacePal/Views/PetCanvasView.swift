@@ -156,7 +156,7 @@ struct PetPreviewCard: View {
         VStack(spacing: 8) {
             ZStack {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(hex: "#F0F4F8"))
+                    .fill(.white)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
                             .strokeBorder(

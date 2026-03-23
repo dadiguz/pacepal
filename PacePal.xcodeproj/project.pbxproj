@@ -10,11 +10,13 @@
 		0CBE54890412CB1379286A4B /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC042BB7D13E16DBC6124016 /* HomeView.swift */; };
 		0E0DFCCC0C6767F04E633C18 /* PetPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */; };
 		19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */; };
+		1D451A9D7C346FFF6283200D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4BC752B951DD7FE1A7F7DEC /* Assets.xcassets */; };
 		22F7078482F7F38ACE247A3B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5A75F746E634E6BCD06CA /* AppState.swift */; };
 		269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65341C429AB45D652AA38A5F /* PacePalApp.swift */; };
 		360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BA961F360AE4AF019E95A4 /* HealthManager.swift */; };
 		376F15783F24F6FD7F45082D /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F07567F023274744522B8 /* HistoryView.swift */; };
 		4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */; };
+		754DE193A42D27D4282183CC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C7678F792B25B5FD646907 /* SettingsView.swift */; };
 		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
 		BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E58890193F6371973206A045 /* PetTypes.swift */; };
@@ -34,11 +36,13 @@
 		9081C4182BF0A09B1C883C51 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		9EA663C5F1B3C352D42194FD /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		BAF6B36493681662021AFF9C /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
-		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C90E6DE2B2E173E850CF45A7 /* PacePal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PacePal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC042BB7D13E16DBC6124016 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
+		E4C7678F792B25B5FD646907 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E58890193F6371973206A045 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
 		E8BA961F360AE4AF019E95A4 /* HealthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthManager.swift; sourceTree = "<group>"; };
+		F4BC752B951DD7FE1A7F7DEC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F54F07567F023274744522B8 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				29D5A75F746E634E6BCD06CA /* AppState.swift */,
+				F4BC752B951DD7FE1A7F7DEC /* Assets.xcassets */,
 				34A316E70EDFBA8CF37CD726 /* Info.plist */,
 				65341C429AB45D652AA38A5F /* PacePalApp.swift */,
 				71E97D3A78301B2AA85A6ED4 /* Engine */,
@@ -118,6 +123,7 @@
 				F54F07567F023274744522B8 /* HistoryView.swift */,
 				CC042BB7D13E16DBC6124016 /* HomeView.swift */,
 				BAF6B36493681662021AFF9C /* PetCanvasView.swift */,
+				E4C7678F792B25B5FD646907 /* SettingsView.swift */,
 				9081C4182BF0A09B1C883C51 /* SplashView.swift */,
 			);
 			path = Views;
@@ -140,6 +146,7 @@
 			buildConfigurationList = B6050DF811F3E9505145E137 /* Build configuration list for PBXNativeTarget "PacePal" */;
 			buildPhases = (
 				1053C4278BC78BAF9DB618E3 /* Sources */,
+				51C71B3B92EF098FDF933563 /* Resources */,
 				1D505F84BF6EB39E672D19EA /* Frameworks */,
 			);
 			buildRules = (
@@ -161,11 +168,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1500;
-				TargetAttributes = {
-					01B2CF2B1350781F6978E222 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = E9416ECD8D99A6458A815BF5 /* Build configuration list for PBXProject "PacePal" */;
 			developmentRegion = en;
@@ -186,6 +188,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		51C71B3B92EF098FDF933563 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D451A9D7C346FFF6283200D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1053C4278BC78BAF9DB618E3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -203,6 +216,7 @@
 				0E0DFCCC0C6767F04E633C18 /* PetPalette.swift in Sources */,
 				BDEDC1F3537A8303D0AEABB3 /* PetTypes.swift in Sources */,
 				4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */,
+				754DE193A42D27D4282183CC /* SettingsView.swift in Sources */,
 				88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -281,6 +295,7 @@
 				CODE_SIGN_ENTITLEMENTS = PacePal/PacePal.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -302,6 +317,7 @@
 				CODE_SIGN_ENTITLEMENTS = PacePal/PacePal.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
 				INFOPLIST_FILE = PacePal/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

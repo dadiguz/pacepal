@@ -14,9 +14,11 @@ private enum DayState {
 struct HistoryView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
+    @Environment(\.dismiss) private var dismiss
 
     @State private var dailyKm: [Int: Double] = [:]   // dayIndex → km
     @State private var isLoading = false
+    @State private var selectedDayIndex: SelectedDay? = nil
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 5), count: 7)
     private let weekLabels = ["D", "L", "M", "M", "J", "V", "S"]
@@ -81,32 +83,59 @@ struct HistoryView: View {
         ZStack {
             Color(hex: "#FFF8F2").ignoresSafeArea()
 
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 28) {
-                    header
-                    gridSection
-                    statsSection
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 28) {
+                        header
+                        gridSection
+                        statsSection
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 64)
+                    .padding(.bottom, 48)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 64)
-                .padding(.bottom, 48)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation { proxy.scrollTo("today", anchor: .center) }
+                    }
+                }
             }
         }
         .task { await loadHistory() }
+        .sheet(item: $selectedDayIndex) { sel in
+            DayDetailView(
+                dayIndex: sel.index,
+                date: date(for: sel.index),
+                state: state(for: sel.index),
+                km: sel.index == todayIndex ? health.todayKm : (dailyKm[sel.index] ?? 0)
+            )
+            .presentationDetents([.fraction(0.35)])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     // MARK: – Header
 
     private var header: some View {
         VStack(spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Reto 66 Días")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Reto 66 Días")
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                    Text("Día \(min(todayIndex + 1, totalDays))/\(totalDays)")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                }
                 Spacer()
-                Text("Día \(min(todayIndex + 1, totalDays))/\(totalDays)")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .padding(10)
+                        .background(Color(hex: "#F0E8E0"))
+                        .clipShape(Circle())
+                }
             }
 
             // Progress bar
@@ -155,6 +184,8 @@ struct HistoryView: View {
                         todayKm: i == todayIndex ? health.todayKm : nil
                     )
                     .aspectRatio(1, contentMode: .fit)
+                    .id(i == todayIndex ? "today" : "day-\(i)")
+                    .onTapGesture { selectedDayIndex = SelectedDay(index: i) }
                 }
             }
         }
@@ -281,6 +312,93 @@ private struct DayCell: View {
         Image(systemName: "xmark")
             .font(.system(size: size * 0.34, weight: .semibold))
             .foregroundStyle(Color(hex: "#E07060"))
+    }
+}
+
+// MARK: – SelectedDay (Identifiable wrapper for sheet)
+
+private struct SelectedDay: Identifiable {
+    let index: Int
+    var id: Int { index }
+}
+
+// MARK: – DayDetailView
+
+private struct DayDetailView: View {
+    let dayIndex: Int
+    let date: Date
+    let state: DayState
+    let km: Double
+
+    private var dateLabel: String {
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "es_MX")
+        fmt.dateFormat = "EEEE d 'de' MMMM"
+        return fmt.string(from: date).capitalized
+    }
+
+    private var dayLabel: String { "Día \(dayIndex + 1)" }
+
+    var body: some View {
+        ZStack {
+            Color(hex: "#FFF8F2").ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Spacer().frame(height: 8)
+                // Day + date
+                VStack(spacing: 4) {
+                    Text(dayLabel)
+                        .font(.system(size: 22, weight: .black, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                    Text(dateLabel)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                }
+
+                // KM stat
+                HStack(spacing: 0) {
+                    VStack(spacing: 4) {
+                        HStack(alignment: .lastTextBaseline, spacing: 4) {
+                            Text(String(format: "%.2f", km))
+                                .font(.system(size: 36, weight: .black, design: .rounded))
+                                .foregroundStyle(stateColor)
+                            Text("km")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundStyle(stateColor.opacity(0.65))
+                                .padding(.bottom, 4)
+                        }
+                        Text(stateLabel)
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(stateColor)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.vertical, 20)
+                .background(stateColor.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .padding(.horizontal, 32)
+
+                Spacer()
+            }
+        }
+    }
+
+    private var stateColor: Color {
+        switch state {
+        case .completed: return Color(hex: "#F9703E")
+        case .missed:    return Color(hex: "#E12D39")
+        case .today:     return Color(hex: "#F9703E")
+        case .future:    return Color(hex: "#9AA5B4")
+        }
+    }
+
+    private var stateLabel: String {
+        switch state {
+        case .completed: return "Completado ✓"
+        case .missed:    return "Sin actividad"
+        case .today:     return km >= runThreshold ? "Completado ✓" : "En progreso"
+        case .future:    return "Próximamente"
+        }
     }
 }
 

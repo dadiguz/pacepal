@@ -82,14 +82,18 @@ struct CharacterSelectView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "shuffle")
-                            Text("Generate")
+                            Text("Generar")
                         }
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(Color(hex: "#EDF0F4"))
-                        .foregroundStyle(Color(hex: "#3E4C59"))
+                        .background(.white)
+                        .foregroundStyle(Color(hex: "#F9703E"))
                         .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .strokeBorder(Color(hex: "#F9703E"), lineWidth: 1.5)
+                        )
                     }
 
                     // Select
@@ -100,7 +104,7 @@ struct CharacterSelectView: View {
                             appState.selectedCharacter = selected
                         }
                     } label: {
-                        Text("Select")
+                        Text("Seleccionar")
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
@@ -117,11 +121,12 @@ struct CharacterSelectView: View {
 
     // MARK: – Header
     private var header: some View {
-        VStack(spacing: 4) {
-            Text("PacePal")
-                .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(Color(hex: "#1F2933"))
-            Text("Choose your running buddy")
+        VStack(spacing: 8) {
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 50)
+            Text("Elige tu compañero de carrera")
                 .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#9AA5B4"))
         }
