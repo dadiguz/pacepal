@@ -53,4 +53,24 @@ final class HealthManager {
         testKmOffset = 0
         realKm = 0
     }
+
+    /// Fetch km for a specific calendar day (async)
+    func fetchKm(for date: Date) async -> Double {
+        guard HKHealthStore.isHealthDataAvailable() else { return 0 }
+        let cal = Calendar.current
+        let start = cal.startOfDay(for: date)
+        guard let end = cal.date(byAdding: .day, value: 1, to: start) else { return 0 }
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end)
+        return await withCheckedContinuation { continuation in
+            let query = HKStatisticsQuery(
+                quantityType: distanceType,
+                quantitySamplePredicate: predicate,
+                options: .cumulativeSum
+            ) { _, result, _ in
+                let meters = result?.sumQuantity()?.doubleValue(for: .meter()) ?? 0
+                continuation.resume(returning: meters / 1000.0)
+            }
+            store.execute(query)
+        }
+    }
 }

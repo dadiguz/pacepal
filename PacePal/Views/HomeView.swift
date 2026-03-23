@@ -8,6 +8,7 @@ struct HomeView: View {
     @Query private var saved: [SavedCharacter]
 
     @State private var showResetConfirm = false
+    @State private var showHistory = false
     @State private var now: Date = Date()
 
     @State private var currentPose: PetPose = .idle
@@ -162,6 +163,20 @@ struct HomeView: View {
                     .foregroundStyle(Color(hex: "#B0A090"))
             }
             Spacer()
+            Button { showHistory = true } label: {
+                Image(systemName: "calendar")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Color(hex: "#A09080"))
+                    .padding(10)
+                    .background(Color(hex: "#F5ECE4"))
+                    .clipShape(Circle())
+            }
+            .sheet(isPresented: $showHistory) {
+                HistoryView()
+                    .environment(appState)
+                    .environment(health)
+            }
+
             Button { showResetConfirm = true } label: {
                 Image(systemName: "person.crop.circle")
                     .font(.system(size: 20, weight: .medium))

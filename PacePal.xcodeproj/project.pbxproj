@@ -13,6 +13,7 @@
 		22F7078482F7F38ACE247A3B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D5A75F746E634E6BCD06CA /* AppState.swift */; };
 		269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65341C429AB45D652AA38A5F /* PacePalApp.swift */; };
 		360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BA961F360AE4AF019E95A4 /* HealthManager.swift */; };
+		376F15783F24F6FD7F45082D /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54F07567F023274744522B8 /* HistoryView.swift */; };
 		4234DB5AFE91B5E020024678 /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FA94EBF2870AB75EC3F81F /* SavedCharacter.swift */; };
 		88A7178AFF6A2C793558CDBC /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9081C4182BF0A09B1C883C51 /* SplashView.swift */; };
 		91650CDFA5CCA1E29B13E074 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA663C5F1B3C352D42194FD /* PetDNA.swift */; };
@@ -38,6 +39,7 @@
 		CCEC04A3D82E8680A08B8BDE /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
 		E58890193F6371973206A045 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
 		E8BA961F360AE4AF019E95A4 /* HealthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthManager.swift; sourceTree = "<group>"; };
+		F54F07567F023274744522B8 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				0D964F26672B8DE14DF7FB85 /* CharacterSelectView.swift */,
+				F54F07567F023274744522B8 /* HistoryView.swift */,
 				CC042BB7D13E16DBC6124016 /* HomeView.swift */,
 				BAF6B36493681662021AFF9C /* PetCanvasView.swift */,
 				9081C4182BF0A09B1C883C51 /* SplashView.swift */,
@@ -191,6 +194,7 @@
 				22F7078482F7F38ACE247A3B /* AppState.swift in Sources */,
 				19FEFAD17305C8478035258B /* CharacterSelectView.swift in Sources */,
 				360DB3C1DE0363701F813CF5 /* HealthManager.swift in Sources */,
+				376F15783F24F6FD7F45082D /* HistoryView.swift in Sources */,
 				0CBE54890412CB1379286A4B /* HomeView.swift in Sources */,
 				269A955EAAD25370462C0457 /* PacePalApp.swift in Sources */,
 				C9270A8C0DC2EF58C4D9A21D /* PetCanvasView.swift in Sources */,

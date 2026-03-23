@@ -8,8 +8,12 @@ final class AppState {
     // Date when energy was last set to 100%
     private(set) var energyResetDate: Date
 
+    // Date when the 66-day challenge started
+    private(set) var challengeStartDate: Date
+
     init() {
         self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
+        self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
     }
 
     // 100% on reset → 0% after 48 hours
@@ -33,5 +37,7 @@ final class AppState {
     /// Call when a character is selected — starts at 60% to invite a first run
     func onCharacterSelected() {
         setEnergy(0.60)
+        challengeStartDate = Calendar.current.startOfDay(for: Date())
+        UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
     }
 }
