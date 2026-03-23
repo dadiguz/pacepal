@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var isAnimating = false
     @State private var displayedKm: Double = 0.0
     @State private var lastKnownKm: Double = 0.0
+    @State private var isInitialLoad = true
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -99,12 +100,20 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            displayedKm = health.todayKm
-            lastKnownKm = health.todayKm
+            isInitialLoad = true
             currentPose = normalPose
         }
         .onChange(of: health.todayKm) { _, newVal in
             guard energy > 0 else { return }
+
+            // First fetch after launch/appear: silently sync without animation or energy reset
+            if isInitialLoad {
+                displayedKm = newVal
+                lastKnownKm = newVal
+                isInitialLoad = false
+                return
+            }
+
             let delta = newVal - lastKnownKm
             guard delta > 0.01 else {
                 if newVal < lastKnownKm { lastKnownKm = newVal; displayedKm = newVal }
