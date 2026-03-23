@@ -92,22 +92,25 @@ struct HomeView: View {
 
                 Spacer(minLength: 16)
 
-                // ── KM counter or dead screen ────────────────────────────
-                if energy <= 0 {
-                    retrySection
-                } else {
-                    kmSection
-                        .background(GeometryReader { geo in
-                            Color.clear.preference(key: TutorialFrameKey.self,
-                                value: ["km": geo.frame(in: .global)])
-                        })
-                }
+                // ── KM counter ───────────────────────────────────────────
+                kmSection
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: TutorialFrameKey.self,
+                            value: ["km": geo.frame(in: .global)])
+                    })
 
                 Spacer(minLength: 24)
 
                 // ── Test buttons ─────────────────────────────────────────
                 testButtons
                     .padding(.bottom, 48)
+            }
+
+            // ── Game Over overlay ─────────────────────────────────────────
+            if energy <= 0 {
+                gameOverOverlay
+                    .transition(.opacity)
+                    .zIndex(5)
             }
 
             // ── Tutorial overlay ──────────────────────────────────────────
@@ -149,11 +152,21 @@ struct HomeView: View {
         .onChange(of: health.todayKm) { _, newVal in
             guard energy > 0 else { return }
 
-            // First fetch after launch/appear: silently sync without animation or energy reset
+            // First fetch after launch/appear
             if isInitialLoad {
-                displayedKm = newVal
-                lastKnownKm = newVal
                 isInitialLoad = false
+                if appState.isFirstRunForCharacter && newVal > 0.01 {
+                    // New character: animate existing km and add energy
+                    appState.isFirstRunForCharacter = false
+                    displayedKm = 0
+                    lastKnownKm = 0
+                    Task { @MainActor in await runKmAnimation(delta: newVal, newTotal: newVal) }
+                } else {
+                    // App relaunch: silently sync, energy was already counted
+                    appState.isFirstRunForCharacter = false
+                    displayedKm = newVal
+                    lastKnownKm = newVal
+                }
                 return
             }
 
@@ -210,7 +223,7 @@ struct HomeView: View {
         displayedKm = newTotal
         lastKnownKm = newTotal
         appState.addEnergy(km: delta); now = Date()
-        if delta > 1.0 {
+        if energy >= 0.99 {
             currentPose = .hype
             try? await Task.sleep(for: .seconds(1.6))
         } else if delta >= 0.3 {
@@ -331,6 +344,13 @@ struct HomeView: View {
                     }
                 }
         }
+        // Hide visually when dead (layout space is preserved)
+        .opacity(energy <= 0 ? 0 : 1)
+        // Capture frame for game over overlay positioning
+        .background(GeometryReader { geo in
+            Color.clear.preference(key: TutorialFrameKey.self,
+                value: ["pet": geo.frame(in: .global)])
+        })
     }
 
     // MARK: – KM section (no card)
@@ -371,31 +391,96 @@ struct HomeView: View {
         }
     }
 
-    // MARK: – Retry section (shown when dead)
-    private var retrySection: some View {
-        VStack(spacing: 12) {
-            Text("\(dna.name) se quedó sin energía...")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
-                .multilineTextAlignment(.center)
+    // MARK: – Game Over overlay
+    private var gameOverOverlay: some View {
+        let pf = tutorialFrames["pet"] ?? .zero
 
-            Button {
-                saved.forEach { modelContext.delete($0) }
-                health.resetKm()
-                withAnimation(.spring(duration: 0.4)) {
-                    appState.selectedCharacter = nil
+        return ZStack {
+            // Dark backdrop — blocks all taps
+            Color.black.opacity(0.90)
+                .ignoresSafeArea()
+                .contentShape(Rectangle())
+
+            if pf != .zero {
+                // Spotlight cone: top at safe area, bottom at pet frame
+                let coneHeight = max(60, pf.maxY - 52)
+                let coneCenterY = 52 + coneHeight / 2
+
+                SpotlightCone()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.55),
+                                Color(hex: "#A8C8FF").opacity(0.12),
+                                .clear
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 260, height: coneHeight)
+                    .position(x: pf.midX, y: coneCenterY)
+
+                // Diffused glow at the cone's top (light source)
+                Ellipse()
+                    .fill(Color.white.opacity(0.45))
+                    .frame(width: 48, height: 16)
+                    .blur(radius: 18)
+                    .position(x: pf.midX, y: 57)
+
+                // Halo on the ground where light lands
+                Ellipse()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color.white.opacity(0.18), .clear],
+                            center: .center, startRadius: 0, endRadius: 80
+                        )
+                    )
+                    .frame(width: 160, height: 40)
+                    .blur(radius: 8)
+                    .position(x: pf.midX, y: pf.midY + 44)
+
+                // Dead pet at exact petSection position
+                ZStack(alignment: .bottom) {
+                    PetAnimationView(dna: dna, pose: .dead, pixelSize: 11)
+                    // Floating shadow below canvas
+                    Ellipse()
+                        .fill(Color.black.opacity(0.65))
+                        .frame(width: 76, height: 10)
+                        .blur(radius: 10)
+                        .offset(y: 18)
                 }
-            } label: {
-                Text("Volver a intentarlo")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(Color(hex: "#F9703E"))
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                .position(x: pf.midX, y: pf.midY - 26)
             }
-            .padding(.horizontal, 40)
+
+            // Message + button pinned to bottom
+            VStack(spacing: 0) {
+                Spacer()
+                Text("\(dna.name) se quedó sin energía...")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.80))
+                Spacer().frame(height: 32)
+                Button {
+                    saved.forEach { modelContext.delete($0) }
+                    health.resetKm()
+                    withAnimation(.spring(duration: 0.4)) {
+                        appState.selectedCharacter = nil
+                    }
+                } label: {
+                    Text("Volver a intentarlo")
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(Color(hex: "#F9703E"))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.45), radius: 16, y: 6)
+                }
+                .padding(.horizontal, 40)
+                .padding(.bottom, 52)
+            }
         }
+        .animation(.easeInOut(duration: 0.5), value: energy <= 0)
     }
 
     // MARK: – Test buttons
@@ -437,6 +522,20 @@ struct HomeView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
+    }
+}
+
+// MARK: - Spotlight cone shape (trapezoid: narrow top, wide bottom)
+private struct SpotlightCone: Shape {
+    func path(in rect: CGRect) -> Path {
+        let topInset = rect.width * 0.42
+        var p = Path()
+        p.move(to:    CGPoint(x: rect.minX + topInset,     y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX - topInset,     y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX,                y: rect.maxY))
+        p.addLine(to: CGPoint(x: rect.minX,                y: rect.maxY))
+        p.closeSubpath()
+        return p
     }
 }
 

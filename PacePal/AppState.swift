@@ -67,9 +67,14 @@ final class AppState {
     }
 
     /// Call when a character is selected — starts at 60% to invite a first run
+    /// Set to true when a brand-new character is chosen so HomeView
+    /// knows to count today's existing km as fresh energy (not suppress them).
+    var isFirstRunForCharacter = false
+
     func onCharacterSelected() {
         setEnergy(0.60)
         challengeStartDate = Calendar.current.startOfDay(for: Date())
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
+        isFirstRunForCharacter = true
     }
 }
