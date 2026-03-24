@@ -10,6 +10,10 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showResetConfirm = false
 
+    #if DEBUG
+    @State private var debugNow: Date = Date()
+    #endif
+
     var onShowTutorial: (() -> Void)? = nil
 
     var body: some View {
@@ -60,6 +64,12 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
+                #if DEBUG
+                testingSection
+                    .padding(.horizontal, 24)
+                    .padding(.top, 24)
+                #endif
+
                 Spacer()
             }
         }
@@ -77,6 +87,54 @@ struct SettingsView: View {
             Text("Se borrará tu progreso y podrás elegir un nuevo compañero.")
         }
     }
+
+    #if DEBUG
+    private var testingSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Testing")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .tracking(1.2)
+                .foregroundStyle(Color(hex: "#9AA5B4"))
+
+            HStack(spacing: 6) {
+                ForEach([
+                    ("100%", 1.00),
+                    ("96%",  0.96),
+                    ("92%",  0.92),
+                    ("70%",  0.70),
+                    ("25%",  0.25),
+                    ("0%",   0.00),
+                ], id: \.0) { label, value in
+                    Button {
+                        appState.setEnergy(value)
+                        debugNow = Date()
+                    } label: {
+                        Text(label)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(Color(hex: "#F5ECE4"))
+                            .foregroundStyle(Color(hex: "#8A7060"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+
+            Button { health.addTestKm() } label: {
+                HStack {
+                    Spacer()
+                    Text("➕ 1 km")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#8A7060"))
+                    Spacer()
+                }
+                .padding(.vertical, 8)
+                .background(Color(hex: "#F5ECE4"))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+    #endif
 
     private func settingsRow(
         icon: String,

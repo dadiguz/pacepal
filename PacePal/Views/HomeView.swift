@@ -20,6 +20,8 @@ struct HomeView: View {
     @State private var displayedKm: Double = 0.0
     @State private var lastKnownKm: Double = 0.0
     @State private var isInitialLoad = true
+    @State private var phraseIndex: Int = Int.random(in: 0..<RunningPhrase.all.count)
+    @State private var showPetStatus = false
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -50,6 +52,7 @@ struct HomeView: View {
         case .happy: return "\(dna.name) está feliz, ¡sigamos!"
         case .jump:  return "\(dna.name) tiene energía, ¿corremos?"
         case .idle:  return "\(dna.name) está listo para correr"
+        case .angry: return "Está exigiendo que corras"
         case .sad:   return "La energía se acaba... ¡sal a correr!"
         case .dead:  return "\(dna.name) está exhausto... ¡ve a correr!"
         default:     return "\(dna.name) está listo"
@@ -62,6 +65,7 @@ struct HomeView: View {
         if energy > 0.95  { return .happy }
         if energy > 0.90  { return .jump  }
         if energy > 0.50  { return .idle  }
+        if energy > 0.25  { return .angry }
         return .sad
     }
 
@@ -85,7 +89,14 @@ struct HomeView: View {
                             value: ["energy": geo.frame(in: .global)])
                     })
 
-                Spacer(minLength: 28)
+                Spacer(minLength: 16)
+
+                // ── Running phrase ────────────────────────────────────────
+                phraseSection
+                    .padding(.horizontal, 28)
+                    .animation(.spring(duration: 0.45), value: phraseIndex)
+
+                Spacer(minLength: 4)
 
                 // ── Pet ──────────────────────────────────────────────────
                 petSection
@@ -99,11 +110,34 @@ struct HomeView: View {
                             value: ["km": geo.frame(in: .global)])
                     })
 
-                Spacer(minLength: 24)
+                // ── Pet status pill ───────────────────────────────────────
+                Button { showPetStatus = true } label: {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(energyColor)
+                            .frame(width: 7, height: 7)
+                        Text(moodText)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#B0A090"))
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#C8BAB0"))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#F5ECE4"))
+                    .clipShape(Capsule())
+                }
+                .padding(.top, 10)
+                .animation(.easeInOut(duration: 0.3), value: moodText)
 
-                // ── Test buttons ─────────────────────────────────────────
-                testButtons
-                    .padding(.bottom, 48)
+                Spacer(minLength: 24)
+            }
+            .sheet(isPresented: $showPetStatus) {
+                PetStatusSheet(dna: dna, moodText: moodText, energyColor: energyColor)
+                    .presentationDetents([.fraction(0.40)])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(Color(hex: "#FFF8F2"))
             }
 
             // ── Game Over overlay ─────────────────────────────────────────
@@ -177,6 +211,10 @@ struct HomeView: View {
             }
             guard !isAnimating else { return }
             Task { @MainActor in await runKmAnimation(delta: delta, newTotal: newVal) }
+        }
+        .onChange(of: appState.energyResetDate) { _, _ in
+            now = Date()
+            if !isAnimating { currentPose = normalPose }
         }
         .onReceive(
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -353,12 +391,40 @@ struct HomeView: View {
         })
     }
 
+    // MARK: – Phrase section
+    private var phraseSection: some View {
+        Text(RunningPhrase.all[phraseIndex].es)
+            .font(.system(size: 22, weight: .medium, design: .rounded))
+            .foregroundStyle(Color(hex: "#B0A090"))
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .onTapGesture {
+                UIPasteboard.general.string = RunningPhrase.all[phraseIndex].es
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 16)
+            .id(phraseIndex)
+            .transition(.asymmetric(
+                insertion: .opacity.combined(with: .offset(y: 10)),
+                removal:   .opacity.combined(with: .offset(y: -6))
+            ))
+    }
+
     // MARK: – KM section (no card)
     private var kmSection: some View {
-        VStack(spacing: 10) {
+        HStack(alignment: .center, spacing: 8) {
+            Button { health.fetchToday() } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#F9703E"))
+                    .frame(width: 34, height: 34)
+                    .background(Color(hex: "#F5ECE4"))
+                    .clipShape(Circle())
+            }
+
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(String(format: "%.1f", displayedKm))
-                    .font(.system(size: 52, weight: .black, design: .rounded))
+                    .font(.system(size: 56, weight: .black, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
                     .contentTransition(.numericText())
                     .animation(.spring(duration: 0.3), value: displayedKm)
@@ -366,27 +432,6 @@ struct HomeView: View {
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E").opacity(0.65))
                     .padding(.bottom, 6)
-            }
-            Text(moodText)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#B0A090"))
-                .multilineTextAlignment(.center)
-                .animation(.easeInOut(duration: 0.4), value: energy)
-
-            Button {
-                health.fetchToday()
-            } label: {
-                HStack(spacing: 5) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text("Sincronizar")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                }
-                .foregroundStyle(Color(hex: "#A09080"))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(Color(hex: "#F5ECE4"))
-                .clipShape(Capsule())
             }
         }
     }
@@ -483,46 +528,6 @@ struct HomeView: View {
         .animation(.easeInOut(duration: 0.5), value: energy <= 0)
     }
 
-    // MARK: – Test buttons
-    private var testButtons: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 6) {
-                ForEach([
-                    ("100%", 1.00),
-                    ("96%",  0.96),
-                    ("92%",  0.92),
-                    ("70%",  0.70),
-                    ("25%",  0.25),
-                    ("0%",   0.00),
-                ], id: \.0) { label, value in
-                    Button {
-                        appState.setEnergy(value)
-                        now = Date()
-                        if !isAnimating { currentPose = normalPose }
-                    } label: {
-                        Text(label)
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 7)
-                            .background(Color(hex: "#F5ECE4"))
-                            .foregroundStyle(Color(hex: "#8A7060"))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-            }
-            .padding(.horizontal, 24)
-
-            Button { health.addTestKm() } label: {
-                Text("➕ 1 km")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 7)
-                    .background(Color(hex: "#F5ECE4"))
-                    .foregroundStyle(Color(hex: "#8A7060"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-        }
-    }
 }
 
 // MARK: - Spotlight cone shape (trapezoid: narrow top, wide bottom)
@@ -536,6 +541,64 @@ private struct SpotlightCone: Shape {
         p.addLine(to: CGPoint(x: rect.minX,                y: rect.maxY))
         p.closeSubpath()
         return p
+    }
+}
+
+// MARK: - Pet Status Sheet
+
+private struct PetStatusSheet: View {
+    let dna: PetDNA
+    let moodText: String
+    let energyColor: Color
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 20)
+
+            // Pet name + status
+            VStack(spacing: 6) {
+                Text(dna.name)
+                    .font(.system(size: 22, weight: .black, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(energyColor)
+                        .frame(width: 8, height: 8)
+                    Text(moodText)
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                }
+            }
+
+            Spacer().frame(height: 32)
+
+            // Placeholder for future run stats
+            HStack(spacing: 0) {
+                statCell(value: "—", label: "Carreras")
+                Divider().frame(height: 32)
+                statCell(value: "—", label: "km totales")
+                Divider().frame(height: 32)
+                statCell(value: "—", label: "Mejor racha")
+            }
+            .padding(.vertical, 16)
+            .background(Color(hex: "#FFF0E8"))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.horizontal, 24)
+
+            Spacer()
+        }
+    }
+
+    private func statCell(value: String, label: String) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(size: 22, weight: .black, design: .rounded))
+                .foregroundStyle(Color(hex: "#C8BAB0"))
+            Text(label)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

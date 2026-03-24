@@ -45,9 +45,8 @@ struct HistoryView: View {
     private var projectedFinish: String {
         let remaining = totalDays - completedCount
         guard remaining > 0 else { return "¡Reto completado!" }
-        let rate = completedCount > 0 ? Double(todayIndex) / Double(completedCount) : 2.0
-        let daysNeeded = Int((Double(remaining) * rate).rounded(.up))
-        if let finish = Calendar.current.date(byAdding: .day, value: daysNeeded, to: Date()) {
+        let today = Calendar.current.startOfDay(for: Date())
+        if let finish = Calendar.current.date(byAdding: .day, value: remaining, to: today) {
             let fmt = DateFormatter()
             fmt.locale = Locale(identifier: "es_MX")
             fmt.dateFormat = "d 'de' MMMM"

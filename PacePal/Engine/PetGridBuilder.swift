@@ -157,6 +157,15 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             } else {
                 pset(&g, x: rX, y: aY+droop, cell: .body); pset(&g, x: rX, y: aY+droop+1, cell: .body)
             }
+        case .angry:
+            let hi = frame % 2 == 0
+            // Left arm: tense at side, alternates puff
+            pset(&g, x: hi ? lX : lX-1, y: aY-1, cell: .body)
+            pset(&g, x: hi ? lX : lX-1, y: aY,   cell: .body)
+            // Right arm: raised to hold sign
+            let rArmTop = hi ? aY-3 : aY-2
+            pset(&g, x: hi ? rX : rX+1, y: rArmTop,   cell: .body)
+            pset(&g, x: hi ? rX : rX+1, y: rArmTop+1, cell: .body)
         case .running:
             switch frame {
             case 0: // left arm far back/low, right arm far forward/high
@@ -361,6 +370,12 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         if frame == 3 {
             pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,cell:.eyePupil)
         }
+    case .angry:
+        // Slanted inward: outer corner high, inner corner low → angry V-brow feel
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX,  y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
     case .hurt:
         if frame < 2 {
             pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
@@ -409,6 +424,10 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:fCx,  y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY,cell:.mouth)
     case .sad:
         pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+    case .angry:
+        // Flat gritted line
+        pset(&g,x:fCx-2,y:mY,cell:.mouth); pset(&g,x:fCx-1,y:mY,cell:.mouth)
+        pset(&g,x:fCx,  y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
     case .dead: break
     case .hurt:
         pset(&g,x:fCx-2,y:mY+1,cell:.mouth); pset(&g,x:fCx-1,y:mY,cell:.mouth)
@@ -538,6 +557,50 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         let tearY = eyeYI + 1 + (frame % 2) * 2
         pset(&g,x:tearX,y:tearY,  cell:.tear)
         pset(&g,x:tearX,y:tearY+1,cell:.tear)
+    }
+
+    // ── Angry sign + vein ────────────────────────────────────────────────────────
+    if pose == .angry {
+        let hi = frame % 2 == 0
+        let stickX = hi ? rX : rX + 1
+        let punchY = hi ? aY - 3 : aY - 2
+
+        // Stick (3 cells up from punch point)
+        for dy in 1...3 { pset(&g, x: stickX, y: punchY - dy, cell: .body) }
+
+        // Sign frame
+        let sX1 = max(0, stickX - 2)
+        let sX2 = min(GRID_SIZE - 1, stickX + 2)
+        let sY2 = punchY - 4
+        let sY1 = max(0, sY2 - 3)
+
+        // Border
+        for x in sX1...sX2 {
+            pset(&g, x: x, y: sY1, cell: .outline)
+            pset(&g, x: x, y: sY2, cell: .outline)
+        }
+        for y in sY1...sY2 {
+            pset(&g, x: sX1, y: y, cell: .outline)
+            pset(&g, x: sX2, y: y, cell: .outline)
+        }
+
+        // Fill interior
+        if sX1 + 1 <= sX2 - 1 && sY1 + 1 <= sY2 - 1 {
+            for y in (sY1 + 1)...(sY2 - 1) {
+                for x in (sX1 + 1)...(sX2 - 1) { pset(&g, x: x, y: y, cell: .face) }
+            }
+        }
+
+        // "!" — alternates color between eyePupil and accent1
+        let bangColor: PetCell = hi ? .eyePupil : .accent1
+        pset(&g, x: stickX, y: sY1 + 1, cell: bangColor)
+        pset(&g, x: stickX, y: sY2 - 1, cell: bangColor)
+
+        // Anger vein on left temple (Z-shape)
+        let vx = eyeLX - 2, vy = eyeYI - 4
+        pset(&g, x: vx,   y: vy,   cell: .speedLine)
+        pset(&g, x: vx+1, y: vy+1, cell: .speedLine)
+        pset(&g, x: vx,   y: vy+2, cell: .speedLine)
     }
 
     // ── Dead: halo + fly ─────────────────────────────────────────────────────────

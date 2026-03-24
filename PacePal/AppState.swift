@@ -50,10 +50,10 @@ final class AppState {
         UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
     }
 
-    /// 1 km = 30% energy, capped at 100%.
+    /// 1 km = 10% energy, capped at 100%.
     func addEnergy(km: Double, at date: Date = Date()) {
         let current   = energy(at: date)
-        let target    = min(1.0, current + km * 0.30)
+        let target    = min(1.0, current + km * 0.10)
         let newElapsed = (1.0 - target) * 36 * 3600
         energyResetDate = date.addingTimeInterval(-newElapsed)
         UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
