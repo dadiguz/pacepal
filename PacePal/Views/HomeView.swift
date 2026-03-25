@@ -112,21 +112,22 @@ struct HomeView: View {
 
                 // ── Pet status pill ───────────────────────────────────────
                 Button { showPetStatus = true } label: {
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(energyColor)
-                            .frame(width: 7, height: 7)
+                    HStack(spacing: 7) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(energyColor)
                         Text(moodText)
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                            .foregroundStyle(Color(hex: "#B0A090"))
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#4A3F35"))
                         Image(systemName: "chevron.up")
                             .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(Color(hex: "#C8BAB0"))
+                            .foregroundStyle(Color(hex: "#4A3F35").opacity(0.4))
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: "#F5ECE4"))
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .background(energyColor.opacity(0.13))
                     .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(energyColor.opacity(0.35), lineWidth: 1))
                 }
                 .padding(.top, 10)
                 .animation(.easeInOut(duration: 0.3), value: moodText)
@@ -278,14 +279,21 @@ struct HomeView: View {
     // MARK: – Top bar
     private var topBar: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Image("Logo")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 44)
-                Text("Día 1 / 66")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#B0A090"))
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(energyColor)
+                        .frame(width: 6, height: 6)
+                        .shadow(color: energyColor.opacity(0.8), radius: 4)
+                        .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: energy)
+                    Text("Día 1 / 66")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#B0A090"))
+                }
             }
             Spacer()
             Button { showHistory = true } label: {
@@ -397,8 +405,8 @@ struct HomeView: View {
     // MARK: – Phrase section
     private var phraseSection: some View {
         Text(RunningPhrase.all[phraseIndex].es)
-            .font(.system(size: 22, weight: .medium, design: .rounded))
-            .foregroundStyle(Color(hex: "#B0A090"))
+            .font(.system(size: 16, weight: .regular, design: .rounded))
+            .foregroundStyle(Color(hex: "#B0A090").opacity(0.75))
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .onTapGesture {
