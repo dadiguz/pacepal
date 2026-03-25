@@ -544,6 +544,7 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         case 2: pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
         default: pset(&g,x:fCx,y:mY,cell:.mouth)
         }
+    } // end switch pose
     } // end else (non-Domo mouth)
 
     // ── Cheeks ───────────────────────────────────────────────────────────────────
