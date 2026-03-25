@@ -189,15 +189,16 @@ struct HomeView: View {
             // First fetch after launch/appear
             if isInitialLoad {
                 isInitialLoad = false
-                if appState.isFirstRunForCharacter && newVal > 0.01 {
-                    // New character: animate existing km and add energy
-                    appState.isFirstRunForCharacter = false
-                    displayedKm = 0
-                    lastKnownKm = 0
-                    Task { @MainActor in await runKmAnimation(delta: newVal, newTotal: newVal) }
+                appState.isFirstRunForCharacter = false
+                let alreadyCounted = appState.kmCountedForEnergy
+                let delta = newVal - alreadyCounted
+                if delta > 0.01 {
+                    // Uncounted km (new character or ran while app was closed): animate + add energy
+                    displayedKm = alreadyCounted
+                    lastKnownKm = alreadyCounted
+                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: newVal) }
                 } else {
-                    // App relaunch: silently sync, energy was already counted
-                    appState.isFirstRunForCharacter = false
+                    // All km already counted in a previous session
                     displayedKm = newVal
                     lastKnownKm = newVal
                 }
@@ -260,7 +261,9 @@ struct HomeView: View {
         }
         displayedKm = newTotal
         lastKnownKm = newTotal
-        appState.addEnergy(km: delta); now = Date()
+        appState.addEnergy(km: delta)
+        appState.recordKmCounted(newTotal)
+        now = Date()
         if energy >= 0.99 {
             currentPose = .hype
             try? await Task.sleep(for: .seconds(1.6))

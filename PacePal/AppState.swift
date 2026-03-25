@@ -8,6 +8,9 @@ final class AppState {
     // Date when energy was last set to 100%
     private(set) var energyResetDate: Date
 
+    // Km already credited to energy for the current character (persisted across launches)
+    private(set) var kmCountedForEnergy: Double
+
     // Date when the 66-day challenge started
     private(set) var challengeStartDate: Date
 
@@ -18,6 +21,7 @@ final class AppState {
 
     init() {
         self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
+        self.kmCountedForEnergy = UserDefaults.standard.double(forKey: "kmCountedForEnergy")
         self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
@@ -71,10 +75,17 @@ final class AppState {
     /// knows to count today's existing km as fresh energy (not suppress them).
     var isFirstRunForCharacter = false
 
+    func recordKmCounted(_ km: Double) {
+        kmCountedForEnergy = km
+        UserDefaults.standard.set(km, forKey: "kmCountedForEnergy")
+    }
+
     func onCharacterSelected() {
         setEnergy(0.60)
         challengeStartDate = Calendar.current.startOfDay(for: Date())
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
+        kmCountedForEnergy = 0
+        UserDefaults.standard.set(0.0, forKey: "kmCountedForEnergy")
         isFirstRunForCharacter = true
     }
 }
