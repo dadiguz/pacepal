@@ -81,11 +81,13 @@ struct PetDNA: Identifiable, Codable {
 
         let animalType: PetAnimalType
         if earTopY >= 5 {
-            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .raccoon, .raccoon, .mouse, .axolotl, .smooth])
+            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .raccoon, .raccoon, .mouse, .axolotl, .smooth,
+                               .capuchin, .fox, .lion, .domo, .pou])
         } else if earTopY >= 3 {
-            animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .duck, .axolotl, .smooth])
+            animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .duck, .axolotl, .smooth,
+                               .capuchin, .mandrill, .fox, .lion, .domo, .pou])
         } else {
-            animalType = pick([.frog, .frog, .raccoon, .duck, .smooth])
+            animalType = pick([.frog, .frog, .raccoon, .duck, .smooth, .mandrill])
         }
 
         let earSp     = (bodyRx * 0.5).rounded()
@@ -95,13 +97,20 @@ struct PetDNA: Identifiable, Codable {
         let armStyle   = rndInt(0, 2)
         let eyeSp      = Double(rndInt(3, 4))
         let eyeStyle   = rndInt(0, 3)
-        let hasMuzzle  = animalType != .frog && animalType != .axolotl && animalType != .raccoon && chance(0.6)
+        let hasMuzzle: Bool
+        if animalType == .mandrill || animalType == .fox || animalType == .lion {
+            hasMuzzle = true
+        } else if animalType == .domo || animalType == .pou || animalType == .frog || animalType == .axolotl || animalType == .raccoon {
+            hasMuzzle = false
+        } else {
+            hasMuzzle = chance(0.6)
+        }
         let mouthStyle = rndInt(0, 3)
-        let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && chance(0.4)
-        let hasCheeks  = chance(0.6)
+        let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && animalType != .domo && animalType != .pou && chance(0.4)
+        let hasCheeks  = animalType != .domo && chance(0.6)
         let hasMarking = chance(0.3)
         let markingStyle = rndInt(0, 1)
-        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .raccoon && animalType != .axolotl
+        let hasBow     = chance(0.2) && earTopY >= 4 && animalType != .raccoon && animalType != .axolotl && animalType != .domo && animalType != .pou
         let hasTail    = chance(0.2)
         let tailOffset = rndInt(0, 3)
 
