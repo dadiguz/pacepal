@@ -38,7 +38,7 @@ struct HomeView: View {
     }
 
     private var energyTimeLabel: String {
-        let minutes = Int(36.0 * 60.0 * energy)
+        let minutes = Int(appState.decaySeconds / 60.0 * energy)
         guard minutes > 0 else { return "Sin energía" }
         let h = minutes / 60
         let m = minutes % 60

@@ -52,6 +52,40 @@ struct SettingsView: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 16))
 
+                    // ── Difficulty row ───────────────────────────────────
+                    let bindable = Bindable(appState)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 14) {
+                            Image(systemName: "dial.medium")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 34, height: 34)
+                                .background(Color(hex: "#9B59B6"))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Dificultad")
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(Color(hex: "#1F2933"))
+                                Text(appState.difficulty.subtitle)
+                                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                                    .animation(.easeInOut(duration: 0.2), value: appState.difficulty)
+                            }
+                        }
+
+                        Picker("", selection: bindable.difficulty) {
+                            ForEach(Difficulty.allCases, id: \.self) { d in
+                                Text(d.label).tag(d)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "#FFF0E8"))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
                         iconColor: "#E12D39",
