@@ -63,15 +63,15 @@ func colorForCell(_ cell: PetCell, gx: Int, gy: Int, dna: PetDNA) -> Color? {
         let dy = (Double(gy) - dna.bodyCy) / max(1, dna.bodyRy)
         let light = dx - dy
         let ck = (gx + gy) % 2
-        let F0 = tone(r, g, b,  28)
-        let F1 = tone(r, g, b,   0)
-        let F2 = tone(r, g, b, -22)
+        let F0 = tone(r, g, b, -15)
+        let F1 = tone(r, g, b, -40)
+        let F2 = tone(r, g, b, -60)
         if      light >  0.25 { return ck == 0 ? F0 : F1 }
         else if light > -0.10 { return F1 }
         else                  { return ck == 0 ? F1 : F2 }
 
     case .eyePupil:  return Color(hex: palette.eyeP)
-    case .eyeShine:  return .white
+    case .eyeShine:  return Color(.sRGB, red: 0.88, green: 0.93, blue: 1.0)
     case .mouth:     return Color(hex: palette.eyeP)
     case .cheek:     return Color(hex: palette.cheek)
     case .shade:     return Color(hex: palette.shade)

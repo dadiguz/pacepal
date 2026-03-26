@@ -81,11 +81,11 @@ struct PetDNA: Identifiable, Codable {
 
         let animalType: PetAnimalType
         if earTopY >= 5 {
-            animalType = pick([.bunny, .bunny, .cat, .cat, .bear, .bear, .raccoon, .raccoon, .mouse, .axolotl, .smooth,
-                               .capuchin, .fox, .lion, .domo, .pou])
+            animalType = pick([.cat, .cat, .bear, .bear, .raccoon, .raccoon, .mouse, .axolotl, .smooth,
+                               .capuchin, .fox, .lion, .domo, .pou, .dog, .tiger, .panda])
         } else if earTopY >= 3 {
             animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .duck, .axolotl, .smooth,
-                               .capuchin, .mandrill, .fox, .lion, .domo, .pou])
+                               .capuchin, .mandrill, .fox, .lion, .domo, .pou, .dog, .tiger, .panda])
         } else {
             animalType = pick([.frog, .frog, .raccoon, .duck, .smooth, .mandrill])
         }
@@ -98,15 +98,15 @@ struct PetDNA: Identifiable, Codable {
         let eyeSp      = Double(rndInt(3, 4))
         let eyeStyle   = rndInt(0, 3)
         let hasMuzzle: Bool
-        if animalType == .mandrill || animalType == .fox || animalType == .lion {
+        if animalType == .mandrill || animalType == .fox || animalType == .lion || animalType == .dog || animalType == .tiger {
             hasMuzzle = true
-        } else if animalType == .domo || animalType == .pou || animalType == .frog || animalType == .axolotl || animalType == .raccoon {
+        } else if animalType == .domo || animalType == .pou || animalType == .frog || animalType == .axolotl || animalType == .raccoon || animalType == .panda {
             hasMuzzle = false
         } else {
             hasMuzzle = chance(0.6)
         }
         let mouthStyle = rndInt(0, 3)
-        let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && animalType != .domo && animalType != .pou && chance(0.4)
+        let hasNose    = !hasMuzzle && animalType != .frog && animalType != .axolotl && animalType != .domo && animalType != .pou && animalType != .panda && chance(0.4)
         let hasCheeks  = animalType != .domo && chance(0.6)
         let hasMarking = chance(0.3)
         let markingStyle = rndInt(0, 1)

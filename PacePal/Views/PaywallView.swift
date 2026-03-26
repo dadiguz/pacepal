@@ -3,9 +3,22 @@ import SwiftUI
 struct PaywallView: View {
     @Environment(AppState.self) private var appState
 
-    private let displayDNA = PetDNA.presets()[1]
     @State private var appeared = false
     @State private var glowPulse = false
+    @State private var featurePage = 0
+
+    private let features: [(icon: String, color: String, title: String, desc: String)] = [
+        ("figure.run",  "#F9703E", "Reto de 66 días",   "El tiempo justo para convertirlo en hábito"),
+        ("heart.fill",  "#E12D39", "Apple Health",       "Tus km se sincronizan solos"),
+        ("flame.fill",  "#DE911D", "Rachas y progreso",  "Cada día del reto en tu historial"),
+    ]
+
+    // Always use the real chosen pet if available
+    private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
+    private var petName: String? {
+        guard let name = appState.selectedCharacter?.name, !name.isEmpty else { return nil }
+        return name
+    }
 
     var body: some View {
         ZStack {
@@ -24,19 +37,19 @@ struct PaywallView: View {
 
                     // Pet
                     petStage
-                        .padding(.top, 4)
+                        .padding(.top, 52)
 
                     // Headline
                     headlineText
-                        .padding(.top, 20)
+                        .padding(.top, 32)
                         .padding(.horizontal, 32)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
                         .animation(.spring(duration: 0.45).delay(0.2), value: appeared)
 
-                    // Feature rows
+                    // Feature carousel
                     featureList
-                        .padding(.top, 16)
+                        .padding(.top, 28)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 8)
                         .animation(.spring(duration: 0.45).delay(0.28), value: appeared)
@@ -44,7 +57,7 @@ struct PaywallView: View {
                     // Price card
                     priceCard
                         .padding(.horizontal, 24)
-                        .padding(.top, 20)
+                        .padding(.top, 28)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
                         .animation(.spring(duration: 0.45).delay(0.35), value: appeared)
@@ -52,7 +65,7 @@ struct PaywallView: View {
                     // CTA
                     ctaButton
                         .padding(.horizontal, 24)
-                        .padding(.top, 14)
+                        .padding(.top, 20)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
                         .animation(.spring(duration: 0.45).delay(0.42), value: appeared)
@@ -65,8 +78,8 @@ struct PaywallView: View {
                     }
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
-                    .padding(.top, 12)
-                    .padding(.bottom, 36)
+                    .padding(.top, 16)
+                    .padding(.bottom, 48)
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.3).delay(0.5), value: appeared)
                 }
@@ -114,18 +127,33 @@ struct PaywallView: View {
 
     private var headlineText: some View {
         VStack(spacing: 6) {
-            (
-                Text("Empieza tu ")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("prueba gratis")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#F9703E"))
-                + Text(" hoy mismo.")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-            )
-            .multilineTextAlignment(.center)
+            if let name = petName {
+                (
+                    Text("Mantén a ")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                    + Text(name)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                    + Text(" con vida.")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                )
+                .multilineTextAlignment(.center)
+            } else {
+                (
+                    Text("Empieza tu ")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                    + Text("prueba gratis")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                    + Text(" hoy mismo.")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                )
+                .multilineTextAlignment(.center)
+            }
 
             HStack(spacing: 6) {
                 Label("7 días gratis", systemImage: "checkmark.seal.fill")
@@ -140,46 +168,66 @@ struct PaywallView: View {
         }
     }
 
-    // MARK: - Feature list
+    // MARK: - Feature carousel
 
     private var featureList: some View {
-        VStack(spacing: 8) {
-            featureRow(icon: "figure.run",  iconColor: "#F9703E",
-                       title: "Reto de 66 días",
-                       desc:  "El tiempo justo para convertirlo en hábito")
-            featureRow(icon: "heart.fill",  iconColor: "#E12D39",
-                       title: "Apple Health",
-                       desc:  "Tus km se sincronizan solos")
-            featureRow(icon: "flame.fill",  iconColor: "#DE911D",
-                       title: "Rachas y progreso",
-                       desc:  "Cada día del reto en tu historial")
+        VStack(spacing: 10) {
+            TabView(selection: $featurePage) {
+                ForEach(features.indices, id: \.self) { i in
+                    featureCard(features[i])
+                        .tag(i)
+                        .padding(.horizontal, 24)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 88)
+
+            // Dots
+            HStack(spacing: 6) {
+                ForEach(features.indices, id: \.self) { i in
+                    Capsule()
+                        .fill(i == featurePage ? Color(hex: "#F9703E") : Color(hex: "#CBD2D9"))
+                        .frame(width: i == featurePage ? 16 : 5, height: 5)
+                        .animation(.spring(duration: 0.3), value: featurePage)
+                }
+            }
         }
-        .padding(.horizontal, 24)
+        .onAppear {
+            // Auto-advance every 2.5s
+            Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
+                withAnimation(.spring(duration: 0.4)) {
+                    featurePage = (featurePage + 1) % features.count
+                }
+            }
+        }
     }
 
-    private func featureRow(icon: String, iconColor: String, title: String, desc: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
+    private func featureCard(_ f: (icon: String, color: String, title: String, desc: String)) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: f.icon)
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 32, height: 32)
-                .background(Color(hex: iconColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .frame(width: 52, height: 52)
+                .background(Color(hex: f.color))
+                .clipShape(RoundedRectangle(cornerRadius: 14))
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(f.title)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                Text(desc)
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                Text(f.desc)
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
             Spacer()
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(Color(hex: "#FFF0E8"))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+        .shadow(color: .black.opacity(0.03), radius: 8, y: 3)
     }
 
     // MARK: - Price card
@@ -197,7 +245,8 @@ struct PaywallView: View {
         .frame(height: 82)
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 10, y: 4)
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+        .shadow(color: .black.opacity(0.04), radius: 10, y: 4)
     }
 
     private func pricePill(top: String, main: String, sub: String, highlighted: Bool) -> some View {
@@ -231,10 +280,8 @@ struct PaywallView: View {
                 .background(Color(hex: "#F9703E"))
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
-                // Glow interior
                 .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.70 : 0.20),
                         radius: glowPulse ? 20 : 8, y: 4)
-                // Glow exterior difuso
                 .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.35 : 0.05),
                         radius: glowPulse ? 38 : 14, y: 8)
         }
@@ -244,5 +291,9 @@ struct PaywallView: View {
 
 #Preview {
     PaywallView()
-        .environment(AppState())
+        .environment({
+            let s = AppState()
+            s.selectedCharacter = PetDNA.presets()[0]
+            return s
+        }())
 }

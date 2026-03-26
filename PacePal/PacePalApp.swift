@@ -45,6 +45,12 @@ struct RootView: View {
             if !appState.onboardingCompleted {
                 OnboardingView()
                     .transition(.opacity)
+            } else if appState.selectedCharacter == nil {
+                CharacterSelectView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
             } else if !appState.paywallDismissed {
                 PaywallView()
                     .transition(.asymmetric(
@@ -57,21 +63,16 @@ struct RootView: View {
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
-            } else if appState.selectedCharacter != nil {
+            } else {
                 HomeView()
                     .transition(.asymmetric(
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
-            } else {
-                CharacterSelectView()
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .leading),
-                        removal: .move(edge: .trailing)
-                    ))
             }
         }
         .animation(.easeInOut(duration: 0.4), value: appState.onboardingCompleted)
+        .animation(.easeInOut(duration: 0.4), value: appState.selectedCharacter?.id)
         .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
         .animation(.easeInOut(duration: 0.4), value: appState.healthPermissionDone)
         .onAppear {

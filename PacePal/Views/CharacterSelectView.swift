@@ -24,8 +24,10 @@ struct CharacterSelectView: View {
     @State private var selectedIndex: Int = 0
 
     // Naming state
-    @State private var isNaming     = false
-    @State private var nickname     = ""
+    @State private var isNaming      = false
+    @State private var nickname      = ""
+    @State private var namingPose    = PetPose.jump
+    @State private var showNameError = false
     @FocusState private var keyboardUp: Bool
 
     private var selected: PetDNA { characters[selectedIndex] }
@@ -134,7 +136,7 @@ struct CharacterSelectView: View {
                         .blur(radius: 12)
                         .padding(.bottom, footOffsetFromBottom - 8)
 
-                    PetAnimationView(dna: selected, pose: .jump, pixelSize: heroPx)
+                    PetAnimationView(dna: selected, pose: namingPose, pixelSize: heroPx)
                         .id(selected.id)
                 }
             }
@@ -145,10 +147,11 @@ struct CharacterSelectView: View {
             Text("Ponle un nombre")
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#1F2933"))
-            Text("Máximo \(maxNicknameLength) letras")
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
+            Text(showNameError ? "¡Necesita un nombre!" : "Máximo \(maxNicknameLength) letras")
+                .font(.system(size: 13, weight: showNameError ? .semibold : .regular, design: .rounded))
+                .foregroundStyle(showNameError ? Color(hex: "#E12D39") : Color(hex: "#9AA5B4"))
                 .padding(.top, 4)
+                .animation(.easeInOut(duration: 0.2), value: showNameError)
 
             Spacer().frame(height: 32)
 
@@ -230,9 +233,18 @@ struct CharacterSelectView: View {
 
     private func confirmNickname() {
         let trimmed = nickname.trimmingCharacters(in: .whitespaces)
-        let finalName = trimmed.isEmpty ? "???" : trimmed
+        guard !trimmed.isEmpty else {
+            // Angry flash: switch to angry pose then back to jump
+            showNameError = true
+            namingPose = .angry
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                namingPose = .jump
+                withAnimation { showNameError = false }
+            }
+            return
+        }
         var namedDNA = selected
-        namedDNA.name = finalName
+        namedDNA.name = trimmed
         characters[selectedIndex] = namedDNA
         keyboardUp = false
         saveAndSelect(namedDNA)
@@ -250,7 +262,7 @@ struct CharacterSelectView: View {
 
     private var animalLabel: String {
         switch selected.animalType {
-        case .bunny:    return "Explosivo"
+        case .bunny:    return "Veloz"
         case .cat:      return "Ágil"
         case .bear:     return "Fuerza"
         case .raccoon:  return "Adaptable"
@@ -265,6 +277,9 @@ struct CharacterSelectView: View {
         case .lion:     return "Dominante"
         case .domo:     return "Imparable"
         case .pou:      return "Constante"
+        case .dog:      return "Leal"
+        case .tiger:    return "Feroz"
+        case .panda:    return "Tenaz"
         }
     }
 

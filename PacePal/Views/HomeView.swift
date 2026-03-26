@@ -432,7 +432,7 @@ struct HomeView: View {
     // MARK: – Phrase section
     private var phraseSection: some View {
         Text(RunningPhrase.all[phraseIndex].es)
-            .font(.system(size: 18, weight: .regular, design: .rounded))
+            .font(.system(size: 20, weight: .regular, design: .rounded))
             .foregroundStyle(Color(hex: "#7A6E68"))
             .multilineTextAlignment(.center)
             .lineLimit(2)

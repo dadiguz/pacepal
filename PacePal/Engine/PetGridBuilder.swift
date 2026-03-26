@@ -157,6 +157,18 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 }
             }
         }
+    case .dog:
+        // Floppy ears hanging on each side
+        fillEllipse(&g, cx: lEarX - 1.5, cy: earTopY + 2.5, rx: 1.8, ry: 2.8, cell: .body)
+        fillEllipse(&g, cx: rEarX + 1.5, cy: earTopY + 2.5, rx: 1.8, ry: 2.8, cell: .body)
+    case .tiger:
+        // Small rounded ears with pointed feel
+        fillEllipse(&g, cx: lEarX, cy: earTopY - 0.5, rx: 1.6, ry: 1.6, cell: .body)
+        fillEllipse(&g, cx: rEarX, cy: earTopY - 0.5, rx: 1.6, ry: 1.6, cell: .body)
+    case .panda:
+        // Big round ears on top (recolored dark in accents pass)
+        fillEllipse(&g, cx: lEarX, cy: earTopY, rx: 2.2, ry: 2.2, cell: .body)
+        fillEllipse(&g, cx: rEarX, cy: earTopY, rx: 2.2, ry: 2.2, cell: .body)
     case .domo: break  // Flat square head, no ears
     case .pou:  break  // Rounded head, no ears
     case .smooth: break
@@ -267,7 +279,8 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     // These types always show tail at idle; others only if hasTail is set
     let showTail = (dna.animalType == .raccoon || dna.animalType == .axolotl ||
                     dna.animalType == .capuchin || dna.animalType == .mandrill ||
-                    dna.animalType == .fox || dna.animalType == .lion)
+                    dna.animalType == .fox || dna.animalType == .lion ||
+                    dna.animalType == .dog || dna.animalType == .tiger)
         ? pose == .idle
         : (dna.hasTail && pose == .idle)
 
@@ -310,6 +323,19 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:rX+2,y:ty-4,cell:.body)
             pset(&g,x:rX+2,y:ty-5,cell:.accent1); pset(&g,x:rX+1,y:ty-5,cell:.accent1)
             pset(&g,x:rX+3,y:ty-5,cell:.accent1); pset(&g,x:rX+2,y:ty-6,cell:.accent1)
+        case .dog:
+            // Short wagging tail curving up
+            pset(&g,x:rX+1,y:ty,  cell:.body)
+            pset(&g,x:rX+2,y:ty-1,cell:.body)
+            pset(&g,x:rX+2,y:ty-2,cell:.body)
+            pset(&g,x:rX+1,y:ty-3,cell:.body)
+        case .tiger:
+            // Long striped tail curving outward
+            pset(&g,x:rX+1,y:ty,  cell:.body); pset(&g,x:rX+2,y:ty-1,cell:.body)
+            pset(&g,x:rX+3,y:ty-2,cell:.body); pset(&g,x:rX+3,y:ty-3,cell:.body)
+            pset(&g,x:rX+2,y:ty-4,cell:.body); pset(&g,x:rX+1,y:ty-4,cell:.body)
+            pset(&g,x:rX+2,y:ty-5,cell:.shade); pset(&g,x:rX+1,y:ty-5,cell:.shade)
+            pset(&g,x:rX+2,y:ty-6,cell:.accent1); pset(&g,x:rX+1,y:ty-6,cell:.accent1)
         default:
             pset(&g, x: rX, y: ty, cell: .body); pset(&g, x: rX+1, y: ty-1, cell: .body)
         }
@@ -404,6 +430,15 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g, x: Int(faceCx)-3, y: Int(muzzleBaseY)+1, cell: .shade)
         pset(&g, x: Int(faceCx)+1, y: Int(muzzleBaseY),   cell: .shade)
         pset(&g, x: Int(faceCx)+1, y: Int(muzzleBaseY)+1, cell: .shade)
+    } else if dna.animalType == .dog {
+        // Dog snout — wide oval + double nose dot
+        fillEllipse(&g, cx: faceCx-1, cy: muzzleBaseY+1, rx: 2.8, ry: 2.0, cell: .face)
+        pset(&g, x: Int(faceCx)-1, y: Int(muzzleBaseY), cell: .eyePupil)
+        pset(&g, x: Int(faceCx),   y: Int(muzzleBaseY), cell: .eyePupil)
+    } else if dna.animalType == .tiger {
+        // Tiger muzzle — wide, flat
+        fillEllipse(&g, cx: faceCx-1, cy: muzzleBaseY+1, rx: 3.0, ry: 1.8, cell: .face)
+        pset(&g, x: Int(faceCx)-1, y: Int(muzzleBaseY), cell: .eyePupil)
     } else if dna.hasMuzzle {
         fillEllipse(&g, cx: faceCx-1, cy: muzzleBaseY+1, rx: 2.5, ry: 1.8, cell: .face)
         pset(&g, x: Int(faceCx)-1, y: Int(muzzleBaseY), cell: .eyePupil)
@@ -419,6 +454,16 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             if pget(g, x: maskLX+dx, y: maskY+dy) == .face { pset(&g, x: maskLX+dx, y: maskY+dy, cell: .shade) }
             if pget(g, x: maskRX+dx, y: maskY+dy) == .face { pset(&g, x: maskRX+dx, y: maskY+dy, cell: .shade) }
         }}
+    }
+
+    // ── Panda eye patches ────────────────────────────────────────────────────────
+    if dna.animalType == .panda && pose != .dead {
+        let maxEyeSpP = max(1, Int(faceRx - 0.3))
+        let pEyeSp = min(Int(dna.eyeSp), maxEyeSpP)
+        let pEyeLX = Double(Int(faceCx) - pEyeSp)
+        let pEyeRX = Double(Int(faceCx) + pEyeSp)
+        fillEllipse(&g, cx: pEyeLX, cy: eyeY, rx: 2.2, ry: 1.8, cell: .shade)
+        fillEllipse(&g, cx: pEyeRX, cy: eyeY, rx: 2.2, ry: 1.8, cell: .shade)
     }
 
     // ── Eyes ─────────────────────────────────────────────────────────────────────
@@ -861,6 +906,24 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         }
         pset(&g, x: aleLX, y: Int(earTopY), cell: .accent2)
         pset(&g, x: aleRX, y: Int(earTopY), cell: .accent2)
+    case .dog:
+        // Inner ear warm highlight
+        pset(&g, x: aleLX, y: Int(earTopY)+2, cell: .accent1)
+        pset(&g, x: aleRX, y: Int(earTopY)+2, cell: .accent1)
+    case .tiger:
+        // Three vertical body stripes
+        let stripeYs = [Int(bodyCy)-2, Int(bodyCy), Int(bodyCy)+2]
+        for sy in stripeYs {
+            let xl = Int((bodyCx - bodyRx * 0.5).rounded())
+            let xr = Int((bodyCx + bodyRx * 0.5).rounded())
+            for x in max(0, xl)...min(GRID_SIZE-1, xr) {
+                if pget(g, x: x, y: sy) == .body { pset(&g, x: x, y: sy, cell: .accent1) }
+            }
+        }
+    case .panda:
+        // Dark ears (shade fill over body-colored ears)
+        fillEllipse(&g, cx: Double(aleLX), cy: earTopY, rx: 2.0, ry: 2.0, cell: .shade)
+        fillEllipse(&g, cx: Double(aleRX), cy: earTopY, rx: 2.0, ry: 2.0, cell: .shade)
     case .domo, .pou: break
     default: break
     }

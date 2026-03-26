@@ -5,7 +5,7 @@ struct HealthPermissionView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
 
-    private let displayDNA = PetDNA.presets()[1]
+    private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     @State private var appeared = false
 
     // Advance automatically once authorized
@@ -29,7 +29,8 @@ struct HealthPermissionView: View {
 
                 // Pet
                 petStage
-                    .padding(.top, 4)
+                    .padding(.top, 32)
+                    .padding(.bottom, 24)
 
                 // Content swaps between normal pitch and denied state
                 if health.authState == .denied || health.authState == .unavailable {
@@ -86,39 +87,30 @@ struct HealthPermissionView: View {
     // MARK: - Pitch content (normal state)
 
     private var pitchContent: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 20) {
             // Title
             (
-                Text("Pacepal necesita\nacceso a ")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                Text("Conecta con\n")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("Apple Health")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                + Text("Apple Health.")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
-                + Text(".")
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
             )
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
 
             // Explanation
             (
-                Text("Sin tus datos de ")
-                    .font(.system(size: 16, design: .rounded))
+                Text("Así sabemos cuándo corres\ny ")
+                    .font(.system(size: 17, design: .rounded))
                     .foregroundStyle(Color(hex: "#52606D"))
-                + Text("distancia recorrida")
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-                + Text(", tu compañero no puede saber cuándo corres.\n\nNunca compartimos tu información — solo la usamos para que ")
-                    .font(.system(size: 16, design: .rounded))
-                    .foregroundStyle(Color(hex: "#52606D"))
-                + Text("tu mascota cobre vida.")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                + Text("tu compañero cobra vida.")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
             .multilineTextAlignment(.center)
-            .lineSpacing(5)
+            .lineSpacing(4)
             .padding(.horizontal, 32)
 
             // What we read
