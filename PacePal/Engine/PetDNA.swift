@@ -137,7 +137,7 @@ struct PetDNA: Identifiable, Codable {
             hasCheeks: hasCheeks, hasMarking: hasMarking, markingStyle: markingStyle,
             hasBow: hasBow, hasTail: hasTail, tailOffset: tailOffset,
             spots: spots, palette: base,
-            name: PetDNA.randomName()
+            name: ""
         )
     }
 
@@ -154,7 +154,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:3,dy:-1,colorIndex:0), PetSpot(dx:-3,dy:1,colorIndex:1),
                            PetSpot(dx:0,dy:3,colorIndex:0), PetSpot(dx:1,dy:-2,colorIndex:1)],
                    palette: { var p = PALETTES[0]; p.accent1 = "#AFF75C"; p.accent2 = "#62F4EB"; return p }(),
-                   name: "Cipactli"),
+                   name: ""),
 
             // Bear – Jigglypuff pink
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 6, bodyCy: 12, earTopY: 6,
@@ -166,7 +166,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:3,dy:-1,colorIndex:0), PetSpot(dx:-2,dy:-2,colorIndex:1),
                            PetSpot(dx:1,dy:3,colorIndex:0), PetSpot(dx:-1,dy:0,colorIndex:1)],
                    palette: { var p = PetPalette("jigglypuff", body: "#C03070", shade: "#F570A8", face: "#FFE0F0", eyeP: "#620830", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#FADB5F"; return p }(),
-                   name: "Itzcoatl"),
+                   name: ""),
 
             // Bunny – Pikachu yellow
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
@@ -178,7 +178,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:-1,dy:-1,colorIndex:0), PetSpot(dx:3,dy:0,colorIndex:1),
                            PetSpot(dx:-3,dy:1,colorIndex:0), PetSpot(dx:0,dy:3,colorIndex:1)],
                    palette: { var p = PetPalette("pikachu", body: "#C07800", shade: "#F0C030", face: "#FFFACC", eyeP: "#5A3400", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#E84040"; return p }(),
-                   name: "Xochitl"),
+                   name: ""),
 
             // Cat – deep teal (contraste fresco-cálido)
             PetDNA(bodyCx: 12, bodyShape: .chubby, bodyRy: 6, bodyRx: 7, bodyCy: 12, earTopY: 6,
@@ -190,7 +190,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:1,dy:-2,colorIndex:0), PetSpot(dx:4,dy:1,colorIndex:1),
                            PetSpot(dx:-4,dy:0,colorIndex:0), PetSpot(dx:2,dy:3,colorIndex:1)],
                    palette: { var p = PetPalette("deepteal", body: "#003D38", shade: "#2A9484", face: "#CCF0EC", eyeP: "#001E1B", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#FADB5F"; return p }(),
-                   name: "Tepeyotl"),
+                   name: ""),
 
             // Frog – Bulbasaur green
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 7, bodyRx: 6, bodyCy: 11, earTopY: 4,
@@ -202,7 +202,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:3,dy:-1,colorIndex:0), PetSpot(dx:-3,dy:1,colorIndex:1),
                            PetSpot(dx:1,dy:3,colorIndex:0), PetSpot(dx:-1,dy:-2,colorIndex:1)],
                    palette: { var p = PetPalette("bulbasaur", body: "#185020", shade: "#50BC54", face: "#D0F5D4", eyeP: "#0A2810", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#FADB5F"; return p }(),
-                   name: "Quetzalco"),
+                   name: ""),
 
             // Raccoon – slate
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
@@ -214,7 +214,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:-3,dy:0,colorIndex:0), PetSpot(dx:1,dy:3,colorIndex:1),
                            PetSpot(dx:-2,dy:-2,colorIndex:0), PetSpot(dx:3,dy:2,colorIndex:1)],
                    palette: { var p = PALETTES[11]; p.accent1 = "#9AA5B4"; p.accent2 = "#E2E8F0"; return p }(),
-                   name: "Mixtli"),
+                   name: ""),
 
             // Mouse – Gengar purple
             PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
@@ -226,7 +226,7 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:3,dy:0,colorIndex:0), PetSpot(dx:-1,dy:-2,colorIndex:1),
                            PetSpot(dx:1,dy:2,colorIndex:0), PetSpot(dx:-3,dy:1,colorIndex:1)],
                    palette: { var p = PetPalette("gengar", body: "#3A0E70", shade: "#8040C8", face: "#ECD8FF", eyeP: "#1C0638", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#B870F0"; return p }(),
-                   name: "Xochipilli"),
+                   name: ""),
 
             // Axolotl – Sylveon magenta
             PetDNA(bodyCx: 12, bodyShape: .chubby, bodyRy: 6, bodyRx: 7, bodyCy: 12, earTopY: 6,
@@ -238,16 +238,8 @@ struct PetDNA: Identifiable, Codable {
                            PetSpot(dx:3,dy:-1,colorIndex:0), PetSpot(dx:-3,dy:1,colorIndex:1),
                            PetSpot(dx:0,dy:3,colorIndex:0), PetSpot(dx:1,dy:-2,colorIndex:1)],
                    palette: { var p = PetPalette("sylveon", body: "#980066", shade: "#DC40A0", face: "#FFD0F2", eyeP: "#4A0030", cheek: "#FADB5F"); p.accent1 = "#FADB5F"; p.accent2 = "#F9703E"; return p }(),
-                   name: "Axolitl"),
+                   name: ""),
         ]
     }
 
-    // MARK: - Name generator
-    private static func randomName() -> String {
-        let pre = ["Xo","Tla","Quet","Itz","Cit","Mix","Co","Hui","Tep",
-                   "Oc","Mo","Xoch","Tec","Mez","Cha","No","Ate","Cuau","Teo","Ix"]
-        let suf = ["tl","atl","otl","tzin","ito","ita","ali","xitl",
-                   "zotl","coatl","palco","lote","quil","pilli","tlan","cal"]
-        return pre.randomElement()! + suf.randomElement()!
-    }
 }

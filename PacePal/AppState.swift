@@ -16,8 +16,8 @@ enum Difficulty: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .pequeñines: return "Pequeñín"
-        case .pro:        return "Pro"
+        case .pequeñines: return "🧸 Pequeñín"
+        case .pro:        return "🐺 Pro"
         }
     }
 

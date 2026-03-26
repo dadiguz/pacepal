@@ -1,6 +1,8 @@
 import SwiftUI
 import SwiftData
 
+private let maxNicknameLength = 10
+
 struct CharacterSelectView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
@@ -9,117 +11,213 @@ struct CharacterSelectView: View {
     @State private var characters: [PetDNA] = PetDNA.presets()
     @State private var selectedIndex: Int = 0
 
+    // Naming state
+    @State private var isNaming     = false
+    @State private var nickname     = ""
+    @FocusState private var keyboardUp: Bool
+
     private var selected: PetDNA { characters[selectedIndex] }
     private var bodyColor: Color { Color(hex: selected.palette.body) }
 
-    // Hero pixel size: fills ~260pt width
     private let heroPx: CGFloat = 10
     private var heroSize: CGFloat { heroPx * CGFloat(GRID_SIZE) }
-    // Feet are at ~row 21/24 → distance from canvas bottom = 3 rows
     private var footOffsetFromBottom: CGFloat { heroPx * 3 }
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            AppBackground()
 
-            VStack(spacing: 0) {
-                header.padding(.top, 56)
+            // ── Normal selection screen ────────────────────────────────────
+            if !isNaming {
+                VStack(spacing: 0) {
+                    header.padding(.top, 56)
 
-                Spacer()
+                    Spacer()
 
-                // ── Hero ────────────────────────────────────────────────────
-                ZStack {
-                    // Background atmosphere glow
-                    Circle()
-                        .fill(bodyColor.opacity(0.07))
-                        .frame(width: heroSize, height: heroSize)
-                        .blur(radius: 20)
+                    heroSection
 
-                    // Character + foot shadow stacked
-                    ZStack(alignment: .bottom) {
-                        // Foot glow/shadow
-                        Ellipse()
-                            .fill(
-                                RadialGradient(
-                                    colors: [bodyColor.opacity(0.50), .clear],
-                                    center: .center,
-                                    startRadius: 0,
-                                    endRadius: 70
-                                )
-                            )
-                            .frame(width: 150, height: 28)
-                            .blur(radius: 14)
-                            .padding(.bottom, footOffsetFromBottom - 8)
-
-                        PetAnimationView(dna: selected, pose: .happy, pixelSize: heroPx)
-                            .id(selected.id)
-                            .transition(.scale(scale: 0.85).combined(with: .opacity))
+                    if !selected.name.isEmpty {
+                        Text(selected.name)
+                            .font(.system(size: 26, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#1F2933"))
+                            .animation(.none, value: selectedIndex)
+                            .padding(.top, 16)
                     }
+
+                    Spacer()
+
+                    characterStrip.padding(.bottom, 8)
+                    pageDots.padding(.bottom, 28)
+
+                    actionButtons
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 48)
                 }
-                .animation(.spring(duration: 0.35), value: selectedIndex)
+                .transition(.opacity)
+            }
 
-                // Name only — no type label
-                Text(selected.name)
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-                    .animation(.none, value: selectedIndex)
-                    .padding(.top, 16)
+            // ── Naming screen ──────────────────────────────────────────────
+            if isNaming {
+                namingScreen
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: isNaming)
+    }
 
-                Spacer()
+    // MARK: – Naming screen
 
-                // ── Carousel ─────────────────────────────────────────────────
-                characterStrip.padding(.bottom, 8)
+    private var namingScreen: some View {
+        ZStack(alignment: .topLeading) {
+            // Back arrow
+            Button {
+                keyboardUp = false
+                withAnimation { isNaming = false }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                    .padding(12)
+                    .background(Color(hex: "#F0EBE6"))
+                    .clipShape(Circle())
+            }
+            .padding(.top, 56)
+            .padding(.leading, 24)
 
-                pageDots.padding(.bottom, 28)
+        VStack(spacing: 0) {
+            Spacer()
 
-                // ── Actions ──────────────────────────────────────────────────
-                HStack(spacing: 12) {
-                    // Generate
-                    Button {
-                        withAnimation(.spring(duration: 0.3)) {
-                            characters[selectedIndex] = PetDNA.random()
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "shuffle")
-                            Text("Generar")
-                        }
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(.white)
-                        .foregroundStyle(Color(hex: "#F9703E"))
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .strokeBorder(Color(hex: "#F9703E"), lineWidth: 1.5)
-                        )
-                    }
+            // Pet hero (same as normal, slightly smaller)
+            ZStack {
+                Circle()
+                    .fill(bodyColor.opacity(0.07))
+                    .frame(width: heroSize * 0.85, height: heroSize * 0.85)
+                    .blur(radius: 20)
 
-                    // Select
-                    Button {
-                        saveCharacter(selected)
-                        appState.onCharacterSelected()
-                        withAnimation(.spring(duration: 0.4)) {
-                            appState.selectedCharacter = selected
-                        }
-                    } label: {
-                        Text("Seleccionar")
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color(hex: "#F9703E"))
-                            .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                    }
+                ZStack(alignment: .bottom) {
+                    Ellipse()
+                        .fill(RadialGradient(
+                            colors: [bodyColor.opacity(0.40), .clear],
+                            center: .center, startRadius: 0, endRadius: 60
+                        ))
+                        .frame(width: 120, height: 22)
+                        .blur(radius: 12)
+                        .padding(.bottom, footOffsetFromBottom - 8)
+
+                    PetAnimationView(dna: selected, pose: .jump, pixelSize: heroPx)
+                        .id(selected.id)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 48)
+            }
+
+            Spacer().frame(height: 28)
+
+            // Prompt
+            Text("Ponle un nombre")
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(hex: "#1F2933"))
+            Text("Máximo \(maxNicknameLength) letras")
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
+                .padding(.top, 4)
+
+            Spacer().frame(height: 32)
+
+            // ── Slot display ────────────────────────────────────────────────
+            nicknameSlots
+
+            // Hidden text field that captures input
+            TextField("", text: $nickname)
+                .focused($keyboardUp)
+                .frame(width: 1, height: 1)
+                .opacity(0.001)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .onChange(of: nickname) { _, new in
+                    // Strip to letters/numbers/spaces, max length
+                    let filtered = String(
+                        new.filter { $0.isLetter || $0.isNumber || $0 == " " }
+                            .prefix(maxNicknameLength)
+                    )
+                    if filtered != new { nickname = filtered }
+                }
+
+            Spacer().frame(height: 40)
+
+            // ── Buttons ─────────────────────────────────────────────────────
+            Button { confirmNickname() } label: {
+                Text("Confirmar")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(hex: "#F9703E"))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+            .padding(.horizontal, 32)
+
+            Spacer()
+        } // VStack
+        } // ZStack
+        .onAppear {
+            nickname = ""
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                keyboardUp = true
             }
         }
     }
 
+    // MARK: – Nickname slots
+
+    private var nicknameSlots: some View {
+        let chars = Array(nickname)
+        return HStack(spacing: 10) {
+            ForEach(0..<maxNicknameLength, id: \.self) { i in
+                let isFilled  = i < chars.count
+                let isCursor  = i == chars.count && chars.count < maxNicknameLength
+                VStack(spacing: 6) {
+                    Text(isFilled ? String(chars[i]) : " ")
+                        .font(.system(size: 20, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color(hex: "#1F2933"))
+                        .frame(width: 22, height: 26)
+
+                    Rectangle()
+                        .fill(
+                            isCursor ? Color(hex: "#F9703E") :
+                            isFilled ? Color(hex: "#1F2933") :
+                                       Color(hex: "#CBD2D9")
+                        )
+                        .frame(height: isCursor ? 2.5 : 1.5)
+                        .animation(.easeInOut(duration: 0.12), value: nickname.count)
+                }
+                .frame(width: 22)
+            }
+        }
+        .padding(.horizontal, 24)
+        .onTapGesture { keyboardUp = true }
+    }
+
+    // MARK: – Confirm
+
+    private func confirmNickname() {
+        let trimmed = nickname.trimmingCharacters(in: .whitespaces)
+        let finalName = trimmed.isEmpty ? "???" : trimmed
+        var namedDNA = selected
+        namedDNA.name = finalName
+        characters[selectedIndex] = namedDNA
+        keyboardUp = false
+        saveAndSelect(namedDNA)
+    }
+
+    private func saveAndSelect(_ dna: PetDNA) {
+        saveCharacter(dna)
+        appState.onCharacterSelected()
+        withAnimation(.spring(duration: 0.4)) {
+            appState.selectedCharacter = dna
+        }
+    }
+
     // MARK: – Header
+
     private var header: some View {
         VStack(spacing: 8) {
             Image("Logo")
@@ -132,7 +230,35 @@ struct CharacterSelectView: View {
         }
     }
 
+    // MARK: – Hero
+
+    private var heroSection: some View {
+        ZStack {
+            Circle()
+                .fill(bodyColor.opacity(0.07))
+                .frame(width: heroSize, height: heroSize)
+                .blur(radius: 20)
+
+            ZStack(alignment: .bottom) {
+                Ellipse()
+                    .fill(RadialGradient(
+                        colors: [bodyColor.opacity(0.50), .clear],
+                        center: .center, startRadius: 0, endRadius: 70
+                    ))
+                    .frame(width: 150, height: 28)
+                    .blur(radius: 14)
+                    .padding(.bottom, footOffsetFromBottom - 8)
+
+                PetAnimationView(dna: selected, pose: .happy, pixelSize: heroPx)
+                    .id(selected.id)
+                    .transition(.scale(scale: 0.85).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(duration: 0.35), value: selectedIndex)
+    }
+
     // MARK: – Carousel
+
     private var characterStrip: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -141,9 +267,7 @@ struct CharacterSelectView: View {
                         PetPreviewCard(dna: dna, isSelected: i == selectedIndex, size: 72)
                             .id(i)
                             .onTapGesture {
-                                withAnimation(.spring(duration: 0.3)) {
-                                    selectedIndex = i
-                                }
+                                withAnimation(.spring(duration: 0.3)) { selectedIndex = i }
                             }
                     }
                 }
@@ -156,15 +280,8 @@ struct CharacterSelectView: View {
         .frame(height: 128)
     }
 
-    // MARK: – Persistence
-    private func saveCharacter(_ dna: PetDNA) {
-        saved.forEach { modelContext.delete($0) }
-        if let data = try? JSONEncoder().encode(dna) {
-            modelContext.insert(SavedCharacter(dnaData: data))
-        }
-    }
-
     // MARK: – Page dots
+
     private var pageDots: some View {
         HStack(spacing: 6) {
             ForEach(0..<characters.count, id: \.self) { i in
@@ -174,6 +291,52 @@ struct CharacterSelectView: View {
                            height: i == selectedIndex ? 8 : 5)
                     .animation(.spring(duration: 0.25), value: selectedIndex)
             }
+        }
+    }
+
+    // MARK: – Action buttons
+
+    private var actionButtons: some View {
+        HStack(spacing: 12) {
+            Button {
+                withAnimation(.spring(duration: 0.3)) {
+                    characters[selectedIndex] = PetDNA.random()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "shuffle")
+                    Text("Generar")
+                }
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(.white)
+                .foregroundStyle(Color(hex: "#F9703E"))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Color(hex: "#F9703E"), lineWidth: 1.5))
+            }
+
+            Button {
+                withAnimation { isNaming = true }
+            } label: {
+                Text("Seleccionar")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color(hex: "#F9703E"))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            }
+        }
+    }
+
+    // MARK: – Persistence
+
+    private func saveCharacter(_ dna: PetDNA) {
+        saved.forEach { modelContext.delete($0) }
+        if let data = try? JSONEncoder().encode(dna) {
+            modelContext.insert(SavedCharacter(dnaData: data))
         }
     }
 }
