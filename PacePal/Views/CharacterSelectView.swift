@@ -8,7 +8,19 @@ struct CharacterSelectView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
 
-    @State private var characters: [PetDNA] = PetDNA.presets()
+    @State private var characters: [PetDNA] = {
+        let anchor = PetDNA.presets()[0]   // smooth/ghost — always first
+        var list = [anchor]
+        var prevType = anchor.animalType
+        for _ in 1..<8 {
+            var pet = PetDNA.random()
+            var tries = 0
+            while pet.animalType == prevType && tries < 15 { pet = PetDNA.random(); tries += 1 }
+            list.append(pet)
+            prevType = pet.animalType
+        }
+        return list
+    }()
     @State private var selectedIndex: Int = 0
 
     // Naming state
@@ -43,6 +55,24 @@ struct CharacterSelectView: View {
                             .animation(.none, value: selectedIndex)
                             .padding(.top, 16)
                     }
+
+                    // Animal type pill
+                    Text(animalLabel.uppercased())
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .tracking(1.4)
+                        .foregroundStyle(bodyColor)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 5)
+                        .background(bodyColor.opacity(0.12))
+                        .clipShape(Capsule())
+                        .padding(.top, selected.name.isEmpty ? 16 : 6)
+                        .animation(.none, value: selectedIndex)
+
+                    // Tagline
+                    Text("Te acompañará en cada kilómetro")
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
+                        .foregroundStyle(Color(hex: "#B0A8A0"))
+                        .padding(.top, 4)
 
                     Spacer()
 
@@ -141,7 +171,7 @@ struct CharacterSelectView: View {
                     if filtered != new { nickname = filtered }
                 }
 
-            Spacer().frame(height: 40)
+            Spacer().frame(height: 32)
 
             // ── Buttons ─────────────────────────────────────────────────────
             Button { confirmNickname() } label: {
@@ -160,7 +190,7 @@ struct CharacterSelectView: View {
         } // ZStack
         .onAppear {
             nickname = ""
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.30) {
                 keyboardUp = true
             }
         }
@@ -216,15 +246,37 @@ struct CharacterSelectView: View {
         }
     }
 
+    // MARK: – Animal type label
+
+    private var animalLabel: String {
+        switch selected.animalType {
+        case .bunny:    return "Explosivo"
+        case .cat:      return "Ágil"
+        case .bear:     return "Fuerza"
+        case .raccoon:  return "Adaptable"
+        case .mouse:    return "Veloz"
+        case .frog:     return "Potencia"
+        case .duck:     return "Resistente"
+        case .axolotl:  return "Resiliente"
+        case .smooth:   return "Libre"
+        case .capuchin: return "Dinámico"
+        case .mandrill: return "Salvaje"
+        case .fox:      return "Estratega"
+        case .lion:     return "Dominante"
+        case .domo:     return "Imparable"
+        case .pou:      return "Constante"
+        }
+    }
+
     // MARK: – Header
 
     private var header: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 50)
-            Text("Elige tu compañero de carrera")
+            Text("Elige tu compañero de 66 días")
                 .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#9AA5B4"))
         }
@@ -249,7 +301,7 @@ struct CharacterSelectView: View {
                     .blur(radius: 14)
                     .padding(.bottom, footOffsetFromBottom - 8)
 
-                PetAnimationView(dna: selected, pose: .happy, pixelSize: heroPx)
+                PetAnimationView(dna: selected, pose: .idle, pixelSize: heroPx)
                     .id(selected.id)
                     .transition(.scale(scale: 0.85).combined(with: .opacity))
             }
@@ -300,7 +352,14 @@ struct CharacterSelectView: View {
         HStack(spacing: 12) {
             Button {
                 withAnimation(.spring(duration: 0.3)) {
-                    characters[selectedIndex] = PetDNA.random()
+                    let leftType  = selectedIndex > 0                    ? characters[selectedIndex - 1].animalType : nil
+                    let rightType = selectedIndex < characters.count - 1 ? characters[selectedIndex + 1].animalType : nil
+                    var pet = PetDNA.random()
+                    var tries = 0
+                    while (pet.animalType == leftType || pet.animalType == rightType) && tries < 20 {
+                        pet = PetDNA.random(); tries += 1
+                    }
+                    characters[selectedIndex] = pet
                 }
             } label: {
                 HStack(spacing: 6) {

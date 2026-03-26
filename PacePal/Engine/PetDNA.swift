@@ -168,18 +168,6 @@ struct PetDNA: Identifiable, Codable {
                    palette: { var p = PetPalette("jigglypuff", body: "#C03070", shade: "#F570A8", face: "#FFE0F0", eyeP: "#620830", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#FADB5F"; return p }(),
                    name: ""),
 
-            // Bunny – Pikachu yellow
-            PetDNA(bodyCx: 12, bodyShape: .round, bodyRy: 6, bodyRx: 5, bodyCy: 12, earTopY: 6,
-                   animalType: .bunny, earSp: 3, bunnyEarH: 4, bearEarR: 0,
-                   armStyle: 1, eyeSp: 2, eyeStyle: 3, hasMuzzle: false, mouthStyle: 1,
-                   hasNose: false, hasCheeks: true, hasMarking: false, markingStyle: 0,
-                   hasBow: true, hasTail: false, tailOffset: 0,
-                   spots: [PetSpot(dx:-2,dy:2,colorIndex:0), PetSpot(dx:2,dy:1,colorIndex:1),
-                           PetSpot(dx:-1,dy:-1,colorIndex:0), PetSpot(dx:3,dy:0,colorIndex:1),
-                           PetSpot(dx:-3,dy:1,colorIndex:0), PetSpot(dx:0,dy:3,colorIndex:1)],
-                   palette: { var p = PetPalette("pikachu", body: "#C07800", shade: "#F0C030", face: "#FFFACC", eyeP: "#5A3400", cheek: "#F9703E"); p.accent1 = "#F9703E"; p.accent2 = "#E84040"; return p }(),
-                   name: ""),
-
             // Cat – deep teal (contraste fresco-cálido)
             PetDNA(bodyCx: 12, bodyShape: .chubby, bodyRy: 6, bodyRx: 7, bodyCy: 12, earTopY: 6,
                    animalType: .cat, earSp: 4, bunnyEarH: 0, bearEarR: 0,

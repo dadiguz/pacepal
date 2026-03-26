@@ -132,7 +132,7 @@ struct HistoryView: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                         .padding(10)
-                        .background(Color(hex: "#F0E8E0"))
+                        .background(Color(hex: "#F5ECE4"))
                         .clipShape(Circle())
                 }
             }
@@ -141,7 +141,7 @@ struct HistoryView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(hex: "#F0E8E0"))
+                        .fill(Color(hex: "#E2E8F0"))
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color(hex: "#F9703E"))
                         .frame(width: geo.size.width * min(Double(completedCount) / Double(totalDays), 1.0))
@@ -194,16 +194,26 @@ struct HistoryView: View {
 
     private var statsSection: some View {
         VStack(spacing: 16) {
+            // Dark HUD card — matches energy card style
             HStack(spacing: 0) {
-                statCell(value: "\(completedCount)", label: "Completados", color: "#F9703E")
-                Divider().frame(height: 32)
-                statCell(value: "\(missedCount)", label: "Faltas", color: missedCount > 0 ? "#E12D39" : "#9AA5B4")
-                Divider().frame(height: 32)
-                statCell(value: "\(streakCount)", label: "Racha", color: streakCount >= 7 ? "#F9703E" : "#1F2933")
+                statCell(value: "\(completedCount)", label: "Completados", valueColor: Color(hex: "#F9703E"))
+                Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
+                statCell(value: "\(missedCount)",   label: "Faltas",
+                         valueColor: missedCount > 0 ? Color(hex: "#E12D39") : Color.white.opacity(0.35))
+                Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
+                statCell(value: "\(streakCount)",   label: "Racha",
+                         valueColor: streakCount >= 7 ? Color(hex: "#F9703E") : .white)
             }
-            .padding(.vertical, 16)
-            .background(Color(hex: "#FFF0E8"))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.vertical, 18)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(hex: "#2B2420"))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color.white.opacity(0.78), lineWidth: 1.5)
+                    )
+                    .shadow(color: Color.black.opacity(0.18), radius: 10, y: 4)
+            )
 
             HStack {
                 Image(systemName: "flag.checkered")
@@ -217,14 +227,15 @@ struct HistoryView: View {
         }
     }
 
-    private func statCell(value: String, label: String, color: String) -> some View {
-        VStack(spacing: 2) {
+    private func statCell(value: String, label: String, valueColor: Color) -> some View {
+        VStack(spacing: 3) {
             Text(value)
-                .font(.system(size: 24, weight: .black, design: .rounded))
-                .foregroundStyle(Color(hex: color))
-            Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
+                .font(.system(size: 26, weight: .black, design: .monospaced))
+                .foregroundStyle(valueColor)
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .tracking(0.8)
+                .foregroundStyle(Color.white.opacity(0.40))
         }
         .frame(maxWidth: .infinity)
     }
@@ -277,7 +288,7 @@ private struct DayCell: View {
 
                 case .today:
                     RoundedRectangle(cornerRadius: size * 0.22)
-                        .fill(Color(hex: "#FFF8F2"))
+                        .fill(Color(hex: "#F5F8FC"))
                         .overlay(
                             RoundedRectangle(cornerRadius: size * 0.22)
                                 .strokeBorder(Color(hex: "#F9703E"), lineWidth: 1.5)
@@ -287,7 +298,7 @@ private struct DayCell: View {
                         ZStack(alignment: .bottom) {
                             Color.clear
                             Rectangle()
-                                .fill(Color(hex: "#F9703E").opacity(0.25))
+                                .fill(Color(hex: "#F9703E").opacity(0.22))
                                 .frame(height: size * min(effectiveKm / runThreshold, 1.0))
                         }
                         .clipShape(RoundedRectangle(cornerRadius: size * 0.22))
@@ -295,7 +306,7 @@ private struct DayCell: View {
 
                 case .future:
                     RoundedRectangle(cornerRadius: size * 0.22)
-                        .fill(Color(hex: "#F0E8E0"))
+                        .fill(Color(hex: "#E8EEF6"))
                 }
             }
         }
@@ -342,8 +353,9 @@ private struct DayDetailView: View {
         ZStack {
             AppBackground()
 
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 Spacer().frame(height: 8)
+
                 // Day + date
                 VStack(spacing: 4) {
                     Text(dayLabel)
@@ -354,28 +366,36 @@ private struct DayDetailView: View {
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                 }
 
-                // KM stat
-                HStack(spacing: 0) {
-                    VStack(spacing: 4) {
-                        HStack(alignment: .lastTextBaseline, spacing: 4) {
-                            Text(String(format: "%.2f", km))
-                                .font(.system(size: 36, weight: .black, design: .rounded))
-                                .foregroundStyle(stateColor)
-                            Text("km")
-                                .font(.system(size: 16, weight: .bold, design: .rounded))
-                                .foregroundStyle(stateColor.opacity(0.65))
-                                .padding(.bottom, 4)
-                        }
-                        Text(stateLabel)
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(stateColor)
-                    }
-                    .frame(maxWidth: .infinity)
+                Spacer().frame(height: 24)
+
+                // KM stat — dark HUD card
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
+                    Text(String(format: "%.2f", km))
+                        .font(.system(size: 38, weight: .black, design: .monospaced))
+                        .foregroundStyle(stateColor)
+                    Text("km")
+                        .font(.system(size: 16, weight: .bold, design: .monospaced))
+                        .foregroundStyle(stateColor.opacity(0.65))
+                        .padding(.bottom, 4)
                 }
-                .padding(.vertical, 20)
-                .background(stateColor.opacity(0.08))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 22)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color(hex: "#2B2420"))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .strokeBorder(Color.white.opacity(0.78), lineWidth: 1.5)
+                        )
+                        .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
+                )
                 .padding(.horizontal, 32)
+
+                Spacer().frame(height: 14)
+
+                Text(stateLabel)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(stateColor)
 
                 Spacer()
             }

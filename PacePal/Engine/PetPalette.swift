@@ -49,4 +49,10 @@ let PALETTES: [PetPalette] = [
     // Neutrals
     PetPalette("slate",      body: "#1F2933", shade: "#3E4C59", face: "#F0F4F8", eyeP: "#1F2933", cheek: "#F35627"),
     PetPalette("steel",      body: "#243B53", shade: "#627D98", face: "#D9E2EC", eyeP: "#102A43", cheek: "#F9703E"),
+    // New
+    PetPalette("celeste",    body: "#1A6FAD", shade: "#65BAE8", face: "#DCEEFB", eyeP: "#0A3660", cheek: "#F9703E"),
+    PetPalette("tangerine",  body: "#C25D10", shade: "#F9A45C", face: "#FFF3E4", eyeP: "#7A3000", cheek: "#F191C1"),
+    PetPalette("pearl",      body: "#8AAFC8", shade: "#C8DEF0", face: "#FFFFFF", eyeP: "#3A5470", cheek: "#F9703E"),
+    PetPalette("mint",       body: "#045E50", shade: "#2CC9A8", face: "#CCFAF2", eyeP: "#012E27", cheek: "#F9703E"),
+    PetPalette("rose",       body: "#A8294A", shade: "#F0709A", face: "#FFE4EE", eyeP: "#540018", cheek: "#FADB5F"),
 ]

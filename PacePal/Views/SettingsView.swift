@@ -32,7 +32,7 @@ struct SettingsView: View {
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(Color(hex: "#9AA5B4"))
                             .padding(10)
-                            .background(Color(hex: "#F0E8E0"))
+                            .background(Color(hex: "#F5ECE4"))
                             .clipShape(Circle())
                     }
                 }
@@ -50,7 +50,6 @@ struct SettingsView: View {
                     ) {
                         onShowTutorial?()
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
 
                     // ── Difficulty row ───────────────────────────────────
                     let bindable = Bindable(appState)
@@ -83,8 +82,9 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
-                    .background(Color(hex: "#FFF0E8"))
+                    .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
 
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
@@ -94,7 +94,6 @@ struct SettingsView: View {
                     ) {
                         showResetConfirm = true
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
                 .padding(.horizontal, 24)
 
@@ -125,9 +124,9 @@ struct SettingsView: View {
     #if DEBUG
     private var testingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Testing")
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .tracking(1.2)
+            Text("TESTING")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .tracking(1.4)
                 .foregroundStyle(Color(hex: "#9AA5B4"))
 
             HStack(spacing: 6) {
@@ -144,12 +143,13 @@ struct SettingsView: View {
                         debugNow = Date()
                     } label: {
                         Text(label)
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
-                            .background(Color(hex: "#F5ECE4"))
-                            .foregroundStyle(Color(hex: "#8A7060"))
+                            .background(Color.white)
+                            .foregroundStyle(Color(hex: "#4A3F35"))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                     }
                 }
             }
@@ -160,11 +160,12 @@ struct SettingsView: View {
                 } label: {
                     Text("➕ 1 km")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#8A7060"))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(Color(hex: "#F5ECE4"))
+                        .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                 }
 
                 Button {
@@ -173,11 +174,12 @@ struct SettingsView: View {
                 } label: {
                     Text("⚡ +10% energía")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#8A7060"))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(Color(hex: "#F5ECE4"))
+                        .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                 }
             }
         }
@@ -217,7 +219,9 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(Color(hex: "#FFF0E8"))
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
         }
     }
 }

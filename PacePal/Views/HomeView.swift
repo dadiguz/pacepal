@@ -97,6 +97,7 @@ struct HomeView: View {
                 // ── Running phrase ────────────────────────────────────────
                 phraseSection
                     .padding(.horizontal, 28)
+                    .padding(.top, 8)
                     .animation(.spring(duration: 0.45), value: phraseIndex)
 
                 Spacer(minLength: 4)
@@ -360,7 +361,7 @@ struct HomeView: View {
                             .frame(width: geo.size.width * energy)
                             .animation(.spring(duration: 0.9), value: energy)
                         RoundedRectangle(cornerRadius: 4)
-                            .strokeBorder(Color.white.opacity(0.70), lineWidth: 1)
+                            .strokeBorder(Color.white.opacity(0.70), lineWidth: 2)
                     }
                 }
                 .frame(height: 13)
@@ -431,8 +432,8 @@ struct HomeView: View {
     // MARK: – Phrase section
     private var phraseSection: some View {
         Text(RunningPhrase.all[phraseIndex].es)
-            .font(.system(size: 16, weight: .regular, design: .rounded))
-            .foregroundStyle(Color(hex: "#B0A090").opacity(0.75))
+            .font(.system(size: 18, weight: .regular, design: .rounded))
+            .foregroundStyle(Color(hex: "#7A6E68"))
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .onTapGesture {
@@ -592,34 +593,41 @@ private struct PetStatusSheet: View {
         VStack(spacing: 0) {
             Spacer().frame(height: 20)
 
-            // Pet name + status
+            // Pet name + mood
             VStack(spacing: 6) {
-                Text(dna.name)
-                    .font(.system(size: 22, weight: .black, design: .rounded))
+                Text(dna.name.uppercased())
+                    .font(.system(size: 20, weight: .black, design: .monospaced))
                     .foregroundStyle(Color(hex: "#1F2933"))
                 HStack(spacing: 6) {
                     Circle()
                         .fill(energyColor)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 7, height: 7)
                     Text(moodText)
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                 }
             }
 
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 28)
 
-            // Placeholder for future run stats
+            // Stats — dark HUD card
             HStack(spacing: 0) {
                 statCell(value: "—", label: "Carreras")
-                Divider().frame(height: 32)
+                Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
                 statCell(value: "—", label: "km totales")
-                Divider().frame(height: 32)
+                Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
                 statCell(value: "—", label: "Mejor racha")
             }
-            .padding(.vertical, 16)
-            .background(Color(hex: "#FFF0E8"))
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .padding(.vertical, 18)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(hex: "#2B2420"))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color.white.opacity(0.78), lineWidth: 1.5)
+                    )
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, y: 4)
+            )
             .padding(.horizontal, 24)
 
             Spacer()
@@ -627,13 +635,14 @@ private struct PetStatusSheet: View {
     }
 
     private func statCell(value: String, label: String) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 3) {
             Text(value)
-                .font(.system(size: 22, weight: .black, design: .rounded))
-                .foregroundStyle(Color(hex: "#C8BAB0"))
-            Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
+                .font(.system(size: 22, weight: .black, design: .monospaced))
+                .foregroundStyle(Color.white.opacity(0.30))
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .tracking(0.8)
+                .foregroundStyle(Color.white.opacity(0.40))
         }
         .frame(maxWidth: .infinity)
     }

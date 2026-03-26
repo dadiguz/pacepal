@@ -176,7 +176,7 @@ struct PetPreviewCard: View {
                     .padding(.bottom, footOffset - 4)
                     .animation(.spring(duration: 0.3), value: isSelected)
 
-                PetAnimationView(dna: dna, pose: .idle, pixelSize: pixelSize)
+                PetAnimationView(dna: dna, pose: isSelected ? .running : .idle, pixelSize: pixelSize)
             }
             .frame(width: size + 24, height: size + 24)
 
