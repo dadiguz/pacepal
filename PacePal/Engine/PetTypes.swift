@@ -24,7 +24,7 @@ enum PetCell: Equatable {
 
 // MARK: - Pose
 enum PetPose: String, CaseIterable, Identifiable {
-    case idle, happy, sad, angry, running, jump, dead, hurt, hype
+    case idle, happy, sad, angry, running, jump, dead, hurt, hype, dizzy
     var id: String { rawValue }
 
     var label: String {
@@ -38,6 +38,7 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .dead:    return "Dead"
         case .hurt:    return "Hurt"
         case .hype:    return "Hype"
+        case .dizzy:   return "Dizzy"
         }
     }
 
@@ -52,6 +53,7 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .dead:    return "💀"
         case .hurt:    return "💥"
         case .hype:    return "⚡️"
+        case .dizzy:   return "😵"
         }
     }
 }

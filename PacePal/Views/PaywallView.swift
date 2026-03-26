@@ -9,7 +9,7 @@ struct PaywallView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            AppBackground()
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {

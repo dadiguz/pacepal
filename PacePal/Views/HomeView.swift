@@ -32,7 +32,8 @@ struct HomeView: View {
         switch energy {
         case 0.60...: return Color(hex: "#4ADE80")
         case 0.30...: return Color(hex: "#A3E635")
-        default:      return Color(hex: "#FCD34D")
+        case 0.15...: return Color(hex: "#FCD34D")
+        default:      return Color(hex: "#E12D39")   // 1–14%: rojo crítico
         }
     }
 
@@ -54,6 +55,7 @@ struct HomeView: View {
         case .idle:  return "\(dna.name) está listo para correr"
         case .angry: return "Está exigiendo que corras"
         case .sad:   return "La energía se acaba... ¡sal a correr!"
+        case .dizzy: return "\(dna.name) está a punto de colapsar..."
         case .dead:  return "\(dna.name) está exhausto... ¡ve a correr!"
         default:     return "\(dna.name) está listo"
         }
@@ -66,21 +68,13 @@ struct HomeView: View {
         if energy > 0.90  { return .jump  }
         if energy > 0.50  { return .idle  }
         if energy > 0.25  { return .angry }
-        return .sad
+        if energy > 0.14  { return .sad   }
+        return .dizzy
     }
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                stops: [
-                    .init(color: Color(hex: "#FEFAF7"), location: 0.00),
-                    .init(color: Color(hex: "#FFF0E6"), location: 0.55),
-                    .init(color: Color(hex: "#FFE4CE"), location: 1.00),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            AppBackground()
 
             VStack(spacing: 0) {
                 // ── Top bar ──────────────────────────────────────────────
@@ -147,7 +141,7 @@ struct HomeView: View {
                 PetStatusSheet(dna: dna, moodText: moodText, energyColor: energyColor)
                     .presentationDetents([.fraction(0.40)])
                     .presentationDragIndicator(.visible)
-                    .presentationBackground(Color(hex: "#FFF8F2"))
+                    .presentationBackground { AppBackground() }
             }
 
             // ── Game Over overlay ─────────────────────────────────────────

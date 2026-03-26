@@ -246,6 +246,13 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             default: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
                      pset(&g, x: rX, y: aY+1, cell: .body); pset(&g, x: rX+1, y: aY+1, cell: .body)
             }
+        case .dizzy:
+            // One arm raised & flailing, other drooping — alternates sway each frame
+            let sway = frame % 2 == 0
+            pset(&g, x: sway ? lX-1 : lX,   y: aY-2, cell: .body)
+            pset(&g, x: sway ? lX-1 : lX,   y: aY-1, cell: .body)
+            pset(&g, x: sway ? rX   : rX+1, y: aY+1, cell: .body)
+            pset(&g, x: sway ? rX   : rX+1, y: aY+2, cell: .body)
         case .idle:
             switch dna.armStyle {
             case 0: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
@@ -481,6 +488,21 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 pset(&g,x:ex-1,y:ey+1,cell:.eyePupil); pset(&g,x:ex+1,y:ey+1,cell:.eyePupil)
             }
         }
+    case .dizzy:
+        // Spinning X↔+ alternating each frame to simulate spiral/dizzy eyes
+        for (ex, ey) in [(eyeLX, eyeYI), (eyeRX, eyeYI)] {
+            if frame % 2 == 0 {
+                // X pattern
+                pset(&g,x:ex-1,y:ey-1,cell:.eyePupil); pset(&g,x:ex+1,y:ey-1,cell:.eyePupil)
+                pset(&g,x:ex,  y:ey,  cell:.eyePupil)
+                pset(&g,x:ex-1,y:ey+1,cell:.eyePupil); pset(&g,x:ex+1,y:ey+1,cell:.eyePupil)
+            } else {
+                // + pattern
+                pset(&g,x:ex,  y:ey-1,cell:.eyePupil)
+                pset(&g,x:ex-1,y:ey,  cell:.eyePupil); pset(&g,x:ex,y:ey,cell:.eyePupil); pset(&g,x:ex+1,y:ey,cell:.eyePupil)
+                pset(&g,x:ex,  y:ey+1,cell:.eyePupil)
+            }
+        }
     default:
         if pose == .idle && frame == 6 {
             // Blink: ojos cerrados (barra horizontal)
@@ -537,6 +559,17 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     case .hurt:
         pset(&g,x:fCx-2,y:mY+1,cell:.mouth); pset(&g,x:fCx-1,y:mY,cell:.mouth)
         pset(&g,x:fCx,  y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+    case .dizzy:
+        // Wavy nauseous mouth — zigzag flips phase each frame
+        if frame % 2 == 0 {
+            pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+        } else {
+            pset(&g,x:fCx-2,y:mY+1,cell:.mouth); pset(&g,x:fCx-1,y:mY,  cell:.mouth)
+            pset(&g,x:fCx,  y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,  cell:.mouth)
+            pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+        }
     default:
         switch dna.mouthStyle {
         case 0: pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)

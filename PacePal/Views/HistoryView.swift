@@ -80,7 +80,7 @@ struct HistoryView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            AppBackground()
 
             ScrollViewReader { proxy in
                 ScrollView(showsIndicators: false) {
@@ -340,7 +340,7 @@ private struct DayDetailView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            AppBackground()
 
             VStack(spacing: 20) {
                 Spacer().frame(height: 8)

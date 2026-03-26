@@ -18,7 +18,7 @@ struct SettingsView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            AppBackground()
 
             VStack(spacing: 0) {
                 // Header
@@ -120,17 +120,31 @@ struct SettingsView: View {
                 }
             }
 
-            Button { health.addTestKm() } label: {
-                HStack {
-                    Spacer()
+            HStack(spacing: 6) {
+                Button {
+                    health.addTestKm()
+                } label: {
                     Text("➕ 1 km")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#8A7060"))
-                    Spacer()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                .padding(.vertical, 8)
-                .background(Color(hex: "#F5ECE4"))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                Button {
+                    appState.addEnergy(km: 1.0)
+                    debugNow = Date()
+                } label: {
+                    Text("⚡ +10% energía")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#8A7060"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
         }
     }
