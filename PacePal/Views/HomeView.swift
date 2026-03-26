@@ -71,7 +71,16 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "#FFF8F2").ignoresSafeArea()
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "#FEFAF7"), location: 0.00),
+                    .init(color: Color(hex: "#FFF0E6"), location: 0.55),
+                    .init(color: Color(hex: "#FFE4CE"), location: 1.00),
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // ── Top bar ──────────────────────────────────────────────
@@ -279,22 +288,10 @@ struct HomeView: View {
     // MARK: – Top bar
     private var topBar: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 4) {
-                Image("Logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 44)
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(energyColor)
-                        .frame(width: 6, height: 6)
-                        .shadow(color: energyColor.opacity(0.8), radius: 4)
-                        .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: energy)
-                    Text("Día 1 / 66")
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#B0A090"))
-                }
-            }
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 44)
             Spacer()
             Button { showHistory = true } label: {
                 Image(systemName: "calendar")
@@ -331,38 +328,73 @@ struct HomeView: View {
         }
     }
 
-    // MARK: – Energy section (no card)
+    // MARK: – Energy section (Pokémon HUD card)
     private var energySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let dayNum = max(1, (Calendar.current.dateComponents([.day],
+            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1)
+
+        return VStack(alignment: .leading, spacing: 14) {
+            // ── Name + Day row ────────────────────────────────────────────
             HStack(alignment: .firstTextBaseline) {
-                Text("ENERGÍA")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .tracking(1.4)
-                    .foregroundStyle(Color(hex: "#B0A090"))
+                Text(dna.name.uppercased())
+                    .font(.system(size: 20, weight: .black, design: .monospaced))
+                    .foregroundStyle(.white)
                 Spacer()
-                Text("\(Int(energy * 100))%")
-                    .font(.system(size: 18, weight: .black, design: .rounded))
+                Text("DÍA: \(String(format: "%02d", dayNum))/66")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+
+            // ── HP bar row ────────────────────────────────────────────────
+            HStack(spacing: 10) {
+                Text("HP")
+                    .font(.system(size: 14, weight: .black, design: .monospaced))
                     .foregroundStyle(energyColor)
+
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white.opacity(0.12))
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(
+                                LinearGradient(
+                                    colors: [energyColor.opacity(0.75), energyColor],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: geo.size.width * energy)
+                            .animation(.spring(duration: 0.9), value: energy)
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Color.white.opacity(0.70), lineWidth: 1)
+                    }
+                }
+                .frame(height: 13)
+
+                Text("\(Int(energy * 100))%")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundStyle(energyColor)
+                    .frame(width: 40, alignment: .trailing)
                     .animation(.easeInOut(duration: 0.4), value: energy)
             }
 
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(hex: "#F0E8E0"))
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(energyColor)
-                        .frame(width: geo.size.width * energy)
-                        .animation(.spring(duration: 0.9), value: energy)
-                }
-            }
-            .frame(height: 12)
-
+            // ── Time remaining ────────────────────────────────────────────
             Text(energyTimeLabel)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(energy <= 0 ? Color(hex: "#E12D39") : Color(hex: "#B0A090"))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(energy <= 0 ? Color(hex: "#FF6B6B") : .white.opacity(0.38))
                 .animation(.easeInOut(duration: 0.4), value: energy)
         }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "#2B2420"))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(Color.white.opacity(0.78), lineWidth: 1.5)
+                )
+                .shadow(color: Color.black.opacity(0.18), radius: 10, y: 4)
+        )
     }
 
     // MARK: – Pet section (no card)
