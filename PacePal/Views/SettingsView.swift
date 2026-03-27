@@ -215,10 +215,10 @@ struct SettingsView: View {
                 }
 
                 Button {
-                    appState.shiftChallengeDay(by: 5)
+                    appState.shiftChallengeDay(by: 3)
                     debugNow = Date()
                 } label: {
-                    Text("+5 días")
+                    Text("+3 días")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#4A3F35"))
                         .frame(maxWidth: .infinity)
@@ -229,10 +229,10 @@ struct SettingsView: View {
                 }
 
                 Button {
-                    appState.shiftChallengeDay(by: 6)
+                    appState.shiftChallengeDay(by: 10)
                     debugNow = Date()
                 } label: {
-                    Text("+6 días")
+                    Text("+10 días")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#4A3F35"))
                         .frame(maxWidth: .infinity)

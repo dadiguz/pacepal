@@ -754,9 +754,19 @@ private struct AchievementModal: View {
 
     var body: some View {
         ZStack {
-            // Background — white for now.
-            // TODO: replace with Image(achievement.imageName) once assets are delivered.
-            Color.white.ignoresSafeArea()
+            // Background photo
+            Image(achievement.imageName)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            // Dark gradient so text is always readable
+            LinearGradient(
+                colors: [Color.black.opacity(0.15), Color.black.opacity(0.65)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
             VStack(spacing: 0) {
                 Spacer()
@@ -765,44 +775,44 @@ private struct AchievementModal: View {
                 Text("DÍA \(achievement.day) / 66")
                     .font(.system(size: 11, weight: .black, design: .monospaced))
                     .tracking(2)
-                    .foregroundStyle(Color(hex: "#F9703E"))
+                    .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 7)
-                    .background(Color(hex: "#F9703E").opacity(0.10))
+                    .background(Color.white.opacity(0.18))
                     .clipShape(Capsule())
-                    .overlay(Capsule().strokeBorder(Color(hex: "#F9703E").opacity(0.25), lineWidth: 1))
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 1))
 
-                // Pet
-                PetAnimationView(dna: dna, pose: achievement.pose, pixelSize: 10)
-                    .scaleEffect(appeared ? 1.0 : 0.7)
-                    .opacity(appeared ? 1 : 0)
-                    .animation(.spring(duration: 0.55, bounce: 0.35).delay(0.1), value: appeared)
-                    .padding(.top, 28)
-
-                // Phrase
+                // Phrase — fixed-width centered container
                 achievement.displayText
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .padding(.top, 32)
+                    .shadow(color: Color.black.opacity(0.55), radius: 6, x: 0, y: 2)
+                    .frame(width: 280)
+                    .padding(.top, 36)
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 12)
-                    .animation(.spring(duration: 0.45).delay(0.25), value: appeared)
+                    .animation(.spring(duration: 0.45).delay(0.15), value: appeared)
 
                 Spacer()
+
+                // Pet — just above the button
+                PetAnimationView(dna: dna, pose: achievement.pose, pixelSize: 7)
+                    .scaleEffect(appeared ? 1.0 : 0.7)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.spring(duration: 0.55, bounce: 0.35).delay(0.25), value: appeared)
+                    .padding(.bottom, 32)
 
                 // CTA
                 Button(action: onDismiss) {
                     Text("¡Vamos!")
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 17)
-                        .background(Color(hex: "#F9703E"))
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color(hex: "#F9703E").opacity(0.35), radius: 12, y: 5)
+                        .padding(.horizontal, 48)
+                        .padding(.vertical, 16)
                 }
-                .padding(.horizontal, 32)
+                .foregroundStyle(.white)
+                .background(Color(hex: "#F9703E"))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
                 .padding(.bottom, 52)
                 .opacity(appeared ? 1 : 0)
                 .animation(.easeIn(duration: 0.3).delay(0.4), value: appeared)

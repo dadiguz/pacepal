@@ -2,98 +2,152 @@ import SwiftUI
 import Observation
 
 // MARK: - Achievement
-// 11 milestones every 6 days of the 66-day challenge.
-// Each corresponds to one background asset: achievement_1 … achievement_11.
+// 23 milestones: day 1, then every 3 days through day 64, plus day 66.
+// Each maps to background_01 … background_23 in order.
 
 struct Achievement: Identifiable {
     let day: Int
+    let index: Int  // 1-based, maps to background_01 … background_23
     let phrase: String
     var id: Int { day }
-    var assetIndex: Int { day / 6 }
-    var imageName: String { "achievement_\(assetIndex)" }
+    var imageName: String { String(format: "background_%02d", index) }
 
     var displayText: Text {
         let orange = Color(hex: "#F9703E")
-        let dark   = Color(hex: "#1F2933")
+        let white  = Color.white
         switch day {
-        case 6:
-            return Text("6 días. ").foregroundStyle(orange).bold()
-                 + Text("Tu cuerpo ya recuerda el camino.").foregroundStyle(dark)
-        case 12:
-            return Text("12 días ").foregroundStyle(orange).bold()
-                 + Text("corriendo. El hábito empieza a tomar ").foregroundStyle(dark)
-                 + Text("forma.").foregroundStyle(orange).bold()
-        case 18:
-            return Text("18 días. ").foregroundStyle(orange).bold()
-                 + Text("Tres semanas de ").foregroundStyle(dark)
-                 + Text("movimiento real.").foregroundStyle(orange).bold()
-        case 24:
-            return Text("24 días. ").foregroundStyle(orange).bold()
-                 + Text("La mitad del reto ya quedó atrás.").foregroundStyle(dark)
-        case 30:
-            return Text("Un mes completo. ").foregroundStyle(orange).bold()
-                 + Text("Esto ya no es casualidad.").foregroundStyle(dark)
-        case 36:
-            return Text("36 días. ").foregroundStyle(orange).bold()
-                 + Text("Más de la mitad del reto. ").foregroundStyle(dark)
-                 + Text("No paras.").foregroundStyle(orange).bold()
-        case 42:
-            return Text("42 días. ").foregroundStyle(orange).bold()
-                 + Text("Ya superaste el mito de los 21. ").foregroundStyle(dark)
-                 + Text("Eres constancia.").foregroundStyle(orange).bold()
-        case 48:
-            return Text("48 días. ").foregroundStyle(orange).bold()
-                 + Text("El final se acerca y ").foregroundStyle(dark)
-                 + Text("tú sigues corriendo.").foregroundStyle(orange).bold()
-        case 54:
-            return Text("54 días. ").foregroundStyle(orange).bold()
-                 + Text("A solo ").foregroundStyle(dark)
-                 + Text("12 días ").foregroundStyle(orange).bold()
-                 + Text("de lograrlo.").foregroundStyle(dark)
-        case 60:
-            return Text("60 días. ").foregroundStyle(orange).bold()
-                 + Text("La recta final. ").foregroundStyle(dark)
+        case 1:
+            return Text("Día 1. ").foregroundStyle(orange).bold()
+                 + Text("Empezaste cuando era más fácil quedarte. Eso ya es ").foregroundStyle(white)
+                 + Text("más que la mayoría.").foregroundStyle(orange).bold()
+        case 4:
+            return Text("4 días seguidos. ").foregroundStyle(orange).bold()
+                 + Text("Tu cuerpo ya siente el ritmo ").foregroundStyle(white)
+                 + Text("en los pies.").foregroundStyle(orange).bold()
+        case 7:
+            return Text("Una semana completa. ").foregroundStyle(orange).bold()
+                 + Text("Tu cuerpo empieza a recordar el camino y ").foregroundStyle(white)
+                 + Text("quiere más.").foregroundStyle(orange).bold()
+        case 10:
+            return Text("10 días. ").foregroundStyle(orange).bold()
+                 + Text("La disciplina ya no es esfuerzo, ").foregroundStyle(white)
+                 + Text("se está instalando sola.").foregroundStyle(orange).bold()
+        case 13:
+            return Text("13 días. ").foregroundStyle(orange).bold()
+                 + Text("Casi dos semanas de ").foregroundStyle(white)
+                 + Text("movimiento real y constante.").foregroundStyle(orange).bold()
+        case 16:
+            return Text("16 días. ").foregroundStyle(orange).bold()
+                 + Text("Ya no tienes que convencerte de salir. El hábito ").foregroundStyle(white)
+                 + Text("ya es tuyo.").foregroundStyle(orange).bold()
+        case 19:
+            return Text("19 días. ").foregroundStyle(orange).bold()
+                 + Text("Cada mañana que elegiste moverte en lugar de quedarte ").foregroundStyle(white)
+                 + Text("cuenta.").foregroundStyle(orange).bold()
+        case 22:
+            return Text("22 días. ").foregroundStyle(orange).bold()
+                 + Text("Tres semanas completas de ").foregroundStyle(white)
+                 + Text("correr sin excusas.").foregroundStyle(orange).bold()
+        case 25:
+            return Text("25 días. ").foregroundStyle(orange).bold()
+                 + Text("Ya pasaste la mitad del reto. No hay marcha atrás, ").foregroundStyle(white)
+                 + Text("no paras.").foregroundStyle(orange).bold()
+        case 28:
+            return Text("28 días. ").foregroundStyle(orange).bold()
+                 + Text("Un mes entero de decisiones correctas, una tras otra.").foregroundStyle(white)
+        case 31:
+            return Text("31 días. ").foregroundStyle(orange).bold()
+                 + Text("El primer mes completo quedó atrás. Cada kilómetro fue ").foregroundStyle(white)
+                 + Text("tuyo.").foregroundStyle(orange).bold()
+        case 34:
+            return Text("34 días. ").foregroundStyle(orange).bold()
+                 + Text("La mayoría ya se rindió hace tiempo. ").foregroundStyle(white)
+                 + Text("Tú sigues corriendo.").foregroundStyle(orange).bold()
+        case 37:
+            return Text("37 días. ").foregroundStyle(orange).bold()
+                 + Text("Más de la mitad del camino recorrido. El final ya ").foregroundStyle(white)
+                 + Text("se acerca.").foregroundStyle(orange).bold()
+        case 40:
+            return Text("40 días. ").foregroundStyle(orange).bold()
+                 + Text("Eres constancia, disciplina y ").foregroundStyle(white)
+                 + Text("movimiento puro.").foregroundStyle(orange).bold()
+        case 43:
+            return Text("43 días. ").foregroundStyle(orange).bold()
+                 + Text("Cada salida, cada kilómetro, es ").foregroundStyle(white)
+                 + Text("una victoria tuya.").foregroundStyle(orange).bold()
+        case 46:
+            return Text("46 días. ").foregroundStyle(orange).bold()
+                 + Text("A solo ").foregroundStyle(white)
+                 + Text("20 días ").foregroundStyle(orange).bold()
+                 + Text("de cruzar la meta. Aguanta.").foregroundStyle(white)
+        case 49:
+            return Text("49 días. ").foregroundStyle(orange).bold()
+                 + Text("Siete semanas de ").foregroundStyle(white)
+                 + Text("pura determinación y ganas.").foregroundStyle(orange).bold()
+        case 52:
+            return Text("52 días. ").foregroundStyle(orange).bold()
+                 + Text("La recta final ya ").foregroundStyle(white)
+                 + Text("está muy cerca.").foregroundStyle(orange).bold()
+        case 55:
+            return Text("55 días. ").foregroundStyle(orange).bold()
+                 + Text("Solo 11 días más entre tú y la meta. ").foregroundStyle(white)
                  + Text("No sueltes ahora.").foregroundStyle(orange).bold()
+        case 58:
+            return Text("58 días. ").foregroundStyle(orange).bold()
+                 + Text("Ya puedes sentirla. ").foregroundStyle(white)
+                 + Text("La meta está justo ahí.").foregroundStyle(orange).bold()
+        case 61:
+            return Text("61 días. ").foregroundStyle(orange).bold()
+                 + Text("Solo 5 días más entre tú y los 66. ").foregroundStyle(white)
+                 + Text("Tú puedes.").foregroundStyle(orange).bold()
+        case 64:
+            return Text("64 días. ").foregroundStyle(orange).bold()
+                 + Text("La línea de meta ").foregroundStyle(white)
+                 + Text("está a dos pasos.").foregroundStyle(orange).bold()
         default: // 66
             return Text("66 días.\n").foregroundStyle(orange).bold()
-                 + Text("Cada mañana que elegiste salir cuando todo decía quedarte.\n").foregroundStyle(dark)
-                 + Text("Cada kilómetro ").foregroundStyle(dark).bold()
-                 + Text("cuando pensabas que no podías.\n\n").foregroundStyle(dark)
+                 + Text("Cada mañana que elegiste salir\ncuando todo decía quedarte.\n").foregroundStyle(white)
+                 + Text("Cada kilómetro ").foregroundStyle(white).bold()
+                 + Text("cuando pensabas que no podías.\n\n").foregroundStyle(white)
                  + Text("Rompiste la meta ").foregroundStyle(orange).bold()
-                 + Text("y lo que construiste no desaparece.\n\n").foregroundStyle(dark)
+                 + Text("y lo que construiste no desaparece.\n\n").foregroundStyle(white)
                  + Text("Sigue corriendo.").foregroundStyle(orange).bold()
         }
     }
 
-    /// Each milestone gets its own unique animation (11 unique poses for 11 milestones)
+    /// Unique celebratory animation per milestone (cycles through 12 poses, finish for day 66)
     var pose: PetPose {
-        switch day {
-        case 6:  return .running
-        case 12: return .bounce
-        case 18: return .cheer
-        case 24: return .dance
-        case 30: return .happy
-        case 36: return .spin
-        case 42: return .jump
-        case 48: return .wave
-        case 54: return .flex
-        case 60: return .star
-        default: return .finish  // day 66
-        }
+        let cycle: [PetPose] = [.running, .happy, .hype, .jump, .cheer, .bounce,
+                                .dance, .spin, .wave, .flex, .star, .running]
+        if day == 66 { return .finish }
+        let i = (index - 1) % cycle.count
+        return cycle[i]
     }
 
     static let all: [Achievement] = [
-        Achievement(day: 6,  phrase: "6 días. Tu cuerpo ya recuerda el camino."),
-        Achievement(day: 12, phrase: "12 días corriendo. El hábito empieza a tomar forma."),
-        Achievement(day: 18, phrase: "18 días. Tres semanas de movimiento real."),
-        Achievement(day: 24, phrase: "24 días. La mitad del reto ya quedó atrás."),
-        Achievement(day: 30, phrase: "Un mes completo. Esto ya no es casualidad."),
-        Achievement(day: 36, phrase: "36 días. Más de la mitad del reto. No paras."),
-        Achievement(day: 42, phrase: "42 días. Ya superaste el mito de los 21. Eres constancia."),
-        Achievement(day: 48, phrase: "48 días. El final se acerca y tú sigues corriendo."),
-        Achievement(day: 54, phrase: "54 días. A solo 12 días de lograrlo."),
-        Achievement(day: 60, phrase: "60 días. La recta final. No sueltes ahora."),
-        Achievement(day: 66, phrase: "66 días. Cada mañana que elegiste salir cuando todo decía quedarte. Cada kilómetro cuando pensabas que no podías. Rompiste la meta — y lo que construiste no desaparece. Sigue corriendo."),
+        Achievement(day:  1, index:  1, phrase: "Día 1. Empezaste."),
+        Achievement(day:  4, index:  2, phrase: "4 días. Ya tienes el ritmo en los pies."),
+        Achievement(day:  7, index:  3, phrase: "Una semana. Tu cuerpo empieza a recordar."),
+        Achievement(day: 10, index:  4, phrase: "10 días. La disciplina se está instalando."),
+        Achievement(day: 13, index:  5, phrase: "13 días. Casi dos semanas de movimiento real."),
+        Achievement(day: 16, index:  6, phrase: "16 días. El hábito ya es tuyo."),
+        Achievement(day: 19, index:  7, phrase: "19 días. Cada salida cuenta."),
+        Achievement(day: 22, index:  8, phrase: "22 días. Tres semanas completas corriendo."),
+        Achievement(day: 25, index:  9, phrase: "25 días. A mitad del reto. No paras."),
+        Achievement(day: 28, index: 10, phrase: "28 días. Un mes de decisiones correctas."),
+        Achievement(day: 31, index: 11, phrase: "31 días. El mes completo quedó atrás."),
+        Achievement(day: 34, index: 12, phrase: "34 días. La mayoría ya se rindió. Tú sigues."),
+        Achievement(day: 37, index: 13, phrase: "37 días. Más de la mitad. El final se acerca."),
+        Achievement(day: 40, index: 14, phrase: "40 días. Eres constancia en movimiento."),
+        Achievement(day: 43, index: 15, phrase: "43 días. Cada salida es una victoria."),
+        Achievement(day: 46, index: 16, phrase: "46 días. A solo 20 días de lograrlo."),
+        Achievement(day: 49, index: 17, phrase: "49 días. Siete semanas de pura determinación."),
+        Achievement(day: 52, index: 18, phrase: "52 días. La recta final está cerca."),
+        Achievement(day: 55, index: 19, phrase: "55 días. A solo 11 días. No sueltes ahora."),
+        Achievement(day: 58, index: 20, phrase: "58 días. Ya puedes verla. La meta está ahí."),
+        Achievement(day: 61, index: 21, phrase: "61 días. 5 días más. Tú puedes."),
+        Achievement(day: 64, index: 22, phrase: "64 días. La línea de meta está a la vuelta."),
+        Achievement(day: 66, index: 23, phrase: "66 días. Rompiste la meta. Sigue corriendo."),
     ]
 }
 
