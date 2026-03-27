@@ -354,6 +354,97 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 pset(&g, x: lX-1, y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
                 pset(&g, x: rX+1, y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
             }
+        case .victory:
+            let alt = frame % 2 == 0
+            pset(&g, x: alt ? lX-2 : lX-1, y: aY-3, cell: .body)
+            pset(&g, x: alt ? lX-1 : lX,   y: aY-2, cell: .body)
+            pset(&g, x: alt ? rX+2 : rX+1, y: aY-3, cell: .body)
+            pset(&g, x: alt ? rX+1 : rX,   y: aY-2, cell: .body)
+        case .clap:
+            let close = frame % 2 == 0
+            pset(&g, x: close ? lX+2 : lX+1, y: aY-1, cell: .body)
+            pset(&g, x: close ? lX+2 : lX+1, y: aY,   cell: .body)
+            pset(&g, x: close ? rX-2 : rX-1, y: aY-1, cell: .body)
+            pset(&g, x: close ? rX-2 : rX-1, y: aY,   cell: .body)
+        case .skip:
+            switch frame {
+            case 0:
+                pset(&g, x: lX-1, y: aY+3, cell: .body); pset(&g, x: lX,   y: aY+4, cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX+1, y: aY-4, cell: .body)
+            case 1:
+                pset(&g, x: lX,   y: aY+1, cell: .body); pset(&g, x: lX,   y: aY+2, cell: .body)
+                pset(&g, x: rX,   y: aY-1, cell: .body); pset(&g, x: rX,   y: aY,   cell: .body)
+            case 2:
+                pset(&g, x: lX+1, y: aY-4, cell: .body); pset(&g, x: lX,   y: aY-3, cell: .body)
+                pset(&g, x: rX+1, y: aY+3, cell: .body); pset(&g, x: rX,   y: aY+4, cell: .body)
+            default:
+                pset(&g, x: lX,   y: aY-1, cell: .body); pset(&g, x: lX,   y: aY,   cell: .body)
+                pset(&g, x: rX,   y: aY+1, cell: .body); pset(&g, x: rX,   y: aY+2, cell: .body)
+            }
+        case .stretch:
+            let w = frame % 2 == 0 ? 3 : 2
+            pset(&g, x: lX-w,   y: aY, cell: .body); pset(&g, x: lX-w+1, y: aY, cell: .body)
+            pset(&g, x: rX+w-1, y: aY, cell: .body); pset(&g, x: rX+w,   y: aY, cell: .body)
+        case .stomp:
+            let hiS = frame % 2 == 0
+            pset(&g, x: lX, y: hiS ? aY-3 : aY-2, cell: .body)
+            pset(&g, x: lX, y: hiS ? aY-2 : aY-1, cell: .body)
+            pset(&g, x: rX, y: hiS ? aY-3 : aY-2, cell: .body)
+            pset(&g, x: rX, y: hiS ? aY-2 : aY-1, cell: .body)
+        case .leap:
+            switch frame {
+            case 0, 2:
+                pset(&g, x: lX-2, y: aY-2, cell: .body); pset(&g, x: lX-1, y: aY-1, cell: .body)
+                pset(&g, x: rX+1, y: aY-2, cell: .body); pset(&g, x: rX+2, y: aY-1, cell: .body)
+            default:
+                pset(&g, x: lX-1, y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX+1, y: aY-2, cell: .body)
+            }
+        case .salute:
+            let altS = frame % 2 == 0
+            pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
+            pset(&g, x: altS ? rX+1 : rX, y: aY-2, cell: .body)
+            pset(&g, x: rX,               y: aY-1, cell: .body)
+            if altS { pset(&g, x: rX+2, y: aY-2, cell: .body) }
+        case .shimmy:
+            let sw = frame % 2 == 0
+            pset(&g, x: sw ? lX-1 : lX, y: aY,   cell: .body)
+            pset(&g, x: sw ? lX-1 : lX, y: aY+1, cell: .body)
+            pset(&g, x: sw ? rX+1 : rX, y: aY,   cell: .body)
+            pset(&g, x: sw ? rX+1 : rX, y: aY+1, cell: .body)
+        case .kick:
+            switch frame {
+            case 0, 2:
+                pset(&g, x: lX, y: aY+1, cell: .body); pset(&g, x: lX, y: aY+2, cell: .body)
+                pset(&g, x: rX, y: aY-3, cell: .body); pset(&g, x: rX, y: aY-2, cell: .body)
+            default:
+                pset(&g, x: lX, y: aY-3, cell: .body); pset(&g, x: lX, y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY+1, cell: .body); pset(&g, x: rX, y: aY+2, cell: .body)
+            }
+        case .pump:
+            switch frame {
+            case 0, 2:
+                pset(&g, x: lX, y: aY-3, cell: .body); pset(&g, x: lX, y: aY-2, cell: .body)
+                pset(&g, x: rX, y: aY,   cell: .body); pset(&g, x: rX, y: aY+1, cell: .body)
+            default:
+                pset(&g, x: lX, y: aY,   cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
+                pset(&g, x: rX, y: aY-3, cell: .body); pset(&g, x: rX, y: aY-2, cell: .body)
+            }
+        case .twirl:
+            switch frame {
+            case 0:
+                pset(&g, x: lX-1, y: aY-2, cell: .body); pset(&g, x: lX-2, y: aY-1, cell: .body)
+                pset(&g, x: rX+2, y: aY,   cell: .body); pset(&g, x: rX+1, y: aY+1, cell: .body)
+            case 1:
+                pset(&g, x: lX,   y: aY-3, cell: .body); pset(&g, x: lX-1, y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY-1, cell: .body); pset(&g, x: rX+2, y: aY,   cell: .body)
+            case 2:
+                pset(&g, x: lX+1, y: aY-1, cell: .body); pset(&g, x: lX+2, y: aY,   cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX-1, y: aY-2, cell: .body)
+            default:
+                pset(&g, x: lX,   y: aY+2, cell: .body); pset(&g, x: lX+1, y: aY+1, cell: .body)
+                pset(&g, x: rX-1, y: aY-2, cell: .body); pset(&g, x: rX,   y: aY-3, cell: .body)
+            }
         case .idle:
             switch dna.armStyle {
             case 0: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)

@@ -113,13 +113,17 @@ struct Achievement: Identifiable {
         }
     }
 
-    /// Unique celebratory animation per milestone (cycles through 12 poses, finish for day 66)
+    /// Unique celebratory animation per milestone — one distinct pose per day
     var pose: PetPose {
-        let cycle: [PetPose] = [.running, .happy, .hype, .jump, .cheer, .bounce,
-                                .dance, .spin, .wave, .flex, .star, .running]
         if day == 66 { return .finish }
-        let i = (index - 1) % cycle.count
-        return cycle[i]
+        let map: [PetPose] = [
+            .running, .happy,   .hype,    .jump,  .cheer,
+            .bounce,  .dance,   .spin,    .wave,  .flex,
+            .star,    .victory, .clap,    .skip,  .stretch,
+            .stomp,   .leap,    .salute,  .shimmy,.kick,
+            .pump,    .twirl
+        ]
+        return map[min(index - 1, map.count - 1)]
     }
 
     static let all: [Achievement] = [
