@@ -23,6 +23,7 @@ struct HomeView: View {
     @State private var phraseIndex: Int = Int.random(in: 0..<RunningPhrase.all.count)
     @State private var showPetStatus = false
     @State private var pendingAchievement: Achievement? = nil
+    @State private var replayAchievement: Achievement? = nil
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -140,19 +141,17 @@ struct HomeView: View {
                 Spacer(minLength: 24)
             }
             .sheet(isPresented: $showPetStatus) {
-                PetStatusSheet(dna: dna, moodText: moodText, energyColor: energyColor)
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
-                    .presentationBackground { AppBackground() }
-            }
-            .sheet(item: $pendingAchievement) { achievement in
-                AchievementModal(achievement: achievement, dna: dna) {
-                    appState.markAchievementSeen(achievement.day)
-                    pendingAchievement = nil
+                PetStatusSheet(dna: dna, moodText: moodText, energyColor: energyColor) { tapped in
+                    showPetStatus = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
+                            replayAchievement = tapped
+                        }
+                    }
                 }
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
-                .interactiveDismissDisabled(true)
+                .presentationDetents([.fraction(0.75)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground { AppBackground() }
             }
 
             // ── Game Over overlay ─────────────────────────────────────────
@@ -179,7 +178,30 @@ struct HomeView: View {
                 .transition(.opacity)
                 .zIndex(10)
             }
+
+            // ── Achievement overlays (auto-trigger + replay) ──────────────
+            if let achievement = pendingAchievement {
+                AchievementModal(achievement: achievement, dna: dna) {
+                    appState.markAchievementSeen(achievement.day)
+                    withAnimation(.spring(duration: 0.35)) { pendingAchievement = nil }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .transition(.opacity)
+                .zIndex(20)
+            }
+            if let achievement = replayAchievement {
+                AchievementModal(achievement: achievement, dna: dna) {
+                    withAnimation(.spring(duration: 0.35)) { replayAchievement = nil }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .transition(.opacity)
+                .zIndex(20)
+            }
         }
+        .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
+        .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
         .onChange(of: appState.selectedCharacter?.id) { _, _ in
             isInitialLoad = true
@@ -256,7 +278,9 @@ struct HomeView: View {
 
     private func checkForAchievement() {
         guard pendingAchievement == nil, !showPetStatus else { return }
-        pendingAchievement = appState.pendingAchievement
+        withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
+            pendingAchievement = appState.pendingAchievement
+        }
     }
 
     // MARK: – Tutorial
@@ -610,11 +634,10 @@ private struct PetStatusSheet: View {
     let dna: PetDNA
     let moodText: String
     let energyColor: Color
+    var onAchievementTapped: (Achievement) -> Void = { _ in }
 
     @Environment(HealthManager.self) private var health
     @Environment(AppState.self) private var appState
-
-    @State private var selectedAchievement: Achievement? = nil
 
     private var bodyColor: Color { Color(hex: dna.palette.body) }
 
@@ -685,7 +708,7 @@ private struct PetStatusSheet: View {
                     ForEach(Achievement.all) { a in
                         let unlocked = appState.seenAchievements.contains(a.day)
                         Button {
-                            if unlocked { selectedAchievement = a }
+                            if unlocked { onAchievementTapped(a) }
                         } label: {
                             VStack(spacing: 5) {
                                 ZStack {
@@ -720,13 +743,6 @@ private struct PetStatusSheet: View {
         .task {
             await health.fetchRunStats(since: appState.challengeStartDate)
         }
-        .sheet(item: $selectedAchievement) { a in
-            AchievementModal(achievement: a, dna: dna) {
-                selectedAchievement = nil
-            }
-            .presentationDetents([.large])
-            .presentationDragIndicator(.hidden)
-        }
     }
 
     private func statCell(value: String, label: String) -> some View {
@@ -753,72 +769,78 @@ private struct AchievementModal: View {
     @State private var appeared = false
 
     var body: some View {
-        ZStack {
-            // Background photo
-            Image(achievement.imageName)
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
+        GeometryReader { geo in
+            ZStack {
+                // Background photo — pinned to exact screen size
+                Image(achievement.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
 
-            // Dark gradient so text is always readable
-            LinearGradient(
-                colors: [Color.black.opacity(0.15), Color.black.opacity(0.65)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+                LinearGradient(
+                    colors: [Color.black.opacity(0.15), Color.black.opacity(0.65)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
 
-            VStack(spacing: 0) {
-                Spacer()
+                VStack(spacing: 0) {
+                    Spacer().frame(height: 124)
 
-                // Day badge
-                Text("DÍA \(achievement.day) / 66")
-                    .font(.system(size: 11, weight: .black, design: .monospaced))
-                    .tracking(2)
+                    // Day badge
+                    Text("DÍA \(achievement.day) / 66")
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .tracking(2)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 7)
+                        .background(Color.white.opacity(0.18))
+                        .clipShape(Capsule())
+                        .overlay(Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 1))
+
+                    // Phrase
+                    achievement.displayText
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .multilineTextAlignment(.center)
+                        .shadow(color: Color.black.opacity(0.55), radius: 6, x: 0, y: 2)
+                        .frame(width: 280)
+                        .padding(.top, 24)
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 12)
+                        .animation(.easeOut(duration: 0.4).delay(0.15), value: appeared)
+
+                    Spacer()
+
+                    // Pet
+                    PetAnimationView(dna: dna, pose: achievement.pose, pixelSize: 7)
+                        .scaleEffect(appeared ? 1.0 : 0.8)
+                        .opacity(appeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.4).delay(0.2), value: appeared)
+                        .padding(.bottom, 32)
+
+                    // CTA
+                    Button(action: onDismiss) {
+                        Text("¡Vamos!")
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .padding(.horizontal, 48)
+                            .padding(.vertical, 16)
+                    }
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 7)
-                    .background(Color.white.opacity(0.18))
-                    .clipShape(Capsule())
-                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 1))
-
-                // Phrase — fixed-width centered container
-                achievement.displayText
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.center)
-                    .shadow(color: Color.black.opacity(0.55), radius: 6, x: 0, y: 2)
-                    .frame(width: 280)
-                    .padding(.top, 36)
+                    .background(Color(hex: "#F9703E"))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
+                    .padding(.bottom, 76)
                     .opacity(appeared ? 1 : 0)
-                    .offset(y: appeared ? 0 : 12)
-                    .animation(.spring(duration: 0.45).delay(0.15), value: appeared)
-
-                Spacer()
-
-                // Pet — just above the button
-                PetAnimationView(dna: dna, pose: achievement.pose, pixelSize: 7)
-                    .scaleEffect(appeared ? 1.0 : 0.7)
-                    .opacity(appeared ? 1 : 0)
-                    .animation(.spring(duration: 0.55, bounce: 0.35).delay(0.25), value: appeared)
-                    .padding(.bottom, 32)
-
-                // CTA
-                Button(action: onDismiss) {
-                    Text("¡Vamos!")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .padding(.horizontal, 48)
-                        .padding(.vertical, 16)
+                    .animation(.easeOut(duration: 0.3).delay(0.3), value: appeared)
                 }
-                .foregroundStyle(.white)
-                .background(Color(hex: "#F9703E"))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
-                .padding(.bottom, 52)
-                .opacity(appeared ? 1 : 0)
-                .animation(.easeIn(duration: 0.3).delay(0.4), value: appeared)
+                .frame(width: geo.size.width, height: geo.size.height)
             }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
-        .onAppear { appeared = true }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation { appeared = true }
+        }
     }
 }
 

@@ -105,13 +105,11 @@ struct Achievement: Identifiable {
                  + Text("La línea de meta ").foregroundStyle(white)
                  + Text("está a dos pasos.").foregroundStyle(orange).bold()
         default: // 66
-            return Text("66 días.\n").foregroundStyle(orange).bold()
-                 + Text("Cada mañana que elegiste salir\ncuando todo decía quedarte.\n").foregroundStyle(white)
-                 + Text("Cada kilómetro ").foregroundStyle(white).bold()
-                 + Text("cuando pensabas que no podías.\n\n").foregroundStyle(white)
+            return Text("66 días. ").foregroundStyle(orange).bold()
+                 + Text("Elegiste salir cuando todo decía quedarte. Corriste cuando pensabas que no podías. ").foregroundStyle(white)
                  + Text("Rompiste la meta ").foregroundStyle(orange).bold()
-                 + Text("y lo que construiste no desaparece.\n\n").foregroundStyle(white)
-                 + Text("Sigue corriendo.").foregroundStyle(orange).bold()
+                 + Text("y lo construiste. ").foregroundStyle(white)
+                 + Text("Ahora sigue corriendo.").foregroundStyle(orange).bold()
         }
     }
 
@@ -147,7 +145,7 @@ struct Achievement: Identifiable {
         Achievement(day: 58, index: 20, phrase: "58 días. Ya puedes verla. La meta está ahí."),
         Achievement(day: 61, index: 21, phrase: "61 días. 5 días más. Tú puedes."),
         Achievement(day: 64, index: 22, phrase: "64 días. La línea de meta está a la vuelta."),
-        Achievement(day: 66, index: 23, phrase: "66 días. Rompiste la meta. Sigue corriendo."),
+        Achievement(day: 66, index: 23, phrase: "66 días. Elegiste salir cuando todo decía quedarte. Corriste cuando pensabas que no podías. Rompiste la meta y lo construiste. Ahora sigue corriendo."),
     ]
 }
 
