@@ -9,6 +9,7 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showResetConfirm = false
+    @State private var showBackgroundPicker = false
 
     #if DEBUG
     @State private var debugNow: Date = Date()
@@ -49,6 +50,15 @@ struct SettingsView: View {
                         subtitle: "Repasa cómo funciona la energía"
                     ) {
                         onShowTutorial?()
+                    }
+
+                    settingsRow(
+                        icon: "photo.on.rectangle",
+                        iconColor: "#3B82F6",
+                        title: "Cambiar fondo",
+                        subtitle: "Personaliza el fondo de tu pantalla"
+                    ) {
+                        showBackgroundPicker = true
                     }
 
                     // ── Difficulty row ───────────────────────────────────
@@ -106,8 +116,15 @@ struct SettingsView: View {
                 Spacer()
             }
         }
+        .sheet(isPresented: $showBackgroundPicker) {
+            BackgroundPickerSheet()
+                .environment(appState)
+                .presentationDetents([.fraction(0.85)])
+                .presentationDragIndicator(.visible)
+        }
         .confirmationDialog("Restablecer compañero", isPresented: $showResetConfirm) {
             Button("Restablecer", role: .destructive) {
+                appState.onCharacterSelected()
                 saved.forEach { modelContext.delete($0) }
                 health.resetKm()
                 dismiss()
@@ -287,6 +304,184 @@ struct SettingsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
         }
+    }
+}
+
+// MARK: - Background Picker Sheet
+
+struct BackgroundPickerSheet: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
+
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+
+    private var currentDay: Int {
+        (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
+    }
+
+    private func isUnlocked(_ index: Int) -> Bool {
+        guard index >= 1 && index <= Achievement.all.count else { return true } // 0 = default always unlocked
+        guard appState.challengeStarted else { return false }
+        return currentDay >= Achievement.all[index - 1].day
+    }
+
+    private func imageName(for index: Int) -> String? {
+        guard index >= 1 else { return nil }
+        return String(format: "background_%02d", index)
+    }
+
+    private var selectedIndex: Int? {
+        guard let bg = appState.selectedBackground else { return 0 }
+        return Achievement.all.first { String(format: "background_%02d", $0.index) == bg }?.index
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Fondos")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .padding(9)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 14)
+
+            Text("Desbloqueas nuevos fondos al alcanzar cada logro")
+                .font(.system(size: 12, weight: .regular, design: .rounded))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 16)
+
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    // Index 0 = default background
+                    ForEach(0...23, id: \.self) { index in
+                        let unlocked = isUnlocked(index)
+                        let isSelected = selectedIndex == index
+                        let name = imageName(for: index)
+
+                        Button {
+                            guard unlocked else { return }
+                            withAnimation(.spring(duration: 0.25)) {
+                                appState.selectBackground(name)
+                            }
+                        } label: {
+                            ZStack {
+                                // Thumbnail
+                                if let name {
+                                    Image(name)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .clipped()
+                                } else {
+                                    // Default gradient preview
+                                    ZStack {
+                                        Color(hex: "#F5F8FC")
+                                        RadialGradient(
+                                            colors: [Color(hex: "#F9703E").opacity(0.18), .clear],
+                                            center: .init(x: 0.5, y: 0.1),
+                                            startRadius: 0, endRadius: 80
+                                        )
+                                    }
+                                }
+
+                                // Lock overlay
+                                if !unlocked {
+                                    Color.black.opacity(0.52)
+                                    VStack(spacing: 4) {
+                                        Image(systemName: "lock.fill")
+                                            .font(.system(size: 16, weight: .semibold))
+                                            .foregroundStyle(.white)
+                                        if index >= 1 && index <= Achievement.all.count {
+                                            Text("Día \(Achievement.all[index - 1].day)")
+                                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                                .foregroundStyle(.white.opacity(0.85))
+                                        }
+                                    }
+                                }
+
+                                // Selection checkmark
+                                if isSelected {
+                                    Color.black.opacity(0.15)
+                                    VStack {
+                                        HStack {
+                                            Spacer()
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.system(size: 20, weight: .bold))
+                                                .foregroundStyle(.white)
+                                                .shadow(color: .black.opacity(0.4), radius: 4)
+                                                .padding(6)
+                                        }
+                                        Spacer()
+                                    }
+                                }
+
+                                // Day label for unlocked (non-default)
+                                if unlocked && index >= 1 {
+                                    VStack {
+                                        Spacer()
+                                        HStack {
+                                            Text("Día \(Achievement.all[index - 1].day)")
+                                                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                                                .foregroundStyle(.white)
+                                                .shadow(color: .black.opacity(0.6), radius: 2)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 3)
+                                                .background(.black.opacity(0.30))
+                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            Spacer()
+                                        }
+                                        .padding(5)
+                                    }
+                                }
+
+                                // "Original" label for default tile
+                                if index == 0 {
+                                    VStack {
+                                        Spacer()
+                                        HStack {
+                                            Text("Original")
+                                                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                                                .foregroundStyle(Color(hex: "#4A3F35"))
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 3)
+                                                .background(Color.white.opacity(0.70))
+                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            Spacer()
+                                        }
+                                        .padding(5)
+                                    }
+                                }
+                            }
+                            .frame(height: 100)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(
+                                        isSelected ? Color(hex: "#F9703E") : Color.clear,
+                                        lineWidth: 3
+                                    )
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 32)
+            }
+        }
+        .background(Color(hex: "#F5F8FC").ignoresSafeArea())
     }
 }
 

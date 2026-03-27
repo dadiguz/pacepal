@@ -27,6 +27,8 @@ struct HomeView: View {
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
+    private var hasPhotoBackground: Bool { appState.selectedBackground != nil }
+
     private var energy: Double { appState.energy(at: now) }
 
     private var energyColor: Color {
@@ -76,8 +78,6 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            AppBackground()
-
             VStack(spacing: 0) {
                 // ── Top bar ──────────────────────────────────────────────
                 topBar
@@ -124,16 +124,16 @@ struct HomeView: View {
                             .foregroundStyle(energyColor)
                         Text(moodText)
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color(hex: "#4A3F35"))
+                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933") : Color(hex: "#4A3F35"))
                         Image(systemName: "chevron.up")
                             .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(Color(hex: "#4A3F35").opacity(0.4))
+                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933").opacity(0.4) : Color(hex: "#4A3F35").opacity(0.4))
                     }
                     .padding(.horizontal, 18)
                     .padding(.vertical, 10)
-                    .background(energyColor.opacity(0.13))
+                    .background(hasPhotoBackground ? Color.white : energyColor.opacity(0.13))
                     .clipShape(Capsule())
-                    .overlay(Capsule().strokeBorder(energyColor.opacity(0.35), lineWidth: 1))
+                    .overlay(Capsule().strokeBorder(energyColor, lineWidth: 1.5))
                 }
                 .padding(.top, 10)
                 .animation(.easeInOut(duration: 0.3), value: moodText)
@@ -200,6 +200,7 @@ struct HomeView: View {
                 .zIndex(20)
             }
         }
+        .background { AppBackground(imageName: appState.selectedBackground) }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
         .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
@@ -323,6 +324,7 @@ struct HomeView: View {
         }
         isAnimating = false
         currentPose = normalPose
+        appState.confirmChallengeStart()
         checkForAchievement()
     }
 
@@ -337,9 +339,9 @@ struct HomeView: View {
             Button { showHistory = true } label: {
                 Image(systemName: "calendar")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(Color(hex: "#A09080"))
+                    .foregroundStyle(hasPhotoBackground ? Color(hex: "#3D3D3D") : Color(hex: "#A09080"))
                     .padding(10)
-                    .background(Color(hex: "#F5ECE4"))
+                    .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
                     .clipShape(Circle())
             }
             .sheet(isPresented: $showHistory) {
@@ -351,9 +353,9 @@ struct HomeView: View {
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(Color(hex: "#A09080"))
+                    .foregroundStyle(hasPhotoBackground ? Color(hex: "#3D3D3D") : Color(hex: "#A09080"))
                     .padding(10)
-                    .background(Color(hex: "#F5ECE4"))
+                    .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
                     .clipShape(Circle())
             }
             .sheet(isPresented: $showSettings) {
@@ -371,8 +373,9 @@ struct HomeView: View {
 
     // MARK: – Energy section (Pokémon HUD card)
     private var energySection: some View {
-        let dayNum = max(1, (Calendar.current.dateComponents([.day],
-            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1)
+        let rawDay = (Calendar.current.dateComponents([.day],
+            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
+        let dayNum = appState.challengeStarted ? max(1, rawDay) : 0
 
         return VStack(alignment: .leading, spacing: 14) {
             // ── Name + Day row ────────────────────────────────────────────
@@ -479,7 +482,9 @@ struct HomeView: View {
     private var phraseSection: some View {
         Text(RunningPhrase.all[phraseIndex].es)
             .font(.system(size: 20, weight: .regular, design: .rounded))
-            .foregroundStyle(Color(hex: "#7A6E68"))
+            .foregroundStyle(hasPhotoBackground ? .white : Color(hex: "#7A6E68"))
+            .shadow(color: hasPhotoBackground ? .black.opacity(0.80) : .clear, radius: 12, x: 0, y: 2)
+            .shadow(color: hasPhotoBackground ? .black.opacity(0.50) : .clear, radius: 4, x: 0, y: 1)
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .onTapGesture {
@@ -502,7 +507,7 @@ struct HomeView: View {
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color(hex: "#F9703E"))
                     .frame(width: 34, height: 34)
-                    .background(Color(hex: "#F5ECE4"))
+                    .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
                     .clipShape(Circle())
             }
 
@@ -510,11 +515,13 @@ struct HomeView: View {
                 Text(String(format: "%.1f", displayedKm))
                     .font(.system(size: 56, weight: .black, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
+                    .shadow(color: hasPhotoBackground ? .black.opacity(0.55) : .clear, radius: 6, x: 0, y: 1)
                     .contentTransition(.numericText())
                     .animation(.spring(duration: 0.3), value: displayedKm)
                 Text("km")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E").opacity(0.65))
+                    .shadow(color: hasPhotoBackground ? .black.opacity(0.45) : .clear, radius: 4, x: 0, y: 1)
                     .padding(.bottom, 6)
             }
         }
@@ -590,6 +597,7 @@ struct HomeView: View {
                     .foregroundStyle(.white.opacity(0.80))
                 Spacer().frame(height: 32)
                 Button {
+                    appState.onCharacterSelected()
                     saved.forEach { modelContext.delete($0) }
                     health.resetKm()
                     withAnimation(.spring(duration: 0.4)) {

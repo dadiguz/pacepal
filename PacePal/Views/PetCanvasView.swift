@@ -206,19 +206,33 @@ extension Color {
 }
 
 // MARK: - Shared app background
-/// Cool white base (#F5F8FC) + subtle brand glow from the top.
-/// Use this as the first layer in every screen's ZStack.
+/// Pass `imageName` to overlay a photo background; nil (default) uses the standard gradient.
 struct AppBackground: View {
+    var imageName: String? = nil
+
     var body: some View {
         ZStack {
-            Color(hex: "#F5F8FC")
-            RadialGradient(
-                colors: [Color(hex: "#F9703E").opacity(0.07), .clear],
-                center: .init(x: 0.5, y: -0.05),
-                startRadius: 0,
-                endRadius: 420
-            )
+            if let imageName {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                LinearGradient(
+                    colors: [.black.opacity(0.08), .black.opacity(0.50)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            } else {
+                Color(hex: "#F5F8FC")
+                RadialGradient(
+                    colors: [Color(hex: "#F9703E").opacity(0.07), .clear],
+                    center: .init(x: 0.5, y: -0.05),
+                    startRadius: 0,
+                    endRadius: 420
+                )
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
         .ignoresSafeArea()
     }
 }

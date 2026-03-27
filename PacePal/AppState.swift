@@ -204,8 +204,14 @@ final class AppState {
     private(set) var paywallDismissed: Bool
     private(set) var healthPermissionDone: Bool
 
+    // Selected background image name (nil = default gradient)
+    private(set) var selectedBackground: String?
+
     // Achievement milestones already seen by the user
     private(set) var seenAchievements: Set<Int>
+
+    // True once the user logs their first run — gates achievement triggers
+    private(set) var challengeStarted: Bool
 
     /// Seconds from 100% to 0% — driven by difficulty
     var decaySeconds: Double { difficulty.decaySeconds }
@@ -221,6 +227,8 @@ final class AppState {
         self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
         self.seenAchievements = Set(seen)
+        self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
+        self.selectedBackground = UserDefaults.standard.string(forKey: "selectedBackground")
     }
 
     func completeOnboarding() {
@@ -274,10 +282,23 @@ final class AppState {
         UserDefaults.standard.set(km, forKey: "kmCountedForEnergy")
     }
 
+    func confirmChallengeStart() {
+        guard !challengeStarted else { return }
+        challengeStarted = true
+        UserDefaults.standard.set(true, forKey: "challengeStarted")
+    }
+
     // Returns the first milestone that's been reached but not yet shown
     var pendingAchievement: Achievement? {
+        guard challengeStarted else { return nil }
         let dayNum = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
         return Achievement.all.first { dayNum >= $0.day && !seenAchievements.contains($0.day) }
+    }
+
+    func selectBackground(_ name: String?) {
+        selectedBackground = name
+        if let name { UserDefaults.standard.set(name, forKey: "selectedBackground") }
+        else { UserDefaults.standard.removeObject(forKey: "selectedBackground") }
     }
 
     func markAchievementSeen(_ day: Int) {
@@ -317,6 +338,12 @@ final class AppState {
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
         kmCountedForEnergy = 0
         UserDefaults.standard.set(0.0, forKey: "kmCountedForEnergy")
+        seenAchievements = []
+        UserDefaults.standard.set([] as [Int], forKey: "seenAchievements")
+        challengeStarted = false
+        UserDefaults.standard.set(false, forKey: "challengeStarted")
         isFirstRunForCharacter = true
+        selectedBackground = nil
+        UserDefaults.standard.removeObject(forKey: "selectedBackground")
     }
 }

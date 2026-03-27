@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct SplashView: View {
+    @Environment(AppState.self) private var appState
     @Query private var saved: [SavedCharacter]
 
     @State private var randomDNA: PetDNA = PetDNA.random()
@@ -11,8 +12,6 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            AppBackground()
-
             VStack(spacing: 0) {
                 Spacer()
 
@@ -33,6 +32,8 @@ struct SplashView: View {
                 Spacer()
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background { AppBackground(imageName: appState.selectedBackground) }
         .onAppear {
             petAppeared = true
         }
