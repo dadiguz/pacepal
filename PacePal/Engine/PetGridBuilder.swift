@@ -265,6 +265,95 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g, x: sway ? lX-1 : lX,   y: aY-1, cell: .body)
             pset(&g, x: sway ? rX   : rX+1, y: aY+1, cell: .body)
             pset(&g, x: sway ? rX   : rX+1, y: aY+2, cell: .body)
+        case .cheer:
+            // Both arms raised high, waving alternately
+            let hiC = frame % 2 == 0
+            pset(&g, x: hiC ? lX-1 : lX, y: aY-3, cell: .body)
+            pset(&g, x: hiC ? lX-1 : lX, y: aY-2, cell: .body)
+            pset(&g, x: hiC ? rX+1 : rX, y: aY-3, cell: .body)
+            pset(&g, x: hiC ? rX+1 : rX, y: aY-2, cell: .body)
+        case .spin:
+            // Arms sweep around in a circle each frame
+            switch frame {
+            case 0:
+                pset(&g, x: lX-2, y: aY,   cell: .body); pset(&g, x: lX-1, y: aY,   cell: .body)
+                pset(&g, x: rX+1, y: aY,   cell: .body); pset(&g, x: rX+2, y: aY,   cell: .body)
+            case 1:
+                pset(&g, x: lX-2, y: aY-1, cell: .body); pset(&g, x: lX-1, y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY-2, cell: .body); pset(&g, x: rX+2, y: aY-1, cell: .body)
+            case 2:
+                pset(&g, x: lX,   y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
+            default:
+                pset(&g, x: lX-2, y: aY,   cell: .body); pset(&g, x: lX-1, y: aY+1, cell: .body)
+                pset(&g, x: rX+1, y: aY+1, cell: .body); pset(&g, x: rX+2, y: aY,   cell: .body)
+            }
+        case .bounce:
+            // Arms swing: up at peak, down on landing
+            let hiB = frame == 1 || frame == 3
+            pset(&g, x: lX, y: hiB ? aY-2 : aY+1, cell: .body)
+            pset(&g, x: lX, y: hiB ? aY-1 : aY+2, cell: .body)
+            pset(&g, x: rX, y: hiB ? aY-2 : aY+1, cell: .body)
+            pset(&g, x: rX, y: hiB ? aY-1 : aY+2, cell: .body)
+        case .dance:
+            // Alternating one arm up, one arm down
+            switch frame {
+            case 0:
+                pset(&g, x: lX-1, y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY,   cell: .body); pset(&g, x: rX+1, y: aY+1, cell: .body)
+            case 2:
+                pset(&g, x: lX-1, y: aY,   cell: .body); pset(&g, x: lX-1, y: aY+1, cell: .body)
+                pset(&g, x: rX+1, y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
+            default:
+                pset(&g, x: lX-1, y: aY-1, cell: .body); pset(&g, x: lX-1, y: aY,   cell: .body)
+                pset(&g, x: rX+1, y: aY-1, cell: .body); pset(&g, x: rX+1, y: aY,   cell: .body)
+            }
+        case .wave:
+            // Champion wave: alternate which arm is raised high
+            if frame < 2 {
+                // Left arm waves high, right arm rests low
+                pset(&g, x: lX,   y: aY-4, cell: .body); pset(&g, x: lX,   y: aY-3, cell: .body)
+                pset(&g, x: lX-1, y: frame == 0 ? aY-4 : aY-3, cell: .body)
+                pset(&g, x: rX,   y: aY+1, cell: .body); pset(&g, x: rX,   y: aY+2, cell: .body)
+            } else {
+                // Right arm waves high, left arm rests low
+                pset(&g, x: rX,   y: aY-4, cell: .body); pset(&g, x: rX,   y: aY-3, cell: .body)
+                pset(&g, x: rX+1, y: frame == 2 ? aY-4 : aY-3, cell: .body)
+                pset(&g, x: lX,   y: aY+1, cell: .body); pset(&g, x: lX,   y: aY+2, cell: .body)
+            }
+        case .flex:
+            // Victory flex: both arms in muscle pose
+            switch frame {
+            case 0: // arms bent up, fists near shoulders
+                pset(&g, x: lX,   y: aY-2, cell: .body); pset(&g, x: lX,   y: aY-1, cell: .body)
+                pset(&g, x: rX,   y: aY-2, cell: .body); pset(&g, x: rX,   y: aY-1, cell: .body)
+            case 1: // arms spread wide flex
+                pset(&g, x: lX-2, y: aY-1, cell: .body); pset(&g, x: lX-1, y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY-2, cell: .body); pset(&g, x: rX+2, y: aY-1, cell: .body)
+            case 2: // arms high and bent outward
+                pset(&g, x: lX-1, y: aY-3, cell: .body); pset(&g, x: lX-1, y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY-3, cell: .body); pset(&g, x: rX+1, y: aY-2, cell: .body)
+            default: // back to shoulders
+                pset(&g, x: lX,   y: aY-2, cell: .body); pset(&g, x: lX-1, y: aY-1, cell: .body)
+                pset(&g, x: rX,   y: aY-2, cell: .body); pset(&g, x: rX+1, y: aY-1, cell: .body)
+            }
+        case .star:
+            // Star jump: both arms spread wide upward
+            let spread = frame % 2 == 0 ? 2 : 1
+            pset(&g, x: lX-spread, y: aY-2, cell: .body); pset(&g, x: lX-spread+1, y: aY-1, cell: .body)
+            pset(&g, x: rX+spread, y: aY-2, cell: .body); pset(&g, x: rX+spread-1, y: aY-1, cell: .body)
+        case .finish:
+            switch frame {
+            case 0: // running — left arm back, right arm forward
+                pset(&g, x: lX-1, y: aY+2, cell: .body); pset(&g, x: lX,   y: aY+3, cell: .body)
+                pset(&g, x: rX,   y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
+            case 1: // arms crossing mid
+                pset(&g, x: lX,   y: aY+1, cell: .body); pset(&g, x: lX,   y: aY+2, cell: .body)
+                pset(&g, x: rX,   y: aY-1, cell: .body); pset(&g, x: rX,   y: aY,   cell: .body)
+            default: // tape broken — arms thrust high in triumph
+                pset(&g, x: lX-1, y: aY-3, cell: .body); pset(&g, x: lX,   y: aY-2, cell: .body)
+                pset(&g, x: rX+1, y: aY-3, cell: .body); pset(&g, x: rX,   y: aY-2, cell: .body)
+            }
         case .idle:
             switch dna.armStyle {
             case 0: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
@@ -373,6 +462,57 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         let sh = (frame == 1 || frame == 2) ? 1 : 0
         pset(&g,x:8-sh,y:19,cell:.body);pset(&g,x:10-sh,y:19,cell:.body);pset(&g,x:8-sh,y:20,cell:.body);pset(&g,x:10-sh,y:20,cell:.body);pset(&g,x:9-sh,y:21,cell:.body)
         pset(&g,x:14+sh,y:19,cell:.body);pset(&g,x:16+sh,y:19,cell:.body);pset(&g,x:14+sh,y:20,cell:.body);pset(&g,x:16+sh,y:20,cell:.body);pset(&g,x:15+sh,y:21,cell:.body)
+    case .bounce:
+        // Feet tucked at peak, landing-wide at ground
+        if frame == 1 || frame == 3 {
+            pset(&g,x:8,y:17,cell:.body);pset(&g,x:10,y:17,cell:.body);pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body)
+            pset(&g,x:14,y:17,cell:.body);pset(&g,x:16,y:17,cell:.body);pset(&g,x:14,y:18,cell:.body);pset(&g,x:16,y:18,cell:.body)
+        } else {
+            pset(&g,x:7,y:19,cell:.body);pset(&g,x:9,y:19,cell:.body);pset(&g,x:7,y:20,cell:.body);pset(&g,x:9,y:20,cell:.body);pset(&g,x:8,y:21,cell:.body)
+            pset(&g,x:15,y:19,cell:.body);pset(&g,x:17,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body);pset(&g,x:17,y:20,cell:.body);pset(&g,x:16,y:21,cell:.body)
+        }
+    case .dance:
+        // Step left on frame 0, step right on frame 2, center on 1/3
+        switch frame {
+        case 0:
+            pset(&g,x:7,y:19,cell:.body);pset(&g,x:9,y:19,cell:.body);pset(&g,x:7,y:20,cell:.body);pset(&g,x:9,y:20,cell:.body);pset(&g,x:8,y:21,cell:.body)
+            pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
+        case 2:
+            pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
+            pset(&g,x:15,y:19,cell:.body);pset(&g,x:17,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body);pset(&g,x:17,y:20,cell:.body);pset(&g,x:16,y:21,cell:.body)
+        default:
+            pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
+            pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
+        }
+    case .flex:
+        // Wide stance flex
+        pset(&g,x:7,y:19,cell:.body);pset(&g,x:9,y:19,cell:.body);pset(&g,x:7,y:20,cell:.body);pset(&g,x:9,y:20,cell:.body);pset(&g,x:8,y:21,cell:.body)
+        pset(&g,x:15,y:19,cell:.body);pset(&g,x:17,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body);pset(&g,x:17,y:20,cell:.body);pset(&g,x:16,y:21,cell:.body)
+    case .star:
+        // Super wide star stance, alternating width
+        if frame % 2 == 0 {
+            pset(&g,x:6,y:19,cell:.body);pset(&g,x:8,y:19,cell:.body);pset(&g,x:6,y:20,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:7,y:21,cell:.body)
+            pset(&g,x:16,y:19,cell:.body);pset(&g,x:18,y:19,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:18,y:20,cell:.body);pset(&g,x:17,y:21,cell:.body)
+        } else {
+            pset(&g,x:7,y:19,cell:.body);pset(&g,x:9,y:19,cell:.body);pset(&g,x:7,y:20,cell:.body);pset(&g,x:9,y:20,cell:.body);pset(&g,x:8,y:21,cell:.body)
+            pset(&g,x:15,y:19,cell:.body);pset(&g,x:17,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body);pset(&g,x:17,y:20,cell:.body);pset(&g,x:16,y:21,cell:.body)
+        }
+    case .finish:
+        // Running feet for frames 0-1, wide triumph stance for 2-3
+        if frame < 2 {
+            switch frame {
+            case 0:
+                pset(&g,x:8,y:17,cell:.body);pset(&g,x:10,y:17,cell:.body);pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body);pset(&g,x:9,y:19,cell:.body)
+                pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
+            default:
+                pset(&g,x:8,y:18,cell:.body);pset(&g,x:10,y:18,cell:.body);pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:9,y:20,cell:.body)
+                pset(&g,x:14,y:18,cell:.body);pset(&g,x:16,y:18,cell:.body);pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body)
+            }
+        } else {
+            // Wide celebratory stance after crossing
+            pset(&g,x:7,y:19,cell:.body);pset(&g,x:9,y:19,cell:.body);pset(&g,x:7,y:20,cell:.body);pset(&g,x:9,y:20,cell:.body);pset(&g,x:8,y:21,cell:.body)
+            pset(&g,x:15,y:19,cell:.body);pset(&g,x:17,y:19,cell:.body);pset(&g,x:15,y:20,cell:.body);pset(&g,x:17,y:20,cell:.body);pset(&g,x:16,y:21,cell:.body)
+        }
     default:
         pset(&g,x:8,y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8,y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9,y:21,cell:.body)
         pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
@@ -548,6 +688,103 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 pset(&g,x:ex,  y:ey+1,cell:.eyePupil)
             }
         }
+    case .cheer:
+        // Happy wide eyes with shine
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+    case .bounce:
+        // Wide eyes at peak, happy eyes on landing
+        if frame == 1 || frame == 3 {
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        } else {
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+        }
+    case .spin:
+        // Alternating open/squint eyes
+        if frame % 2 == 0 {
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+        } else {
+            pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
+            pset(&g,x:eyeRX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
+        }
+    case .dance:
+        // Wink alternating sides
+        if frame == 0 {
+            // Wink left (left eye = closed bar)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+        } else if frame == 2 {
+            // Wink right (right eye = closed bar)
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        } else {
+            // Both eyes open happy
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+        }
+    case .wave:
+        // Happy eyes with shine
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+    case .flex:
+        // Intense hype-style 2×2 eyes — fierce and determined
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+    case .star:
+        // Wide excited eyes with double shine
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine); pset(&g,x:eyeRX+1,y:eyeYI-1,cell:.eyeShine)
+    case .finish:
+        if frame < 2 {
+            // Fierce focused eyes while running (like hype)
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        } else {
+            // Wide joyful eyes with double shine after crossing
+            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine); pset(&g,x:eyeLX,y:eyeYI-1,cell:.eyeShine)
+            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+            pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine); pset(&g,x:eyeRX+1,y:eyeYI-1,cell:.eyeShine)
+        }
     default:
         if pose == .idle && frame == 6 {
             // Blink: ojos cerrados (barra horizontal)
@@ -615,6 +852,49 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:fCx,  y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,  cell:.mouth)
             pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
         }
+    case .cheer:
+        // Big open excited smile (same arc as hype)
+        pset(&g,x:fCx-3,y:mY,  cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+3,y:mY,  cell:.mouth)
+    case .bounce, .spin:
+        // Happy curve
+        pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+    case .dance:
+        // Big smile on wink frames, normal smile on other frames
+        if frame == 0 || frame == 2 {
+            pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+        } else {
+            pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
+        }
+    case .wave:
+        // Happy curve
+        pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+    case .flex:
+        // Big open power smile
+        pset(&g,x:fCx-3,y:mY,  cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+3,y:mY,  cell:.mouth)
+    case .star:
+        // Wide open excited mouth
+        pset(&g,x:fCx-3,y:mY,  cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+3,y:mY,  cell:.mouth)
+    case .finish:
+        // Big open smile all frames, extra wide after crossing
+        pset(&g,x:fCx-3,y:mY,  cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+        pset(&g,x:fCx+3,y:mY,  cell:.mouth)
     default:
         switch dna.mouthStyle {
         case 0: pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
@@ -845,6 +1125,140 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             let drop = frame - 2
             pset(&g,x:eyeLX,y:eyeYI+2+drop*2,cell:.tear); pset(&g,x:eyeLX,y:eyeYI+3+drop*2,cell:.tear)
             pset(&g,x:eyeRX,y:eyeYI+2+drop*2,cell:.tear); pset(&g,x:eyeRX,y:eyeYI+3+drop*2,cell:.tear)
+        }
+    }
+
+    // ── Cheer sparkles ────────────────────────────────────────────────────────────
+    if pose == .cheer {
+        let sparkPos: [(Int, Int)] = [
+            (lX-2, aY-5), (rX+2, aY-5),
+            (lX-3, aY-3), (rX+3, aY-3)
+        ]
+        let (sx, sy) = sparkPos[frame % 4]
+        pset(&g,x:sx,  y:sy-1,cell:.gold); pset(&g,x:sx-1,y:sy,cell:.gold)
+        pset(&g,x:sx,  y:sy,  cell:.gold); pset(&g,x:sx+1,y:sy,cell:.gold); pset(&g,x:sx,y:sy+1,cell:.gold)
+    }
+
+    // ── Spin effects (rotating star + speed lines) ────────────────────────────────
+    if pose == .spin {
+        let spinPos: [(Int, Int)] = [
+            (lX-3, aY-2), (Int(bodyCx), Int(earTopY)-3), (rX+3, aY-2), (rX+2, Int(bodyCy)+3)
+        ]
+        let (sx, sy) = spinPos[frame % 4]
+        pset(&g,x:sx,  y:sy-1,cell:.gold); pset(&g,x:sx-1,y:sy,cell:.gold)
+        pset(&g,x:sx,  y:sy,  cell:.gold); pset(&g,x:sx+1,y:sy,cell:.gold); pset(&g,x:sx,y:sy+1,cell:.gold)
+        for sdy in [-1, 0, 1] {
+            if pget(g, x: lX-1, y: aY+sdy) == .empty { pset(&g, x: lX-1, y: aY+sdy, cell: .speedLine) }
+            if pget(g, x: rX+1, y: aY+sdy) == .empty { pset(&g, x: rX+1, y: aY+sdy, cell: .speedLine) }
+        }
+    }
+
+    // ── Bounce effects (peak sparks / landing dust) ───────────────────────────────
+    if pose == .bounce {
+        if frame == 1 || frame == 3 {
+            pset(&g,x:lX,  y:aY-4,cell:.gold); pset(&g,x:lX-1,y:aY-5,cell:.gold)
+            pset(&g,x:rX,  y:aY-4,cell:.gold); pset(&g,x:rX+1,y:aY-5,cell:.gold)
+        } else {
+            pset(&g,x:7,y:22,cell:.shade); pset(&g,x:9,y:22,cell:.shade)
+            pset(&g,x:6,y:21,cell:.shade); pset(&g,x:10,y:21,cell:.shade)
+            pset(&g,x:14,y:22,cell:.shade); pset(&g,x:16,y:22,cell:.shade)
+            pset(&g,x:13,y:21,cell:.shade); pset(&g,x:17,y:21,cell:.shade)
+        }
+    }
+
+    // ── Dance effects (gold note near raised arm) ──────────────────────────────────
+    if pose == .dance {
+        let noteX: Int
+        let noteY = aY - 4
+        switch frame {
+        case 0: noteX = rX + 3
+        case 2: noteX = lX - 3
+        default: noteX = frame == 1 ? rX + 2 : lX - 2
+        }
+        pset(&g,x:noteX,  y:noteY,   cell:.gold)
+        pset(&g,x:noteX,  y:noteY-1, cell:.gold)
+        pset(&g,x:noteX+1,y:noteY,   cell:.gold)
+    }
+
+    // ── Wave effects (sparkle near raised hand) ────────────────────────────────────
+    if pose == .wave {
+        let wx = frame < 2 ? lX - 2 : rX + 2
+        let wy = aY - 5
+        pset(&g,x:wx,  y:wy-1,cell:.gold); pset(&g,x:wx-1,y:wy,cell:.gold)
+        pset(&g,x:wx,  y:wy,  cell:.gold); pset(&g,x:wx+1,y:wy,cell:.gold)
+        pset(&g,x:wx,  y:wy+1,cell:.gold)
+    }
+
+    // ── Flex effects (power aura — lightning bolts) ────────────────────────────────
+    if pose == .flex {
+        if frame == 1 || frame == 3 {
+            pset(&g,x:lX-2,y:aY-3,cell:.lightning); pset(&g,x:lX-3,y:aY-4,cell:.lightning)
+            pset(&g,x:lX-2,y:aY-5,cell:.lightning)
+            pset(&g,x:rX+2,y:aY-3,cell:.lightning); pset(&g,x:rX+3,y:aY-4,cell:.lightning)
+            pset(&g,x:rX+2,y:aY-5,cell:.lightning)
+        } else {
+            pset(&g,x:lX-1,y:aY-3,cell:.gold); pset(&g,x:lX-2,y:aY-2,cell:.gold)
+            pset(&g,x:rX+1,y:aY-3,cell:.gold); pset(&g,x:rX+2,y:aY-2,cell:.gold)
+        }
+    }
+
+    // ── Star burst effects ─────────────────────────────────────────────────────────
+    if pose == .star {
+        let burstR: [(Int, Int)] = [
+            (Int(bodyCx), Int(earTopY)-3),
+            (lX-3, aY-3),
+            (rX+3, aY-3),
+            (Int(bodyCx), Int(bodyCy)+Int(bodyRy)+2)
+        ]
+        let (bx, by) = burstR[frame % 4]
+        pset(&g,x:bx,  y:by-1,cell:.gold); pset(&g,x:bx-1,y:by,cell:.gold)
+        pset(&g,x:bx,  y:by,  cell:.gold); pset(&g,x:bx+1,y:by,cell:.gold)
+        pset(&g,x:bx,  y:by+1,cell:.gold)
+        // Speed lines radiating out
+        if frame % 2 == 0 {
+            pset(&g,x:lX-1,y:aY-1,cell:.speedLine); pset(&g,x:rX+1,y:aY-1,cell:.speedLine)
+            pset(&g,x:lX-1,y:aY+1,cell:.speedLine); pset(&g,x:rX+1,y:aY+1,cell:.speedLine)
+        }
+    }
+
+    // ── Finish line crossing effects ──────────────────────────────────────────────
+    if pose == .finish {
+        if frame < 2 {
+            // Gold finish-line tape (vertical band just ahead of the pet)
+            let tapeX = rX + 4
+            for ty in (aY - 5)...(aY + 5) {
+                if ty >= 0 && ty < GRID_SIZE && pget(g, x: tapeX, y: ty) == .empty {
+                    pset(&g, x: tapeX, y: ty, cell: .gold)
+                }
+            }
+            // Speed lines charging toward the tape
+            for sly in [Int(bodyCy)-2, Int(bodyCy), Int(bodyCy)+2] {
+                for sdx in 1...3 {
+                    if pget(g, x: rX+sdx, y: sly) == .empty { pset(&g, x: rX+sdx, y: sly, cell: .speedLine) }
+                }
+            }
+        } else {
+            // Tape broken — gold fragments burst outward
+            let fragments: [(Int, Int)] = [
+                (rX+5, aY-5), (rX+6, aY-3), (rX+5, aY-1),
+                (lX-4, aY-5), (lX-5, aY-3), (Int(bodyCx), Int(earTopY)-4),
+                (rX+4, aY-7), (lX-3, aY-7)
+            ]
+            for (fx, fy) in fragments {
+                if fy >= 0 && fy < GRID_SIZE && fx >= 0 && fx < GRID_SIZE {
+                    if pget(g, x: fx, y: fy) == .empty { pset(&g, x: fx, y: fy, cell: .gold) }
+                }
+            }
+            // Lightning burst
+            pset(&g, x: rX+5, y: aY-4, cell: .lightning); pset(&g, x: rX+6, y: aY-5, cell: .lightning)
+            pset(&g, x: lX-4, y: aY-4, cell: .lightning); pset(&g, x: lX-5, y: aY-5, cell: .lightning)
+            // Speed lines trailing behind
+            let trailLen = frame == 2 ? 4 : 6
+            for sly in [Int(bodyCy)-3, Int(bodyCy)-1, Int(bodyCy)+1, Int(bodyCy)+3] {
+                for sdx in 1...trailLen {
+                    if pget(g, x: rX+sdx, y: sly) == .empty { pset(&g, x: rX+sdx, y: sly, cell: .speedLine) }
+                }
+            }
         }
     }
 

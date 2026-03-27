@@ -260,28 +260,7 @@ struct CharacterSelectView: View {
 
     // MARK: – Animal type label
 
-    private var animalLabel: String {
-        switch selected.animalType {
-        case .bunny:    return "Veloz"
-        case .cat:      return "Ágil"
-        case .bear:     return "Fuerza"
-        case .raccoon:  return "Adaptable"
-        case .mouse:    return "Veloz"
-        case .frog:     return "Potencia"
-        case .duck:     return "Resistente"
-        case .axolotl:  return "Resiliente"
-        case .smooth:   return "Libre"
-        case .capuchin: return "Dinámico"
-        case .mandrill: return "Salvaje"
-        case .fox:      return "Estratega"
-        case .lion:     return "Dominante"
-        case .domo:     return "Imparable"
-        case .pou:      return "Constante"
-        case .dog:      return "Leal"
-        case .tiger:    return "Feroz"
-        case .panda:    return "Tenaz"
-        }
-    }
+    private var animalLabel: String { selected.animalType.archetypeLabel }
 
     // MARK: – Header
 

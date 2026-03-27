@@ -116,6 +116,26 @@ struct HealthPermissionView: View {
             // What we read
             dataReadPills
                 .padding(.top, 4)
+
+            // Third-party app hint card
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "info.circle.fill")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Color(hex: "#F9703E").opacity(0.7))
+                    .padding(.top, 1)
+                Text("Si usas **Strava**, **Garmin** u otra app, activa la sync con Apple Health para que tus carreras cuenten.")
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundStyle(Color(hex: "#52606D"))
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color(hex: "#FFF1EC"))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color(hex: "#F9703E").opacity(0.20), lineWidth: 1))
+            .padding(.horizontal, 32)
+            .padding(.top, 8)
         }
         .padding(.top, 24)
         .opacity(appeared ? 1 : 0)

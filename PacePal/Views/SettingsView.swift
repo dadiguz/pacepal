@@ -182,6 +182,70 @@ struct SettingsView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                 }
             }
+
+            // Day controls
+            let dayNum = (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
+            HStack(spacing: 6) {
+                Button {
+                    appState.resetChallengeToToday()
+                    debugNow = Date()
+                } label: {
+                    Text("0 días")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#E12D39"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+
+                Button {
+                    appState.shiftChallengeDay(by: 1)
+                    debugNow = Date()
+                } label: {
+                    Text("+1 día")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+
+                Button {
+                    appState.shiftChallengeDay(by: 5)
+                    debugNow = Date()
+                } label: {
+                    Text("+5 días")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+
+                Button {
+                    appState.shiftChallengeDay(by: 6)
+                    debugNow = Date()
+                } label: {
+                    Text("+6 días")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+
+                Text("DÍA \(dayNum)")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
+            }
         }
     }
     #endif

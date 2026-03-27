@@ -22,6 +22,7 @@ struct HomeView: View {
     @State private var isInitialLoad = true
     @State private var phraseIndex: Int = Int.random(in: 0..<RunningPhrase.all.count)
     @State private var showPetStatus = false
+    @State private var pendingAchievement: Achievement? = nil
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -80,7 +81,7 @@ struct HomeView: View {
                 // ── Top bar ──────────────────────────────────────────────
                 topBar
                     .padding(.horizontal, 24)
-                    .padding(.top, 60)
+                    .padding(.top, 44)
 
                 Spacer(minLength: 20)
 
@@ -140,9 +141,18 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showPetStatus) {
                 PetStatusSheet(dna: dna, moodText: moodText, energyColor: energyColor)
-                    .presentationDetents([.fraction(0.40)])
+                    .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
                     .presentationBackground { AppBackground() }
+            }
+            .sheet(item: $pendingAchievement) { achievement in
+                AchievementModal(achievement: achievement, dna: dna) {
+                    appState.markAchievementSeen(achievement.day)
+                    pendingAchievement = nil
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.hidden)
+                .interactiveDismissDisabled(true)
             }
 
             // ── Game Over overlay ─────────────────────────────────────────
@@ -182,6 +192,9 @@ struct HomeView: View {
             isInitialLoad = true
             currentPose = normalPose
             health.fetchToday()   // establece baseline al arrancar
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                checkForAchievement()
+            }
             if !UserDefaults.standard.bool(forKey: "hasSeenTutorial") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     withAnimation { showTutorial = true }
@@ -230,12 +243,20 @@ struct HomeView: View {
                 health.fetchToday()
                 if !isAnimating { currentPose = normalPose }
             }
+            checkForAchievement()
         }
         .onReceive(
             NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
         ) { _ in
             if energy > 0 { health.fetchToday() }
         }
+    }
+
+    // MARK: – Achievement check
+
+    private func checkForAchievement() {
+        guard pendingAchievement == nil, !showPetStatus else { return }
+        pendingAchievement = appState.pendingAchievement
     }
 
     // MARK: – Tutorial
@@ -278,6 +299,7 @@ struct HomeView: View {
         }
         isAnimating = false
         currentPose = normalPose
+        checkForAchievement()
     }
 
     // MARK: – Top bar
@@ -589,34 +611,54 @@ private struct PetStatusSheet: View {
     let moodText: String
     let energyColor: Color
 
+    @Environment(HealthManager.self) private var health
+    @Environment(AppState.self) private var appState
+
+    @State private var selectedAchievement: Achievement? = nil
+
+    private var bodyColor: Color { Color(hex: dna.palette.body) }
+
     var body: some View {
+        ScrollView {
         VStack(spacing: 0) {
             Spacer().frame(height: 20)
 
-            // Pet name + mood
-            VStack(spacing: 6) {
-                Text(dna.name.uppercased())
-                    .font(.system(size: 20, weight: .black, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-                HStack(spacing: 6) {
-                    Circle()
-                        .fill(energyColor)
-                        .frame(width: 7, height: 7)
-                    Text(moodText)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#9AA5B4"))
-                }
-            }
+            // Pet name
+            Text(dna.name.uppercased())
+                .font(.system(size: 20, weight: .black, design: .monospaced))
+                .foregroundStyle(Color(hex: "#1F2933"))
 
-            Spacer().frame(height: 28)
+            // Archetype pill
+            Text(dna.animalType.archetypeLabel.uppercased())
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .tracking(1.4)
+                .foregroundStyle(bodyColor)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 5)
+                .background(bodyColor.opacity(0.12))
+                .clipShape(Capsule())
+                .padding(.top, 6)
+
+            // Mood row
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(energyColor)
+                    .frame(width: 7, height: 7)
+                Text(moodText)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
+            }
+            .padding(.top, 8)
+
+            Spacer().frame(height: 24)
 
             // Stats — dark HUD card
             HStack(spacing: 0) {
-                statCell(value: "—", label: "Carreras")
+                statCell(value: "\(health.totalRuns)", label: "Carreras")
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "—", label: "km totales")
+                statCell(value: String(format: "%.1f", health.totalKmAllTime), label: "km totales")
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "—", label: "Mejor racha")
+                statCell(value: "\(health.bestStreak)", label: "Mejor racha")
             }
             .padding(.vertical, 18)
             .background(
@@ -630,7 +672,60 @@ private struct PetStatusSheet: View {
             )
             .padding(.horizontal, 24)
 
-            Spacer()
+            // Achievements
+            VStack(alignment: .leading, spacing: 10) {
+                Text("LOGROS")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .tracking(1.2)
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                    .padding(.horizontal, 24)
+
+                let columns = Array(repeating: GridItem(.flexible(), spacing: 12), count: 6)
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(Achievement.all) { a in
+                        let unlocked = appState.seenAchievements.contains(a.day)
+                        Button {
+                            if unlocked { selectedAchievement = a }
+                        } label: {
+                            VStack(spacing: 5) {
+                                ZStack {
+                                    Circle()
+                                        .fill(unlocked
+                                              ? Color(hex: "#F9703E").opacity(0.12)
+                                              : Color(hex: "#F0F4F8"))
+                                        .frame(width: 46, height: 46)
+                                    Image(systemName: unlocked ? "star.fill" : "lock.fill")
+                                        .font(.system(size: unlocked ? 16 : 13, weight: .semibold))
+                                        .foregroundStyle(unlocked
+                                                         ? Color(hex: "#F9703E")
+                                                         : Color(hex: "#CBD2D9"))
+                                }
+                                Text("Día \(a.day)")
+                                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                                    .foregroundStyle(unlocked
+                                                     ? Color(hex: "#F9703E")
+                                                     : Color(hex: "#CBD2D9"))
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 24)
+            }
+            .padding(.top, 20)
+
+            Spacer().frame(height: 32)
+        }
+        } // ScrollView
+        .task {
+            await health.fetchRunStats(since: appState.challengeStartDate)
+        }
+        .sheet(item: $selectedAchievement) { a in
+            AchievementModal(achievement: a, dna: dna) {
+                selectedAchievement = nil
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.hidden)
         }
     }
 
@@ -638,13 +733,82 @@ private struct PetStatusSheet: View {
         VStack(spacing: 3) {
             Text(value)
                 .font(.system(size: 22, weight: .black, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.30))
+                .foregroundStyle(Color.white)
             Text(label.uppercased())
                 .font(.system(size: 9, weight: .bold, design: .rounded))
                 .tracking(0.8)
                 .foregroundStyle(Color.white.opacity(0.40))
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Achievement Modal
+
+private struct AchievementModal: View {
+    let achievement: Achievement
+    let dna: PetDNA
+    let onDismiss: () -> Void
+
+    @State private var appeared = false
+
+    var body: some View {
+        ZStack {
+            // Background — white for now.
+            // TODO: replace with Image(achievement.imageName) once assets are delivered.
+            Color.white.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Spacer()
+
+                // Day badge
+                Text("DÍA \(achievement.day) / 66")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .tracking(2)
+                    .foregroundStyle(Color(hex: "#F9703E"))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 7)
+                    .background(Color(hex: "#F9703E").opacity(0.10))
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(Color(hex: "#F9703E").opacity(0.25), lineWidth: 1))
+
+                // Pet
+                PetAnimationView(dna: dna, pose: achievement.pose, pixelSize: 10)
+                    .scaleEffect(appeared ? 1.0 : 0.7)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.spring(duration: 0.55, bounce: 0.35).delay(0.1), value: appeared)
+                    .padding(.top, 28)
+
+                // Phrase
+                achievement.displayText
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 32)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 12)
+                    .animation(.spring(duration: 0.45).delay(0.25), value: appeared)
+
+                Spacer()
+
+                // CTA
+                Button(action: onDismiss) {
+                    Text("¡Vamos!")
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 17)
+                        .background(Color(hex: "#F9703E"))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.35), radius: 12, y: 5)
+                }
+                .padding(.horizontal, 32)
+                .padding(.bottom, 52)
+                .opacity(appeared ? 1 : 0)
+                .animation(.easeIn(duration: 0.3).delay(0.4), value: appeared)
+            }
+        }
+        .onAppear { appeared = true }
     }
 }
 

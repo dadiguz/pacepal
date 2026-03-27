@@ -24,7 +24,7 @@ enum PetCell: Equatable {
 
 // MARK: - Pose
 enum PetPose: String, CaseIterable, Identifiable {
-    case idle, happy, sad, angry, running, jump, dead, hurt, hype, dizzy
+    case idle, happy, sad, angry, running, jump, dead, hurt, hype, dizzy, cheer, spin, bounce, dance, wave, flex, star, finish
     var id: String { rawValue }
 
     var label: String {
@@ -39,6 +39,14 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .hurt:    return "Hurt"
         case .hype:    return "Hype"
         case .dizzy:   return "Dizzy"
+        case .cheer:   return "Cheer"
+        case .spin:    return "Spin"
+        case .bounce:  return "Bounce"
+        case .dance:   return "Dance"
+        case .wave:    return "Wave"
+        case .flex:    return "Flex"
+        case .star:    return "Star"
+        case .finish:  return "Finish"
         }
     }
 
@@ -54,6 +62,14 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .hurt:    return "💥"
         case .hype:    return "⚡️"
         case .dizzy:   return "😵"
+        case .cheer:   return "🙌"
+        case .spin:    return "🌀"
+        case .bounce:  return "🦋"
+        case .dance:   return "💃"
+        case .wave:    return "👋"
+        case .flex:    return "💪"
+        case .star:    return "⭐"
+        case .finish:  return "🏁"
         }
     }
 }
@@ -68,6 +84,32 @@ enum PetAnimalType: String, CaseIterable, Codable {
 // MARK: - Body shape
 enum PetBodyShape: String, Codable {
     case round, chubby, slim, pear, tall
+}
+
+// MARK: - Archetype label
+extension PetAnimalType {
+    var archetypeLabel: String {
+        switch self {
+        case .bunny:    return "Veloz"
+        case .cat:      return "Ágil"
+        case .bear:     return "Fuerza"
+        case .raccoon:  return "Adaptable"
+        case .mouse:    return "Veloz"
+        case .frog:     return "Potencia"
+        case .duck:     return "Resistente"
+        case .axolotl:  return "Resiliente"
+        case .smooth:   return "Libre"
+        case .capuchin: return "Dinámico"
+        case .mandrill: return "Salvaje"
+        case .fox:      return "Estratega"
+        case .lion:     return "Dominante"
+        case .domo:     return "Imparable"
+        case .pou:      return "Constante"
+        case .dog:      return "Leal"
+        case .tiger:    return "Feroz"
+        case .panda:    return "Tenaz"
+        }
+    }
 }
 
 // MARK: - Grid typealias
