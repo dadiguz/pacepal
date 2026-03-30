@@ -11,25 +11,29 @@ struct SplashView: View {
     @State private var petAppeared = false
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                Spacer()
+        GeometryReader { geo in
+            ZStack {
+                VStack(spacing: 0) {
+                    // Flexible top spacer (replaces topBar + energySection + phraseSection)
+                    Spacer()
 
-                // Pet fades in after logo is already visible
-                PetAnimationView(dna: dna, pose: .running, pixelSize: 9.07)
-                    .opacity(petAppeared ? 1 : 0)
-                    .scaleEffect(petAppeared ? 1 : 0.85)
-                    .animation(.spring(duration: 0.55, bounce: 0.25).delay(0.2), value: petAppeared)
+                    // Logo centered above the pet
+                    Image("Logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200)
 
-                Spacer().frame(height: 28)
+                    Spacer().frame(height: 28)
 
-                // Logo always visible immediately — no animation delay
-                Image("Logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200)
+                    // Pet — anchored at same position as HomeView
+                    PetAnimationView(dna: dna, pose: .running, pixelSize: 9.07)
+                        .opacity(petAppeared ? 1 : 0)
+                        .scaleEffect(petAppeared ? 1 : 0.85)
+                        .animation(.spring(duration: 0.55, bounce: 0.25).delay(0.2), value: petAppeared)
 
-                Spacer()
+                    // Fixed bottom anchor matching HomeView's km + pill + spacers
+                    Color.clear.frame(height: geo.size.height * 0.25 - 8)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
