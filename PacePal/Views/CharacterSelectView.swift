@@ -29,9 +29,13 @@ struct CharacterSelectView: View {
     @State private var namingPose    = PetPose.jump
     @State private var showNameError = false
     @FocusState private var keyboardUp: Bool
+    @State private var glowPulse = false
+    @State private var glowAngle: Double = 0
+    @State private var glowAngle2: Double = 0
 
     private var selected: PetDNA { characters[selectedIndex] }
     private var bodyColor: Color { Color(hex: selected.palette.body) }
+    private var accentColor: Color { Color(hex: selected.palette.accent1) }
 
     private let heroPx: CGFloat = 9.07
     private var heroSize: CGFloat { heroPx * CGFloat(GRID_SIZE) }
@@ -280,12 +284,33 @@ struct CharacterSelectView: View {
 
     private var heroSection: some View {
         ZStack {
-            Circle()
-                .fill(bodyColor.opacity(0.07))
-                .frame(width: heroSize, height: heroSize)
+            // Outer ambient glow — ellipse rotates slowly like light orbiting
+            Ellipse()
+                .fill(
+                    RadialGradient(
+                        colors: [bodyColor.opacity(0.28), accentColor.opacity(0.10), .clear],
+                        center: .center, startRadius: 0, endRadius: heroSize * 0.7
+                    )
+                )
+                .frame(width: heroSize * 1.7, height: heroSize * 1.1)
+                .blur(radius: 26)
+                .rotationEffect(.degrees(glowAngle))
+                .scaleEffect(glowPulse ? 1.12 : 0.90)
+                .animation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true), value: glowPulse)
+                .animation(nil, value: selectedIndex)
+
+            // Accent glow — counter-rotates at different speed
+            Ellipse()
+                .fill(accentColor.opacity(glowPulse ? 0.26 : 0.08))
+                .frame(width: heroSize * 0.85, height: heroSize * 0.55)
                 .blur(radius: 20)
+                .rotationEffect(.degrees(-glowAngle2))
+                .offset(x: heroSize * 0.12, y: heroSize * 0.08)
+                .animation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true), value: glowPulse)
+                .animation(nil, value: selectedIndex)
 
             ZStack(alignment: .bottom) {
+                // Ground shadow
                 Ellipse()
                     .fill(RadialGradient(
                         colors: [bodyColor.opacity(0.50), .clear],
@@ -301,6 +326,15 @@ struct CharacterSelectView: View {
             }
         }
         .animation(.spring(duration: 0.35), value: selectedIndex)
+        .onAppear {
+            glowPulse = true
+            withAnimation(.linear(duration: 5.5).repeatForever(autoreverses: false)) {
+                glowAngle = 360
+            }
+            withAnimation(.linear(duration: 8.5).repeatForever(autoreverses: false)) {
+                glowAngle2 = 360
+            }
+        }
     }
 
     // MARK: – Carousel
