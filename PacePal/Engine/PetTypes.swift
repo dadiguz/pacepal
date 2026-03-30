@@ -104,6 +104,7 @@ enum PetAnimalType: String, CaseIterable, Codable {
     case bunny, cat, bear, raccoon, mouse, frog, duck, axolotl, smooth
     case capuchin, mandrill, fox, lion, domo, pou
     case dog, tiger, panda
+    case corgi, dragon
 }
 
 // MARK: - Body shape
@@ -130,9 +131,11 @@ extension PetAnimalType {
         case .lion:     return "Dominante"
         case .domo:     return "Imparable"
         case .pou:      return "Constante"
-        case .dog:      return "Leal"
-        case .tiger:    return "Feroz"
-        case .panda:    return "Tenaz"
+        case .dog:        return "Leal"
+        case .tiger:      return "Feroz"
+        case .panda:      return "Tenaz"
+        case .corgi:   return "Alegre"
+        case .dragon:  return "Legendario"
         }
     }
 }

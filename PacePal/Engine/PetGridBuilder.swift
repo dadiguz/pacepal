@@ -172,6 +172,30 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     case .domo: break  // Flat square head, no ears
     case .pou:  break  // Rounded head, no ears
     case .smooth: break
+    case .corgi:
+        let eT = Int(earTopY)
+        // Large upright triangle ears
+        pset(&g, x: Int(lEarX)-1, y: eT,   cell: .body); pset(&g, x: Int(lEarX), y: eT,   cell: .body); pset(&g, x: Int(lEarX)+1, y: eT,   cell: .body)
+        pset(&g, x: Int(lEarX)-1, y: eT-1, cell: .body); pset(&g, x: Int(lEarX), y: eT-1, cell: .body)
+        pset(&g, x: Int(lEarX),   y: eT-2, cell: .body); pset(&g, x: Int(lEarX), y: eT-3, cell: .body)
+        pset(&g, x: Int(rEarX)-1, y: eT,   cell: .body); pset(&g, x: Int(rEarX), y: eT,   cell: .body); pset(&g, x: Int(rEarX)+1, y: eT,   cell: .body)
+        pset(&g, x: Int(rEarX),   y: eT-1, cell: .body); pset(&g, x: Int(rEarX)+1, y: eT-1, cell: .body)
+        pset(&g, x: Int(rEarX),   y: eT-2, cell: .body); pset(&g, x: Int(rEarX),   y: eT-3, cell: .body)
+    case .dragon:
+        // Horns (recolored accent1 later)
+        let hBase = Int(earTopY)
+        pset(&g, x: Int(lEarX),     y: hBase,           cell: .body)
+        pset(&g, x: Int(lEarX) - 1, y: hBase - 1,       cell: .body)
+        pset(&g, x: Int(lEarX) - 1, y: max(0,hBase-2),  cell: .body)
+        pset(&g, x: Int(rEarX),     y: hBase,           cell: .body)
+        pset(&g, x: Int(rEarX) + 1, y: hBase - 1,       cell: .body)
+        pset(&g, x: Int(rEarX) + 1, y: max(0,hBase-2),  cell: .body)
+        // Small wing nubs
+        let wY = Int((bodyCy - bodyRy * 0.25).rounded())
+        pset(&g, x: Int((bodyCx-bodyRx).rounded())-1, y: wY,   cell: .body)
+        pset(&g, x: Int((bodyCx-bodyRx).rounded())-2, y: wY-1, cell: .body)
+        pset(&g, x: Int((bodyCx+bodyRx).rounded())+1, y: wY,   cell: .body)
+        pset(&g, x: Int((bodyCx+bodyRx).rounded())+2, y: wY-1, cell: .body)
     }
 
     // ── Arms ────────────────────────────────────────────────────────────────────
@@ -1791,6 +1815,13 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         // Dark ears (shade fill over body-colored ears)
         fillEllipse(&g, cx: Double(aleLX), cy: earTopY, rx: 2.0, ry: 2.0, cell: .shade)
         fillEllipse(&g, cx: Double(aleRX), cy: earTopY, rx: 2.0, ry: 2.0, cell: .shade)
+    case .dragon:
+        // Horns in accent1
+        let hBase = Int(earTopY)
+        for (hx, hy) in [(Int(lEarX), hBase), (Int(lEarX)-1, hBase-1), (Int(lEarX)-1, max(0,hBase-2)),
+                         (Int(rEarX), hBase), (Int(rEarX)+1, hBase-1), (Int(rEarX)+1, max(0,hBase-2))] {
+            if let c = pget(g, x: hx, y: hy), c == .body || c == .outline { pset(&g, x: hx, y: hy, cell: .accent1) }
+        }
     case .domo, .pou: break
     default: break
     }
