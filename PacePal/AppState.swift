@@ -203,6 +203,7 @@ final class AppState {
     private(set) var onboardingCompleted: Bool
     private(set) var paywallDismissed: Bool
     private(set) var healthPermissionDone: Bool
+    private(set) var notificationPermissionDone: Bool
 
     // Selected background image name (nil = default gradient)
     private(set) var selectedBackground: String?
@@ -225,6 +226,7 @@ final class AppState {
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
         self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")
+        self.notificationPermissionDone = UserDefaults.standard.bool(forKey: "notificationPermissionDone")
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
         self.seenAchievements = Set(seen)
         self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
@@ -244,6 +246,11 @@ final class AppState {
     func completeHealthPermission() {
         healthPermissionDone = true
         UserDefaults.standard.set(true, forKey: "healthPermissionDone")
+    }
+
+    func completeNotificationPermission() {
+        notificationPermissionDone = true
+        UserDefaults.standard.set(true, forKey: "notificationPermissionDone")
     }
 
     func energy(at date: Date) -> Double {

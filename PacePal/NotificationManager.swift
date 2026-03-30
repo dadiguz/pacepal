@@ -41,10 +41,12 @@ struct NotificationManager {
 
     // MARK: - Permission
 
-    static func requestPermission() {
+    static func requestPermission(completion: (() -> Void)? = nil) {
         let center = UNUserNotificationCenter.current()
         center.delegate = NotificationDelegate.shared
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+            completion?()
+        }
     }
 
     // MARK: - Immediate (threshold just crossed)

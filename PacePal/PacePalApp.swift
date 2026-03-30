@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct PacepalApp: App {
@@ -22,7 +23,13 @@ struct PacepalApp: App {
             .environment(health)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .task {
-                NotificationManager.requestPermission()
+                // Set delegate so foreground banners work for returning users.
+                // New users go through NotificationPermissionView which calls requestPermission().
+                if appState.notificationPermissionDone {
+                    NotificationManager.requestPermission()
+                } else {
+                    UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+                }
                 // Only auto-request for returning users who already completed
                 // the health permission screen — new users see it explicitly.
                 if appState.healthPermissionDone {
@@ -64,6 +71,12 @@ struct RootView: View {
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
+            } else if !appState.notificationPermissionDone {
+                NotificationPermissionView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
             } else {
                 HomeView()
                     .transition(.asymmetric(
@@ -76,6 +89,7 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.4), value: appState.selectedCharacter?.id)
         .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
         .animation(.easeInOut(duration: 0.4), value: appState.healthPermissionDone)
+        .animation(.easeInOut(duration: 0.4), value: appState.notificationPermissionDone)
         .onAppear {
             if appState.selectedCharacter == nil, let first = saved.first, let dna = first.dna {
                 appState.selectedCharacter = dna

@@ -218,6 +218,15 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             let rArmTop = hi ? aY-3 : aY-2
             pset(&g, x: hi ? rX : rX+1, y: rArmTop,   cell: .body)
             pset(&g, x: hi ? rX : rX+1, y: rArmTop+1, cell: .body)
+        case .sign:
+            let bob = frame % 2 == 0
+            // Left arm: raised in excitement, bounces up/down
+            pset(&g, x: lX-1, y: bob ? aY-3 : aY-2, cell: .body)
+            pset(&g, x: lX-1, y: bob ? aY-2 : aY-1, cell: .body)
+            // Right arm: raised to hold sign, bobs with animation
+            let sArmTop = bob ? aY-3 : aY-2
+            pset(&g, x: bob ? rX : rX+1, y: sArmTop,   cell: .body)
+            pset(&g, x: bob ? rX : rX+1, y: sArmTop+1, cell: .body)
         case .running:
             switch frame {
             case 0: // left arm far back/low, right arm far forward/high
@@ -810,6 +819,14 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:eyeLX,  y:eyeYI+1,cell:.eyePupil)
         pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil)
         pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+    case .sign:
+        // Big happy wide eyes with shine — excited and welcoming
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
     case .hurt:
         if frame < 2 {
             pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
@@ -1216,6 +1233,18 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
         pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
         pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+    case .sign:
+        // Big open smile alternating — beaming with happiness
+        if frame % 2 == 0 {
+            pset(&g,x:fCx-3,y:mY,  cell:.mouth); pset(&g,x:fCx-2,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx-1,y:mY+1,cell:.mouth); pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+            pset(&g,x:fCx+1,y:mY+1,cell:.mouth); pset(&g,x:fCx+2,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx+3,y:mY,  cell:.mouth)
+        } else {
+            pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
+            pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+        }
     default:
         switch dna.mouthStyle {
         case 0: pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
@@ -1386,6 +1415,58 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g, x: vx,   y: vy,   cell: .speedLine)
         pset(&g, x: vx+1, y: vy+1, cell: .speedLine)
         pset(&g, x: vx,   y: vy+2, cell: .speedLine)
+    }
+
+    // ── Happy sign + sparkles ────────────────────────────────────────────────────
+    if pose == .sign {
+        let bob = frame % 2 == 0
+        let stickX = bob ? rX : rX + 1
+        let punchY = bob ? aY - 3 : aY - 2
+
+        // Stick
+        for dy in 1...3 { pset(&g, x: stickX, y: punchY - dy, cell: .body) }
+
+        // Sign frame with accent1 border (cheerful, not angry)
+        let sX1 = max(0, stickX - 2)
+        let sX2 = min(GRID_SIZE - 1, stickX + 2)
+        let sY2 = punchY - 4
+        let sY1 = max(0, sY2 - 3)
+
+        for x in sX1...sX2 {
+            pset(&g, x: x, y: sY1, cell: .accent1)
+            pset(&g, x: x, y: sY2, cell: .accent1)
+        }
+        for y in sY1...sY2 {
+            pset(&g, x: sX1, y: y, cell: .accent1)
+            pset(&g, x: sX2, y: y, cell: .accent1)
+        }
+
+        // Fill interior
+        if sX1 + 1 <= sX2 - 1 && sY1 + 1 <= sY2 - 1 {
+            for y in (sY1 + 1)...(sY2 - 1) {
+                for x in (sX1 + 1)...(sX2 - 1) { pset(&g, x: x, y: y, cell: .face) }
+            }
+        }
+
+        // Bell icon: top row = bell body (3px), bottom-center = clapper dot
+        let signCx = (sX1 + sX2) / 2
+        if sY1 + 1 < sY2 {
+            pset(&g, x: signCx - 1, y: sY1 + 1, cell: bob ? .accent1 : .gold)
+            pset(&g, x: signCx,     y: sY1 + 1, cell: bob ? .accent1 : .gold)
+            pset(&g, x: signCx + 1, y: sY1 + 1, cell: bob ? .accent1 : .gold)
+        }
+        if sY2 - 1 > sY1 {
+            pset(&g, x: signCx, y: sY2 - 1, cell: bob ? .gold : .accent1)
+        }
+
+        // Sparkles alternating corners
+        if bob {
+            pset(&g, x: sX1 - 1, y: sY1,     cell: .gold)
+            pset(&g, x: sX2 + 1, y: sY2 - 1, cell: .gold)
+        } else {
+            pset(&g, x: sX2 + 1, y: sY1,     cell: .accent2)
+            pset(&g, x: sX1 - 1, y: sY2 - 1, cell: .accent2)
+        }
     }
 
     // ── Dead: halo + fly ─────────────────────────────────────────────────────────

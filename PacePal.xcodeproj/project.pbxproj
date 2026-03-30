@@ -26,6 +26,7 @@
 		993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
+		A4C8F2E1B3D5607849A1C2E3 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
 		F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */; };
 		F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFD71C59100C3272E16C7E9 /* HomeView.swift */; };
@@ -55,6 +56,7 @@
 		E1792ED93F8A896E09756EBD /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		FAFD71C59100C3272E16C7E9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FF72C8057EA6268B152E458B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionView.swift; sourceTree = "<group>"; };
 		FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPermissionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -143,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */,
+				B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */,
 				FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */,
 				E1792ED93F8A896E09756EBD /* HistoryView.swift */,
 				FAFD71C59100C3272E16C7E9 /* HomeView.swift */,
@@ -225,6 +228,7 @@
 				6A60E5F1C6C061547B1B150F /* AppState.swift in Sources */,
 				0061DE2AC33314850435DCAD /* CharacterSelectView.swift in Sources */,
 				B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */,
+				A4C8F2E1B3D5607849A1C2E3 /* NotificationPermissionView.swift in Sources */,
 				D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */,
 				79105446F07FFC6FE1B33EDD /* HistoryView.swift in Sources */,
 				F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */,
