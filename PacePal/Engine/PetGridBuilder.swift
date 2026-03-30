@@ -777,19 +777,13 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
 
     switch pose {
     case .hype:
-        if frame == 0 || frame == 3 {
-            // Intense wide 2×2 eyes
-            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
-            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
-            pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
-            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
-        } else {
-            // Fierce squint bars (frames 1&2) — thick pressed bars
-            pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,  cell:.eyePupil)
-            pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
-            pset(&g,x:eyeRX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
-            pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
-        }
+        // Happy sparkly eyes — big 2×2, shine twinkles between frames
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:frame%2==0 ? eyeLX-1 : eyeLX, y:eyeYI-1, cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:frame%2==0 ? eyeRX : eyeRX+1,   y:eyeYI-1, cell:.eyeShine)
     case .dead:
         for (ex, ey) in [(eyeLX, eyeYI), (eyeRX, eyeYI)] {
             pset(&g,x:ex-1,y:ey-1,cell:.eyePupil); pset(&g,x:ex+1,y:ey-1,cell:.eyePupil)
@@ -1308,63 +1302,6 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     }
 
     // ── Hype aura — 11 spiky rays + lightning (faithful port of JS) ─────────────
-    if pose == .hype {
-        let bTop   = Int((bodyCy - bodyRy).rounded()) - 1
-        let bBot   = Int((bodyCy + bodyRy).rounded()) + 1
-        let bLeft  = Int((bodyCx - bodyRx).rounded()) - 1
-        let bRight = Int((bodyCx + bodyRx).rounded()) + 1
-        let cx = Int(bodyCx), cy = Int(bodyCy)
-
-        let len = [2, 3, 5, 3][frame]
-
-        // 11 rays: (startX, startY, dirX, dirY)
-        let rays: [(Int,Int,Int,Int)] = [
-            (cx,     bTop,    0, -1),
-            (cx - 1, bTop,   -1, -1),
-            (cx + 1, bTop,    1, -1),
-            (bLeft,  cy - 1, -1, -1),
-            (bLeft,  cy,     -1,  0),
-            (bLeft,  cy + 1, -1,  1),
-            (bRight, cy - 1,  1, -1),
-            (bRight, cy,      1,  0),
-            (bRight, cy + 1,  1,  1),
-            (cx - 1, bBot,   -1,  1),
-            (cx + 1, bBot,    1,  1),
-        ]
-
-        for (sx, sy, dx, dy) in rays {
-            for i in 1...len {
-                let px = sx + dx * i, py = sy + dy * i
-                if pget(g, x: px, y: py) == .empty { pset(&g, x: px, y: py, cell: .speedLine) }
-                if i == 1 {
-                    let p1x = px - dy, p1y = py + dx
-                    let p2x = px + dy, p2y = py - dx
-                    if pget(g, x: p1x, y: p1y) == .empty { pset(&g, x: p1x, y: p1y, cell: .speedLine) }
-                    if pget(g, x: p2x, y: p2y) == .empty { pset(&g, x: p2x, y: p2y, cell: .speedLine) }
-                }
-            }
-            if frame >= 1 {
-                pset(&g, x: sx + dx * len, y: sy + dy * len, cell: .gold)
-            }
-        }
-
-        // Lightning bolts (electric blue) at ray tips
-        let lTip   = bLeft  - len
-        let rTip   = bRight + len
-        let topTip = bTop   - len
-
-        if frame == 1 || frame == 3 {
-            pset(&g,x:lTip-1,y:cy-1,cell:.lightning); pset(&g,x:lTip-2,y:cy-2,cell:.lightning); pset(&g,x:lTip-1,y:cy-3,cell:.lightning)
-            pset(&g,x:rTip+1,y:cy-1,cell:.lightning); pset(&g,x:rTip+2,y:cy-2,cell:.lightning); pset(&g,x:rTip+1,y:cy-3,cell:.lightning)
-        } else if frame == 2 {
-            pset(&g,x:lTip-1,y:cy-1,cell:.lightning); pset(&g,x:lTip-2,y:cy-2,cell:.lightning)
-            pset(&g,x:lTip-1,y:cy-3,cell:.lightning); pset(&g,x:lTip-2,y:cy-4,cell:.lightning)
-            pset(&g,x:rTip+1,y:cy-1,cell:.lightning); pset(&g,x:rTip+2,y:cy-2,cell:.lightning)
-            pset(&g,x:rTip+1,y:cy-3,cell:.lightning); pset(&g,x:rTip+2,y:cy-4,cell:.lightning)
-            pset(&g,x:cx-1,y:topTip-1,cell:.lightning); pset(&g,x:cx,y:topTip-2,cell:.lightning); pset(&g,x:cx+1,y:topTip-1,cell:.lightning)
-        }
-    }
-
     // ── Sad tears ────────────────────────────────────────────────────────────────
     if pose == .sad {
         let tearX = frame < 2 ? eyeLX : eyeRX
@@ -1862,6 +1799,26 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         let px = Int(bodyCx)+spot.dx, py = Int(bodyCy)+spot.dy
         let c = pget(g, x: px, y: py)
         if c == .body || c == .outline { pset(&g, x: px, y: py, cell: spot.colorIndex == 0 ? .accent1 : .accent2) }
+    }
+
+    // ── Hype aura — pixel-art outline alternating orange ↔ yellow each frame ──────
+    if pose == .hype {
+        let auraColor: PetCell = frame % 2 == 0 ? .lightning : .gold
+        let silhouette: Set<PetCell> = [.body, .outline, .face, .eyeWhite, .eyePupil,
+                                        .eyeShine, .mouth, .cheek, .shade, .nose, .accent1, .accent2]
+        var toMark: [(Int, Int)] = []
+        let dirs = [(-1,0),(1,0),(0,-1),(0,1)]
+        for y in 0..<GRID_SIZE {
+            for x in 0..<GRID_SIZE {
+                guard g[y][x] == .empty else { continue }
+                for (dx, dy) in dirs {
+                    if let cell = pget(g, x: x+dx, y: y+dy), silhouette.contains(cell) {
+                        toMark.append((x, y)); break
+                    }
+                }
+            }
+        }
+        for (x, y) in toMark { pset(&g, x: x, y: y, cell: auraColor) }
     }
 
     return g
