@@ -22,6 +22,7 @@ struct PacepalApp: App {
             .environment(health)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .task {
+                NotificationManager.requestPermission()
                 // Only auto-request for returning users who already completed
                 // the health permission screen — new users see it explicitly.
                 if appState.healthPermissionDone {

@@ -13,6 +13,7 @@ struct SettingsView: View {
 
     #if DEBUG
     @State private var debugNow: Date = Date()
+    @State private var drainTimer: Timer? = nil
     #endif
 
     var onShowTutorial: (() -> Void)? = nil
@@ -169,6 +170,31 @@ struct SettingsView: View {
                             .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                     }
                 }
+            }
+
+            // Drain: decreases energy 1% every second for testing notifications
+            Button {
+                if drainTimer != nil {
+                    drainTimer?.invalidate()
+                    drainTimer = nil
+                } else {
+                    drainTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                        let current = appState.energy(at: Date())
+                        appState.setEnergy(max(0, current - 0.01))
+                        debugNow = Date()
+                    }
+                }
+            } label: {
+                Text(drainTimer != nil ? "⏹ Detener drain" : "📉 -1% / seg (drain)")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(drainTimer != nil ? Color(hex: "#FFF0EE") : Color.white)
+                    .foregroundStyle(drainTimer != nil ? Color(hex: "#E53E3E") : Color(hex: "#4A3F35"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(
+                        drainTimer != nil ? Color(hex: "#E53E3E").opacity(0.4) : Color(hex: "#E2E8F0"),
+                        lineWidth: 1))
             }
 
             HStack(spacing: 6) {

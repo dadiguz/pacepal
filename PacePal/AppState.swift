@@ -272,6 +272,16 @@ final class AppState {
         UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
     }
 
+    /// Reschedules energy-drop notifications with the pet's current name and sprite image.
+    func scheduleNotifications(petName: String, attachmentURL: URL? = nil) {
+        NotificationManager.scheduleEnergyNotifications(
+            petName: petName,
+            energyResetDate: energyResetDate,
+            decaySeconds: decaySeconds,
+            attachmentURL: attachmentURL
+        )
+    }
+
     /// Call when a character is selected — starts at 60% to invite a first run
     /// Set to true when a brand-new character is chosen so HomeView
     /// knows to count today's existing km as fresh energy (not suppress them).

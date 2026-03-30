@@ -23,6 +23,7 @@
 		9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF3C2194692874670A6BB4F /* SplashView.swift */; };
 		B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECB56EF581B42616F072F3A /* HealthManager.swift */; };
 		B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87722B94D0D1737F52EC447F /* PaywallView.swift */; };
+		993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
@@ -42,6 +43,7 @@
 		50F1DC0C152081AE60BE85FA /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		5BF0218419DD8150496DC2B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningPhrases.swift; sourceTree = "<group>"; };
+		E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
 		87722B94D0D1737F52EC447F /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayView.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				5BF0218419DD8150496DC2B4 /* Info.plist */,
 				21204707A39D2F5D0852F039 /* PacePalApp.swift */,
 				5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */,
+				E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */,
 				924E2FE57E3D70EA88B28530 /* Engine */,
 				1B21660C88236FFF6E105047 /* Health */,
 				D1AC9720282703724E2412A6 /* Persistence */,
@@ -234,6 +237,7 @@
 				1B8540E3E208B4546AE2A881 /* PetPalette.swift in Sources */,
 				8340550C0AA71F9E8A2B9EC4 /* PetTypes.swift in Sources */,
 				2DABBE3DFD0832F5A5ABF17C /* RunningPhrases.swift in Sources */,
+				993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */,
 				BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */,
 				6C61820E9DAAFDAD2A31E652 /* SettingsView.swift in Sources */,
 				9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */,

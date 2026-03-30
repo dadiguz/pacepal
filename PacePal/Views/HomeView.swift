@@ -17,6 +17,7 @@ struct HomeView: View {
 
     @State private var currentPose: PetPose = .idle
     @State private var isAnimating = false
+    @State private var lastTrackedEnergy: Double = 1.0
     @State private var displayedKm: Double = 0.0
     @State private var lastKnownKm: Double = 0.0
     @State private var isInitialLoad = true
@@ -214,7 +215,10 @@ struct HomeView: View {
         .onAppear {
             isInitialLoad = true
             currentPose = normalPose
+            lastTrackedEnergy = appState.energy(at: Date())
             health.fetchToday()   // establece baseline al arrancar
+            let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
+            appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 checkForAchievement()
             }
@@ -257,6 +261,11 @@ struct HomeView: View {
         .onChange(of: appState.energyResetDate) { _, _ in
             now = Date()
             if !isAnimating { currentPose = normalPose }
+            let newEnergy = appState.energy(at: Date())
+            let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
+            NotificationManager.fireIfThresholdCrossed(petName: dna.name, oldEnergy: lastTrackedEnergy, newEnergy: newEnergy, attachmentURL: imgURL)
+            lastTrackedEnergy = newEnergy
+            appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
         }
         .onReceive(
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
