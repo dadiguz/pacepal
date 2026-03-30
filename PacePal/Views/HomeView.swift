@@ -457,7 +457,7 @@ struct HomeView: View {
                 .blur(radius: 12)
                 .padding(.bottom, 8)
 
-            PetAnimationView(dna: dna, pose: currentPose, pixelSize: 11)
+            PetAnimationView(dna: dna, pose: currentPose, pixelSize: 9.07)
                 .id(dna.id)
                 .onTapGesture {
                     guard !isAnimating && currentPose != .dead else { return }
@@ -577,7 +577,7 @@ struct HomeView: View {
 
                 // Dead pet at exact petSection position
                 ZStack(alignment: .bottom) {
-                    PetAnimationView(dna: dna, pose: .dead, pixelSize: 11)
+                    PetAnimationView(dna: dna, pose: .dead, pixelSize: 9.07)
                     // Floating shadow below canvas
                     Ellipse()
                         .fill(Color.black.opacity(0.65))

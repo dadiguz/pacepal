@@ -33,7 +33,7 @@ struct CharacterSelectView: View {
     private var selected: PetDNA { characters[selectedIndex] }
     private var bodyColor: Color { Color(hex: selected.palette.body) }
 
-    private let heroPx: CGFloat = 10
+    private let heroPx: CGFloat = 9.07
     private var heroSize: CGFloat { heroPx * CGFloat(GRID_SIZE) }
     private var footOffsetFromBottom: CGFloat { heroPx * 3 }
 

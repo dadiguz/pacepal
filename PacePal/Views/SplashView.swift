@@ -16,7 +16,7 @@ struct SplashView: View {
                 Spacer()
 
                 // Pet fades in after logo is already visible
-                PetAnimationView(dna: dna, pose: .running, pixelSize: 13)
+                PetAnimationView(dna: dna, pose: .running, pixelSize: 9.07)
                     .opacity(petAppeared ? 1 : 0)
                     .scaleEffect(petAppeared ? 1 : 0.85)
                     .animation(.spring(duration: 0.55, bounce: 0.25).delay(0.2), value: petAppeared)
