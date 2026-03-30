@@ -373,9 +373,8 @@ struct HomeView: View {
 
     // MARK: – Energy section (Pokémon HUD card)
     private var energySection: some View {
-        let rawDay = (Calendar.current.dateComponents([.day],
-            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
-        let dayNum = appState.challengeStarted ? max(1, rawDay) : 0
+        let dayNum = max(1, (Calendar.current.dateComponents([.day],
+            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1)
 
         return VStack(alignment: .leading, spacing: 14) {
             // ── Name + Day row ────────────────────────────────────────────
@@ -793,7 +792,7 @@ private struct AchievementModal: View {
                 )
 
                 VStack(spacing: 0) {
-                    Spacer().frame(height: 124)
+                    Spacer().frame(height: 132)
 
                     // Day badge
                     Text("DÍA \(achievement.day) / 66")
