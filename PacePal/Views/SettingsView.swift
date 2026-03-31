@@ -64,41 +64,6 @@ struct SettingsView: View {
                         showBackgroundPicker = true
                     }
 
-                    // ── Difficulty row ───────────────────────────────────
-                    let bindable = Bindable(appState)
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 14) {
-                            Image(systemName: "dial.medium")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(width: 34, height: 34)
-                                .background(Color(hex: "#9B59B6"))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Dificultad")
-                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(Color(hex: "#1F2933"))
-                                Text(appState.difficulty.subtitle)
-                                    .font(.system(size: 12, weight: .regular, design: .rounded))
-                                    .foregroundStyle(Color(hex: "#9AA5B4"))
-                                    .animation(.easeInOut(duration: 0.2), value: appState.difficulty)
-                            }
-                        }
-
-                        Picker("", selection: bindable.difficulty) {
-                            ForEach(Difficulty.allCases, id: \.self) { d in
-                                Text(d.label).tag(d)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-
                     // ── Sounds toggle ────────────────────────────────────
                     let bindableState = Bindable(appState)
                     HStack(spacing: 14) {
@@ -164,11 +129,11 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                #if DEBUG
-                testingSection
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                #endif
+                // #if DEBUG
+                // testingSection
+                //     .padding(.horizontal, 24)
+                //     .padding(.top, 24)
+                // #endif
 
                 Spacer()
             }
