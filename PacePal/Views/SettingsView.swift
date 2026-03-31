@@ -129,11 +129,11 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                // #if DEBUG
-                // testingSection
-                //     .padding(.horizontal, 24)
-                //     .padding(.top, 24)
-                // #endif
+                #if DEBUG
+                testingSection
+                    .padding(.horizontal, 24)
+                    .padding(.top, 24)
+                #endif
 
                 Spacer()
             }
@@ -172,6 +172,19 @@ struct SettingsView: View {
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .tracking(1.4)
                 .foregroundStyle(Color(hex: "#9AA5B4"))
+
+            Button {
+                appState.syncToWidget(km: health.todayKm)
+            } label: {
+                Text("📲 Sync widget ahora")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color(hex: "#EFF8FF"))
+                    .foregroundStyle(Color(hex: "#1C5FA8"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#BFDBFE"), lineWidth: 1))
+            }
 
             Button {
                 SoundManager.shared.playRandomHappy(enabled: true)

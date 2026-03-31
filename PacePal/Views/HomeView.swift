@@ -271,6 +271,9 @@ struct HomeView: View {
             guard !isAnimating else { return }
             Task { @MainActor in await runKmAnimation(delta: delta, newTotal: newVal) }
         }
+        .onChange(of: health.todayKm) { _, km in
+            appState.syncToWidget(km: km)
+        }
         .onChange(of: appState.energyResetDate) { _, _ in
             now = Date()
             if !isAnimating { currentPose = normalPose }
@@ -279,6 +282,7 @@ struct HomeView: View {
             NotificationManager.fireIfThresholdCrossed(petName: dna.name, oldEnergy: lastTrackedEnergy, newEnergy: newEnergy, attachmentURL: imgURL)
             lastTrackedEnergy = newEnergy
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
+            appState.syncToWidget(km: health.todayKm)
         }
         .onReceive(
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()

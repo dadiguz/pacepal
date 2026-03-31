@@ -1,5 +1,6 @@
 import SwiftUI
 import Observation
+import WidgetKit
 
 // MARK: - Achievement
 // 23 milestones: day 1, then every 3 days through day 64, plus day 66.
@@ -373,5 +374,24 @@ final class AppState {
         isFirstRunForCharacter = true
         selectedBackground = nil
         UserDefaults.standard.removeObject(forKey: "selectedBackground")
+        syncToWidget(km: 0)
+    }
+
+    // MARK: - Widget sync
+
+    private static let widgetDefaults = UserDefaults(suiteName: "group.io.dallio.PacePal")
+
+    /// Writes all widget-relevant data to the shared App Group and reloads timelines.
+    func syncToWidget(km: Double) {
+        guard let dna = selectedCharacter,
+              let dnaData = try? JSONEncoder().encode(dna) else { return }
+        let d = Self.widgetDefaults
+        d?.set(energyResetDate, forKey: "w_energyResetDate")
+        d?.set(difficulty.decaySeconds, forKey: "w_decaySeconds")
+        d?.set(dnaData, forKey: "w_petDNAData")
+        d?.set(km, forKey: "w_todayKm")
+        let day = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
+        d?.set(day, forKey: "w_challengeDay")
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }

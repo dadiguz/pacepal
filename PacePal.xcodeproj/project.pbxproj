@@ -14,8 +14,6 @@
 		391DB47B58EA508DF702D0E6 /* TutorialOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */; };
 		3CF3A2D4D8D88B3AFFC0769B /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */; };
 		5485A5AB673208F162919A94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF72C8057EA6268B152E458B /* Assets.xcassets */; };
-		EE11223344556677889900FF /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = AA11223344556677889900BB /* sounds */; };
-		FF11223344556677889900EE /* songs in Resources */ = {isa = PBXBuildFile; fileRef = CC11223344556677889900DD /* songs */; };
 		5BF2351EFF00418C847ECE40 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00912038B1E4E4792FD404E /* PurchaseManager.swift */; };
 		65E18912F484DC7714104362 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1DC0C152081AE60BE85FA /* PetDNA.swift */; };
 		6A60E5F1C6C061547B1B150F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095032E3C4A0A2086640BAD7 /* AppState.swift */; };
@@ -25,17 +23,50 @@
 		8340550C0AA71F9E8A2B9EC4 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CFC4735EC647C641C99A93 /* PetTypes.swift */; };
 		9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF3C2194692874670A6BB4F /* SplashView.swift */; };
 		993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */; };
-		D9B52E3A7C1F04E8B6A093F5 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A71F8E2B490D56F1CE8A04 /* SoundManager.swift */; };
 		A4C8F2E1B3D5607849A1C2E3 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */; };
 		B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECB56EF581B42616F072F3A /* HealthManager.swift */; };
 		B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87722B94D0D1737F52EC447F /* PaywallView.swift */; };
 		BEC0C0162F7B43C7002B9B64 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */; };
+		BEC0C01E2F7C6292002B9B64 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC0C01D2F7C6292002B9B64 /* WidgetKit.framework */; };
+		BEC0C0202F7C6292002B9B64 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC0C01F2F7C6292002B9B64 /* SwiftUI.framework */; };
+		BEC0C0312F7C6295002B9B64 /* PacepalWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BEC0C01C2F7C6292002B9B64 /* PacepalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BEC0C03C2F7C6552002B9B64 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1DC0C152081AE60BE85FA /* PetDNA.swift */; };
+		BEC0C03D2F7C655B002B9B64 /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */; };
+		BEC0C03E2F7C6560002B9B64 /* PetPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EC1A3F0DA504608DCBFA8E /* PetPalette.swift */; };
+		BEC0C03F2F7C6565002B9B64 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CFC4735EC647C641C99A93 /* PetTypes.swift */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
+		D9B52E3A7C1F04E8B6A093F5 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A71F8E2B490D56F1CE8A04 /* SoundManager.swift */; };
+		EE11223344556677889900FF /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = AA11223344556677889900BB /* sounds */; };
 		F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */; };
 		F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFD71C59100C3272E16C7E9 /* HomeView.swift */; };
+		FF11223344556677889900EE /* songs in Resources */ = {isa = PBXBuildFile; fileRef = CC11223344556677889900DD /* songs */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BEC0C02F2F7C6295002B9B64 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0BABAF8E8445F76C71591D0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BEC0C01B2F7C6292002B9B64;
+			remoteInfo = PacepalWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BEC0C0322F7C6295002B9B64 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BEC0C0312F7C6295002B9B64 /* PacepalWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		08C361822464750003249082 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -54,21 +85,46 @@
 		942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayView.swift; sourceTree = "<group>"; };
 		9D24656B4F85773EF6FC7FE9 /* Pacepal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pacepal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4EC1A3F0DA504608DCBFA8E /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
+		AA11223344556677889900BB /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sounds; sourceTree = SOURCE_ROOT; };
 		AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
 		B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionView.swift; sourceTree = "<group>"; };
 		BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		BEC0C01C2F7C6292002B9B64 /* PacepalWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PacepalWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEC0C01D2F7C6292002B9B64 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		BEC0C01F2F7C6292002B9B64 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		BEC0C0402F7C65D6002B9B64 /* PacepalWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacepalWidgetExtension.entitlements; sourceTree = "<group>"; };
 		C1918003EAED4B99DE32E955 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		C3A71F8E2B490D56F1CE8A04 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		CC11223344556677889900DD /* songs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = songs; sourceTree = SOURCE_ROOT; };
 		DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		E1792ED93F8A896E09756EBD /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
-		C3A71F8E2B490D56F1CE8A04 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		F00912038B1E4E4792FD404E /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
 		FAFD71C59100C3272E16C7E9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FF72C8057EA6268B152E458B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPermissionView.swift; sourceTree = "<group>"; };
-		AA11223344556677889900BB /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sounds; path = sounds; sourceTree = SOURCE_ROOT; };
-		CC11223344556677889900DD /* songs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = songs; path = songs; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BEC0C0352F7C6295002B9B64 /* Exceptions for "PacepalWidget" folder in "PacepalWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BEC0C0212F7C6292002B9B64 /* PacepalWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BEC0C0352F7C6295002B9B64 /* Exceptions for "PacepalWidget" folder in "PacepalWidgetExtension" target */,
+			);
+			path = PacepalWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3EA74D81E4184D4F19B62AB7 /* Frameworks */ = {
@@ -77,6 +133,15 @@
 			files = (
 				1EAD1E1908DA981BFDBDF376 /* HealthKit.framework in Frameworks */,
 				BEC0C0162F7B43C7002B9B64 /* StoreKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEC0C0192F7C6292002B9B64 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEC0C0202F7C6292002B9B64 /* SwiftUI.framework in Frameworks */,
+				BEC0C01E2F7C6292002B9B64 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				9D24656B4F85773EF6FC7FE9 /* Pacepal.app */,
+				BEC0C01C2F7C6292002B9B64 /* PacepalWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,6 +191,8 @@
 			children = (
 				BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */,
 				C1918003EAED4B99DE32E955 /* HealthKit.framework */,
+				BEC0C01D2F7C6292002B9B64 /* WidgetKit.framework */,
+				BEC0C01F2F7C6292002B9B64 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -132,7 +200,9 @@
 		57BA43114174DCC6140B2A26 = {
 			isa = PBXGroup;
 			children = (
+				BEC0C0402F7C65D6002B9B64 /* PacepalWidgetExtension.entitlements */,
 				271D4FC64E22094343D201A3 /* PacePal */,
+				BEC0C0212F7C6292002B9B64 /* PacepalWidget */,
 				34CBBD0FCB1732E8A740FD7B /* Frameworks */,
 				1F8196361619EFCEDABE7135 /* Products */,
 			);
@@ -178,6 +248,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEC0C0362F7C6295002B9B64 /* Build configuration list for PBXNativeTarget "PacepalWidgetExtension" */;
+			buildPhases = (
+				BEC0C0182F7C6292002B9B64 /* Sources */,
+				BEC0C0192F7C6292002B9B64 /* Frameworks */,
+				BEC0C01A2F7C6292002B9B64 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BEC0C0212F7C6292002B9B64 /* PacepalWidget */,
+			);
+			name = PacepalWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PacepalWidgetExtension;
+			productReference = BEC0C01C2F7C6292002B9B64 /* PacepalWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E757EDD39E299A8EDF9C45ED /* Pacepal */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8281D60592FED21F90AB0D47 /* Build configuration list for PBXNativeTarget "Pacepal" */;
@@ -185,10 +277,12 @@
 				0DEE2120D3AC1338B0479714 /* Sources */,
 				5C5673F1BE247A16771791E3 /* Resources */,
 				3EA74D81E4184D4F19B62AB7 /* Frameworks */,
+				BEC0C0322F7C6295002B9B64 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BEC0C0302F7C6295002B9B64 /* PBXTargetDependency */,
 			);
 			name = Pacepal;
 			packageProductDependencies = (
@@ -204,7 +298,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					BEC0C01B2F7C6292002B9B64 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+				};
 			};
 			buildConfigurationList = B9B58562F8A840BC11EF3DB6 /* Build configuration list for PBXProject "Pacepal" */;
 			developmentRegion = en;
@@ -221,6 +321,7 @@
 			projectRoot = "";
 			targets = (
 				E757EDD39E299A8EDF9C45ED /* Pacepal */,
+				BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -233,6 +334,13 @@
 				5485A5AB673208F162919A94 /* Assets.xcassets in Resources */,
 				EE11223344556677889900FF /* sounds in Resources */,
 				FF11223344556677889900EE /* songs in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEC0C01A2F7C6292002B9B64 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +377,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BEC0C0182F7C6292002B9B64 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEC0C03D2F7C655B002B9B64 /* PetGridBuilder.swift in Sources */,
+				BEC0C03C2F7C6552002B9B64 /* PetDNA.swift in Sources */,
+				BEC0C03E2F7C6560002B9B64 /* PetPalette.swift in Sources */,
+				BEC0C03F2F7C6565002B9B64 /* PetTypes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BEC0C0302F7C6295002B9B64 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */;
+			targetProxy = BEC0C02F2F7C6295002B9B64 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		23567FE84C0664D259653938 /* Debug */ = {
@@ -418,6 +545,84 @@
 			};
 			name = Release;
 		};
+		BEC0C0332F7C6295002B9B64 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = PacepalWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PacepalWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PacepalWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacePal.PacepalWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BEC0C0342F7C6295002B9B64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = PacepalWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PacepalWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PacepalWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacePal.PacepalWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		D66206E824D48367994C3F40 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -456,6 +661,15 @@
 			buildConfigurations = (
 				23567FE84C0664D259653938 /* Debug */,
 				B49E165897C2EA2BC5501102 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BEC0C0362F7C6295002B9B64 /* Build configuration list for PBXNativeTarget "PacepalWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEC0C0332F7C6295002B9B64 /* Debug */,
+				BEC0C0342F7C6295002B9B64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
