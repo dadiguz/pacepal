@@ -243,6 +243,11 @@ final class AppState {
         UserDefaults.standard.set(true, forKey: "paywallDismissed")
     }
 
+    func resetPaywall() {
+        paywallDismissed = false
+        UserDefaults.standard.set(false, forKey: "paywallDismissed")
+    }
+
     func completeHealthPermission() {
         healthPermissionDone = true
         UserDefaults.standard.set(true, forKey: "healthPermissionDone")

@@ -14,6 +14,7 @@
 		391DB47B58EA508DF702D0E6 /* TutorialOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */; };
 		3CF3A2D4D8D88B3AFFC0769B /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */; };
 		5485A5AB673208F162919A94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF72C8057EA6268B152E458B /* Assets.xcassets */; };
+		5BF2351EFF00418C847ECE40 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00912038B1E4E4792FD404E /* PurchaseManager.swift */; };
 		65E18912F484DC7714104362 /* PetDNA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1DC0C152081AE60BE85FA /* PetDNA.swift */; };
 		6A60E5F1C6C061547B1B150F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095032E3C4A0A2086640BAD7 /* AppState.swift */; };
 		6C61820E9DAAFDAD2A31E652 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248137B2B6AAC42E29F22ACC /* SettingsView.swift */; };
@@ -21,12 +22,13 @@
 		79105446F07FFC6FE1B33EDD /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1792ED93F8A896E09756EBD /* HistoryView.swift */; };
 		8340550C0AA71F9E8A2B9EC4 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CFC4735EC647C641C99A93 /* PetTypes.swift */; };
 		9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF3C2194692874670A6BB4F /* SplashView.swift */; };
+		993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */; };
+		A4C8F2E1B3D5607849A1C2E3 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */; };
 		B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECB56EF581B42616F072F3A /* HealthManager.swift */; };
 		B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87722B94D0D1737F52EC447F /* PaywallView.swift */; };
-		993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */; };
+		BEC0C0162F7B43C7002B9B64 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
-		A4C8F2E1B3D5607849A1C2E3 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
 		F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */; };
 		F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFD71C59100C3272E16C7E9 /* HomeView.swift */; };
@@ -44,19 +46,21 @@
 		50F1DC0C152081AE60BE85FA /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
 		5BF0218419DD8150496DC2B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningPhrases.swift; sourceTree = "<group>"; };
-		E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
 		87722B94D0D1737F52EC447F /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayView.swift; sourceTree = "<group>"; };
 		9D24656B4F85773EF6FC7FE9 /* Pacepal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pacepal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4EC1A3F0DA504608DCBFA8E /* PetPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetPalette.swift; sourceTree = "<group>"; };
 		AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
+		B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionView.swift; sourceTree = "<group>"; };
+		BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		C1918003EAED4B99DE32E955 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		E1792ED93F8A896E09756EBD /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		F00912038B1E4E4792FD404E /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
 		FAFD71C59100C3272E16C7E9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FF72C8057EA6268B152E458B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionView.swift; sourceTree = "<group>"; };
 		FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthPermissionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -66,6 +70,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1EAD1E1908DA981BFDBDF376 /* HealthKit.framework in Frameworks */,
+				BEC0C0162F7B43C7002B9B64 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +102,7 @@
 				21204707A39D2F5D0852F039 /* PacePalApp.swift */,
 				5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */,
 				E21AA22A98BC44CCB2D46775 /* NotificationManager.swift */,
+				F00912038B1E4E4792FD404E /* PurchaseManager.swift */,
 				924E2FE57E3D70EA88B28530 /* Engine */,
 				1B21660C88236FFF6E105047 /* Health */,
 				D1AC9720282703724E2412A6 /* Persistence */,
@@ -108,6 +114,7 @@
 		34CBBD0FCB1732E8A740FD7B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BEC0C0152F7B43C7002B9B64 /* StoreKit.framework */,
 				C1918003EAED4B99DE32E955 /* HealthKit.framework */,
 			);
 			name = Frameworks;
@@ -242,6 +249,7 @@
 				8340550C0AA71F9E8A2B9EC4 /* PetTypes.swift in Sources */,
 				2DABBE3DFD0832F5A5ABF17C /* RunningPhrases.swift in Sources */,
 				993136D1ABEF4DA2A54C9F9A /* NotificationManager.swift in Sources */,
+				5BF2351EFF00418C847ECE40 /* PurchaseManager.swift in Sources */,
 				BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */,
 				6C61820E9DAAFDAD2A31E652 /* SettingsView.swift in Sources */,
 				9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */,

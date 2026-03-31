@@ -6,6 +6,7 @@ import UserNotifications
 struct PacepalApp: App {
     @State private var appState = AppState()
     @State private var health = HealthManager()
+    @State private var store = PurchaseManager()
     @State private var showSplash = true
 
     var body: some Scene {
@@ -21,6 +22,7 @@ struct PacepalApp: App {
             }
             .environment(appState)
             .environment(health)
+            .environment(store)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .task {
                 // Set delegate so foreground banners work for returning users.
@@ -34,6 +36,11 @@ struct PacepalApp: App {
                 // the health permission screen — new users see it explicitly.
                 if appState.healthPermissionDone {
                     health.requestAuthorizationAndFetch()
+                }
+                // Verify subscription is still active; if not, reset paywall so it shows again.
+                await store.refreshStatus()
+                if !store.isPremium && appState.paywallDismissed {
+                    appState.resetPaywall()
                 }
                 try? await Task.sleep(for: .seconds(2.4))
                 showSplash = false

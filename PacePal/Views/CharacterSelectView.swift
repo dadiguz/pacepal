@@ -148,7 +148,7 @@ struct CharacterSelectView: View {
             Spacer().frame(height: 28)
 
             // Prompt
-            Text("Ponle un nombre")
+            Text("¿Cómo se llama tu compañero?")
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#1F2933"))
             Text(showNameError ? "¡Necesita un nombre!" : "Máximo \(maxNicknameLength) letras")

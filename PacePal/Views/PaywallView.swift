@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PaywallView: View {
     @Environment(AppState.self) private var appState
+    @Environment(PurchaseManager.self) private var store
 
     @State private var appeared = false
     @State private var glowPulse = false
@@ -13,7 +14,6 @@ struct PaywallView: View {
         ("flame.fill",  "#DE911D", "Rachas y progreso",  "Cada día del reto en tu historial"),
     ]
 
-    // Always use the real chosen pet if available
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     private var petName: String? {
         guard let name = appState.selectedCharacter?.name, !name.isEmpty else { return nil }
@@ -70,18 +70,36 @@ struct PaywallView: View {
                         .offset(y: appeared ? 0 : 10)
                         .animation(.spring(duration: 0.45).delay(0.42), value: appeared)
 
-                    // Skip
-                    Button("Continuar sin suscripción") {
-                        withAnimation(.easeInOut(duration: 0.35)) {
-                            appState.dismissPaywall()
-                        }
+                    // Error message
+                    if let error = store.purchaseError {
+                        Text(error)
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#E12D39"))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
+                            .padding(.top, 12)
                     }
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(Color(hex: "#9AA5B4"))
+
+                    // Restore
+                    Button {
+                        Task { await store.restore() }
+                    } label: {
+                        Text(store.isRestoring ? "Buscando compra..." : "Restaurar compra")
+                            .font(.system(size: 13, weight: .regular, design: .rounded))
+                            .foregroundStyle(Color(hex: "#9AA5B4"))
+                    }
+                    .disabled(store.isRestoring || store.isPurchasing)
                     .padding(.top, 16)
                     .padding(.bottom, 48)
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.3).delay(0.5), value: appeared)
+                }
+            }
+        }
+        .onChange(of: store.isPremium) { _, premium in
+            if premium {
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    appState.dismissPaywall()
                 }
             }
         }
@@ -182,7 +200,6 @@ struct PaywallView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: 88)
 
-            // Dots
             HStack(spacing: 6) {
                 ForEach(features.indices, id: \.self) { i in
                     Capsule()
@@ -193,7 +210,6 @@ struct PaywallView: View {
             }
         }
         .onAppear {
-            // Auto-advance every 2.5s
             Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
                 withAnimation(.spring(duration: 0.4)) {
                     featurePage = (featurePage + 1) % features.count
@@ -240,7 +256,7 @@ struct PaywallView: View {
                 .fill(Color(hex: "#E4E7EB"))
                 .frame(width: 1, height: 56)
 
-            pricePill(top: "DESPUÉS", main: "$49", sub: "al mes · MXN", highlighted: false)
+            pricePill(top: "DESPUÉS", main: store.displayPrice, sub: "al año", highlighted: false)
         }
         .frame(height: 82)
         .background(.white)
@@ -269,23 +285,30 @@ struct PaywallView: View {
 
     private var ctaButton: some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.35)) {
-                appState.dismissPaywall()
-            }
+            Task { await store.purchase() }
         } label: {
-            Text("Comenzar prueba gratuita")
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 17)
-                .background(Color(hex: "#F9703E"))
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.70 : 0.20),
-                        radius: glowPulse ? 20 : 8, y: 4)
-                .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.35 : 0.05),
-                        radius: glowPulse ? 38 : 14, y: 8)
+            HStack(spacing: 8) {
+                if store.isPurchasing {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(0.85)
+                }
+                Text(store.isPurchasing ? "Procesando..." : "Comenzar prueba gratuita")
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 17)
+            .background(Color(hex: "#F9703E").opacity(store.isPurchasing ? 0.6 : 1))
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.70 : 0.20),
+                    radius: glowPulse ? 20 : 8, y: 4)
+            .shadow(color: Color(hex: "#F9703E").opacity(glowPulse ? 0.35 : 0.05),
+                    radius: glowPulse ? 38 : 14, y: 8)
         }
+        .disabled(store.isPurchasing || store.isRestoring)
         .scaleEffect(glowPulse ? 1.012 : 0.996)
+        .animation(.easeInOut(duration: 0.2), value: store.isPurchasing)
     }
 }
 
@@ -296,4 +319,5 @@ struct PaywallView: View {
             s.selectedCharacter = PetDNA.presets()[0]
             return s
         }())
+        .environment(PurchaseManager())
 }
