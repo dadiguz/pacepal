@@ -89,6 +89,13 @@ struct PaywallView: View {
                             .foregroundStyle(Color(hex: "#9AA5B4"))
                     }
                     .disabled(store.isRestoring || store.isPurchasing)
+                    .onChange(of: store.isPremium) { _, premium in
+                        if premium {
+                            withAnimation(.easeInOut(duration: 0.35)) {
+                                appState.dismissPaywall()
+                            }
+                        }
+                    }
                     .padding(.top, 16)
                     .padding(.bottom, 48)
                     .opacity(appeared ? 1 : 0)
@@ -285,7 +292,14 @@ struct PaywallView: View {
 
     private var ctaButton: some View {
         Button {
-            Task { await store.purchase() }
+            Task {
+                await store.purchase()
+                if store.isPremium {
+                    withAnimation(.easeInOut(duration: 0.35)) {
+                        appState.dismissPaywall()
+                    }
+                }
+            }
         } label: {
             HStack(spacing: 8) {
                 if store.isPurchasing {
