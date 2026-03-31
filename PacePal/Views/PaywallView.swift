@@ -9,11 +9,11 @@ struct PaywallView: View {
     @State private var featurePage = 0
     @State private var purchased = false
 
-    private let features: [(icon: String, color: String, title: String, desc: String)] = [
-        ("figure.run",  "#F9703E", "Reto de 66 días",   "El tiempo justo para convertirlo en hábito"),
-        ("heart.fill",  "#E12D39", "Apple Health",       "Tus km se sincronizan solos"),
-        ("flame.fill",  "#DE911D", "Rachas y progreso",  "Cada día del reto en tu historial"),
-    ]
+    private var features: [(icon: String, color: String, title: String, desc: String)] {[
+        ("figure.run",  "#F9703E", appState.t("Reto de 66 días", "66-day Challenge"),    appState.t("El tiempo justo para convertirlo en hábito", "Just the right time to make it a habit")),
+        ("heart.fill",  "#E12D39", "Apple Health",                                        appState.t("Tus km se sincronizan solos", "Your km sync automatically")),
+        ("flame.fill",  "#DE911D", appState.t("Rachas y progreso", "Streaks & progress"), appState.t("Cada día del reto en tu historial", "Every challenge day in your history")),
+    ]}
 
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     private var petName: String? {
@@ -85,7 +85,7 @@ struct PaywallView: View {
                     Button {
                         Task { await store.restore() }
                     } label: {
-                        Text(store.isRestoring ? "Buscando compra..." : "Restaurar compra")
+                        Text(store.isRestoring ? appState.t("Buscando compra...", "Restoring...") : appState.t("Restaurar compra", "Restore purchase"))
                             .font(.system(size: 13, weight: .regular, design: .rounded))
                             .foregroundStyle(Color(hex: "#9AA5B4"))
                     }
@@ -155,26 +155,26 @@ struct PaywallView: View {
         VStack(spacing: 6) {
             if let name = petName {
                 (
-                    Text("Mantén a ")
+                    Text(appState.t("Mantén a ", "Keep "))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                     + Text(name)
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#F9703E"))
-                    + Text(" con vida.")
+                    + Text(appState.t(" con vida.", " alive."))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                 )
                 .multilineTextAlignment(.center)
             } else {
                 (
-                    Text("Empieza tu ")
+                    Text(appState.t("Empieza tu ", "Start your "))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
-                    + Text("prueba gratis")
+                    + Text(appState.t("prueba gratis", "free trial"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#F9703E"))
-                    + Text(" hoy mismo.")
+                    + Text(appState.t(" hoy mismo.", " today."))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                 )
@@ -182,12 +182,12 @@ struct PaywallView: View {
             }
 
             HStack(spacing: 6) {
-                Label("7 días gratis", systemImage: "checkmark.seal.fill")
+                Label(appState.t("7 días gratis", "7 days free"), systemImage: "checkmark.seal.fill")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
                 Text("·")
                     .foregroundStyle(Color(hex: "#CBD2D9"))
-                Text("Cancela cuando quieras")
+                Text(appState.t("Cancela cuando quieras", "Cancel anytime"))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
@@ -258,13 +258,13 @@ struct PaywallView: View {
 
     private var priceCard: some View {
         HStack(spacing: 0) {
-            pricePill(top: "HOY", main: "GRATIS", sub: "7 días de prueba", highlighted: true)
+            pricePill(top: appState.t("HOY", "TODAY"), main: appState.t("GRATIS", "FREE"), sub: appState.t("7 días de prueba", "7-day trial"), highlighted: true)
 
             Rectangle()
                 .fill(Color(hex: "#E4E7EB"))
                 .frame(width: 1, height: 56)
 
-            pricePill(top: "DESPUÉS", main: store.displayPrice, sub: "al año", highlighted: false)
+            pricePill(top: appState.t("DESPUÉS", "AFTER"), main: store.displayPrice, sub: appState.t("al año", "per year"), highlighted: false)
         }
         .frame(height: 82)
         .background(.white)
@@ -311,7 +311,7 @@ struct PaywallView: View {
                         .tint(.white)
                         .scaleEffect(0.85)
                 }
-                Text(store.isPurchasing ? "Procesando..." : "Comenzar prueba gratuita")
+                Text(store.isPurchasing ? appState.t("Procesando...", "Processing...") : appState.t("Comenzar prueba gratuita", "Start free trial"))
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
             }
             .frame(maxWidth: .infinity)

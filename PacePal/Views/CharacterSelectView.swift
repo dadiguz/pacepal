@@ -75,7 +75,7 @@ struct CharacterSelectView: View {
                         .animation(.none, value: selectedIndex)
 
                     // Tagline
-                    Text("Te acompañará en cada kilómetro")
+                    Text(appState.t("Te acompañará en cada kilómetro", "They'll be with you every kilometer"))
                         .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundStyle(Color(hex: "#B0A8A0"))
                         .padding(.top, 4)
@@ -174,10 +174,10 @@ struct CharacterSelectView: View {
             Spacer().frame(height: 28)
 
             // Prompt
-            Text("¿Cómo se llama tu compañero?")
+            Text(appState.t("¿Cómo se llama tu compañero?", "What's your companion's name?"))
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#1F2933"))
-            Text(showNameError ? "¡Necesita un nombre!" : "Máximo \(maxNicknameLength) letras")
+            Text(showNameError ? appState.t("¡Necesita un nombre!", "They need a name!") : appState.t("Máximo \(maxNicknameLength) letras", "Max \(maxNicknameLength) characters"))
                 .font(.system(size: 13, weight: showNameError ? .semibold : .regular, design: .rounded))
                 .foregroundStyle(showNameError ? Color(hex: "#E12D39") : Color(hex: "#9AA5B4"))
                 .padding(.top, 4)
@@ -208,7 +208,7 @@ struct CharacterSelectView: View {
 
             // ── Buttons ─────────────────────────────────────────────────────
             Button { confirmNickname() } label: {
-                Text("Confirmar")
+                Text(appState.t("Confirmar", "Confirm"))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
@@ -292,7 +292,7 @@ struct CharacterSelectView: View {
 
     // MARK: – Animal type label
 
-    private var animalLabel: String { selected.animalType.archetypeLabel }
+    private var animalLabel: String { selected.animalType.archetypeLabel(language: appState.language) }
 
     // MARK: – Header
 
@@ -302,7 +302,7 @@ struct CharacterSelectView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 50)
-            Text("Elige tu compañero de 66 días")
+            Text(appState.t("Elige tu compañero de 66 días", "Choose your 66-day companion"))
                 .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#9AA5B4"))
         }
@@ -428,7 +428,7 @@ struct CharacterSelectView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "shuffle")
-                    Text("Generar")
+                    Text(appState.t("Generar", "Generate"))
                 }
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .frame(maxWidth: .infinity)
@@ -447,7 +447,7 @@ struct CharacterSelectView: View {
                     withAnimation { isNaming = true }
                 }
             } label: {
-                Text("Seleccionar")
+                Text(appState.t("Seleccionar", "Select"))
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)

@@ -114,30 +114,31 @@ enum PetBodyShape: String, Codable {
 
 // MARK: - Archetype label
 extension PetAnimalType {
-    var archetypeLabel: String {
+    func archetypeLabel(language: Language) -> String {
         switch self {
-        case .bunny:    return "Veloz"
-        case .cat:      return "Ágil"
-        case .bear:     return "Fuerza"
-        case .raccoon:  return "Adaptable"
-        case .mouse:    return "Veloz"
-        case .frog:     return "Potencia"
-        case .duck:     return "Resistente"
-        case .axolotl:  return "Resiliente"
-        case .smooth:   return "Libre"
-        case .capuchin: return "Dinámico"
-        case .mandrill: return "Salvaje"
-        case .fox:      return "Estratega"
-        case .lion:     return "Dominante"
-        case .domo:     return "Imparable"
-        case .pou:      return "Constante"
-        case .dog:        return "Leal"
-        case .tiger:      return "Feroz"
-        case .panda:      return "Tenaz"
-        case .corgi:   return "Alegre"
-        case .dragon:  return "Legendario"
+        case .bunny:    return language == .en ? "Swift"      : "Veloz"
+        case .cat:      return language == .en ? "Agile"      : "Ágil"
+        case .bear:     return language == .en ? "Strength"   : "Fuerza"
+        case .raccoon:  return language == .en ? "Adaptable"  : "Adaptable"
+        case .mouse:    return language == .en ? "Swift"      : "Veloz"
+        case .frog:     return language == .en ? "Power"      : "Potencia"
+        case .duck:     return language == .en ? "Resilient"  : "Resistente"
+        case .axolotl:  return language == .en ? "Resilient"  : "Resiliente"
+        case .smooth:   return language == .en ? "Free"       : "Libre"
+        case .capuchin: return language == .en ? "Dynamic"    : "Dinámico"
+        case .mandrill: return language == .en ? "Wild"       : "Salvaje"
+        case .fox:      return language == .en ? "Strategist" : "Estratega"
+        case .lion:     return language == .en ? "Dominant"   : "Dominante"
+        case .domo:     return language == .en ? "Unstoppable": "Imparable"
+        case .pou:      return language == .en ? "Consistent" : "Constante"
+        case .dog:      return language == .en ? "Loyal"      : "Leal"
+        case .tiger:    return language == .en ? "Fierce"     : "Feroz"
+        case .panda:    return language == .en ? "Tenacious"  : "Tenaz"
+        case .corgi:    return language == .en ? "Cheerful"   : "Alegre"
+        case .dragon:   return language == .en ? "Legendary"  : "Legendario"
         }
     }
+    var archetypeLabel: String { archetypeLabel(language: .es) }
 }
 
 // MARK: - Grid typealias

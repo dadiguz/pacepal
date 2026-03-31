@@ -1,6 +1,13 @@
 import SwiftUI
 import Observation
 
+// MARK: - Language
+enum Language: String, CaseIterable {
+    case es, en
+    var displayName: String { self == .en ? "English" : "Español" }
+    var flag: String { self == .en ? "🇺🇸" : "🇲🇽" }
+}
+
 // MARK: - Achievement
 // 23 milestones: day 1, then every 3 days through day 64, plus day 66.
 // Each maps to background_01 … background_23 in order.
@@ -113,6 +120,60 @@ struct Achievement: Identifiable, Equatable {
         }
     }
 
+    func displayText(language: Language) -> Text {
+        guard language == .en else { return displayText }
+        let orange = Color(hex: "#F9703E")
+        let white  = Color.white
+        switch day {
+        case 1:
+            return Text("Day 1. ").foregroundStyle(orange).bold() + Text("You started when it was easier to stay. That's already ").foregroundStyle(white) + Text("more than most.").foregroundStyle(orange).bold()
+        case 4:
+            return Text("4 days straight. ").foregroundStyle(orange).bold() + Text("Your body already feels the rhythm ").foregroundStyle(white) + Text("in your feet.").foregroundStyle(orange).bold()
+        case 7:
+            return Text("One full week. ").foregroundStyle(orange).bold() + Text("Your body starts to remember the way and ").foregroundStyle(white) + Text("wants more.").foregroundStyle(orange).bold()
+        case 10:
+            return Text("10 days. ").foregroundStyle(orange).bold() + Text("Discipline is no longer effort, ").foregroundStyle(white) + Text("it's installing itself.").foregroundStyle(orange).bold()
+        case 13:
+            return Text("13 days. ").foregroundStyle(orange).bold() + Text("Almost two weeks of ").foregroundStyle(white) + Text("real, consistent movement.").foregroundStyle(orange).bold()
+        case 16:
+            return Text("16 days. ").foregroundStyle(orange).bold() + Text("You don't have to convince yourself to go out. The habit ").foregroundStyle(white) + Text("is already yours.").foregroundStyle(orange).bold()
+        case 19:
+            return Text("19 days. ").foregroundStyle(orange).bold() + Text("Every morning you chose to move instead of stay ").foregroundStyle(white) + Text("counts.").foregroundStyle(orange).bold()
+        case 22:
+            return Text("22 days. ").foregroundStyle(orange).bold() + Text("Three full weeks of ").foregroundStyle(white) + Text("running without excuses.").foregroundStyle(orange).bold()
+        case 25:
+            return Text("25 days. ").foregroundStyle(orange).bold() + Text("You've passed the halfway point. No going back, ").foregroundStyle(white) + Text("you don't stop.").foregroundStyle(orange).bold()
+        case 28:
+            return Text("28 days. ").foregroundStyle(orange).bold() + Text("A whole month of right decisions, one after another.").foregroundStyle(white)
+        case 31:
+            return Text("31 days. ").foregroundStyle(orange).bold() + Text("The first full month is behind you. Every kilometer was ").foregroundStyle(white) + Text("yours.").foregroundStyle(orange).bold()
+        case 34:
+            return Text("34 days. ").foregroundStyle(orange).bold() + Text("Most people gave up long ago. ").foregroundStyle(white) + Text("You keep running.").foregroundStyle(orange).bold()
+        case 37:
+            return Text("37 days. ").foregroundStyle(orange).bold() + Text("More than half the journey done. The end ").foregroundStyle(white) + Text("is getting close.").foregroundStyle(orange).bold()
+        case 40:
+            return Text("40 days. ").foregroundStyle(orange).bold() + Text("You are consistency, discipline and ").foregroundStyle(white) + Text("pure movement.").foregroundStyle(orange).bold()
+        case 43:
+            return Text("43 days. ").foregroundStyle(orange).bold() + Text("Every outing, every kilometer, is ").foregroundStyle(white) + Text("your victory.").foregroundStyle(orange).bold()
+        case 46:
+            return Text("46 days. ").foregroundStyle(orange).bold() + Text("Only ").foregroundStyle(white) + Text("20 days ").foregroundStyle(orange).bold() + Text("from the finish line. Hold on.").foregroundStyle(white)
+        case 49:
+            return Text("49 days. ").foregroundStyle(orange).bold() + Text("Seven weeks of ").foregroundStyle(white) + Text("pure determination and drive.").foregroundStyle(orange).bold()
+        case 52:
+            return Text("52 days. ").foregroundStyle(orange).bold() + Text("The final stretch ").foregroundStyle(white) + Text("is very close.").foregroundStyle(orange).bold()
+        case 55:
+            return Text("55 days. ").foregroundStyle(orange).bold() + Text("Only 11 more days between you and the goal. ").foregroundStyle(white) + Text("Don't let go now.").foregroundStyle(orange).bold()
+        case 58:
+            return Text("58 days. ").foregroundStyle(orange).bold() + Text("You can almost feel it. ").foregroundStyle(white) + Text("The goal is right there.").foregroundStyle(orange).bold()
+        case 61:
+            return Text("61 days. ").foregroundStyle(orange).bold() + Text("Only 5 more days between you and 66. ").foregroundStyle(white) + Text("You can do it.").foregroundStyle(orange).bold()
+        case 64:
+            return Text("64 days. ").foregroundStyle(orange).bold() + Text("The finish line ").foregroundStyle(white) + Text("is two steps away.").foregroundStyle(orange).bold()
+        default:
+            return Text("66 days. ").foregroundStyle(orange).bold() + Text("You chose to go out when everything said stay. You ran when you thought you couldn't. ").foregroundStyle(white) + Text("You crossed the finish line ").foregroundStyle(orange).bold() + Text("and built it. ").foregroundStyle(white) + Text("Keep running.").foregroundStyle(orange).bold()
+        }
+    }
+
     /// Unique celebratory animation per milestone — one distinct pose per day
     var pose: PetPose {
         if day == 66 { return .finish }
@@ -173,12 +234,13 @@ enum Difficulty: String, CaseIterable {
         }
     }
 
-    var subtitle: String {
+    func subtitle(lang: Language) -> String {
         switch self {
-        case .pequeñines: return "La energía dura 7 días"
-        case .pro:        return "La energía dura 36 horas"
+        case .pequeñines: return lang == .en ? "Energy lasts 7 days" : "La energía dura 7 días"
+        case .pro:        return lang == .en ? "Energy lasts 36 hours" : "La energía dura 36 horas"
         }
     }
+    var subtitle: String { subtitle(lang: .es) }
 }
 
 @Observable
@@ -209,6 +271,20 @@ final class AppState {
     var soundsEnabled: Bool {
         didSet { UserDefaults.standard.set(soundsEnabled, forKey: "soundsEnabled") }
     }
+
+    // Language
+    var language: Language {
+        get {
+            if let stored = UserDefaults.standard.string(forKey: "appLanguage"),
+               let lang = Language(rawValue: stored) { return lang }
+            let code = Locale.current.language.languageCode?.identifier ?? "es"
+            return code == "en" ? .en : .es
+        }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: "appLanguage") }
+    }
+
+    /// Returns `es` string if language is Spanish, `en` string if English.
+    func t(_ es: String, _ en: String) -> String { language == .en ? en : es }
 
     // Selected background image name (nil = default gradient)
     private(set) var selectedBackground: String?

@@ -67,10 +67,10 @@ struct NotificationPermissionView: View {
     private var pitchContent: some View {
         VStack(spacing: 20) {
             (
-                Text("Que nada te haga\n")
+                Text(appState.t("Que nada te haga\n", "Let nothing make you\n"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("perderle el ritmo.")
+                + Text(appState.t("perderle el ritmo.", "lose the rhythm."))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -78,10 +78,10 @@ struct NotificationPermissionView: View {
             .padding(.horizontal, 32)
 
             (
-                Text("Te avisamos cuando tu compañero\npierda energía para que ")
+                Text(appState.t("Te avisamos cuando tu compañero\npierda energía para que ", "We'll notify you when your companion\nloses energy so "))
                     .font(.system(size: 17, design: .rounded))
                     .foregroundStyle(Color(hex: "#52606D"))
-                + Text("nunca se quede solo.")
+                + Text(appState.t("nunca se quede solo.", "they're never left alone."))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -91,8 +91,8 @@ struct NotificationPermissionView: View {
 
             // Benefit pills
             HStack(spacing: 10) {
-                benefitPill(icon: "bolt.fill",    label: "Alertas de energía")
-                benefitPill(icon: "figure.run",   label: "Motivación diaria")
+                benefitPill(icon: "bolt.fill",    label: appState.t("Alertas de energía", "Energy alerts"))
+                benefitPill(icon: "figure.run",   label: appState.t("Motivación diaria", "Daily motivation"))
             }
             .padding(.top, 4)
         }
@@ -139,7 +139,7 @@ struct NotificationPermissionView: View {
                     }
                     Image(systemName: "bell.fill")
                         .font(.system(size: 15))
-                    Text(requesting ? "Esperando permiso..." : "Activar notificaciones")
+                    Text(requesting ? appState.t("Esperando permiso...", "Waiting for permission...") : appState.t("Activar notificaciones", "Enable notifications"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                 }
                 .frame(maxWidth: .infinity)
@@ -157,7 +157,7 @@ struct NotificationPermissionView: View {
                     appState.completeNotificationPermission()
                 }
             } label: {
-                Text("Omitir por ahora")
+                Text(appState.t("Omitir por ahora", "Skip for now"))
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }

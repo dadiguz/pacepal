@@ -81,11 +81,11 @@ struct OnboardingView: View {
                 // Hook copy
                 VStack(spacing: 10) {
                     (
-                        Text("Tu compañero\nde ")
+                        Text(appState.t("Tu compañero\nde ", "Your\n"))
                             .foregroundStyle(Color(hex: "#1F2933"))
-                        + Text("66 días")
+                        + Text(appState.t("66 días", "66 days"))
                             .foregroundStyle(Color(hex: "#F9703E"))
-                        + Text(" te espera.")
+                        + Text(appState.t(" te espera.", " companion awaits."))
                             .foregroundStyle(Color(hex: "#1F2933"))
                     )
                     .font(.system(size: 30, weight: .bold, design: .rounded))
@@ -94,7 +94,7 @@ struct OnboardingView: View {
                     .offset(y: appeared ? 0 : 10)
                     .animation(.spring(duration: 0.45).delay(0.2), value: appeared)
 
-                    Text("Corre. Mantenlo vivo.")
+                    Text(appState.t("Corre. Mantenlo vivo.", "Run. Keep them alive."))
                         .font(.system(size: 16, weight: .regular, design: .rounded))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                         .opacity(appeared ? 1 : 0)
@@ -109,7 +109,7 @@ struct OnboardingView: View {
                         appState.completeOnboarding()
                     }
                 } label: {
-                    Text("Elegir mi compañero")
+                    Text(appState.t("Elegir mi compañero", "Choose my companion"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)

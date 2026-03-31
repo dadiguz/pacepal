@@ -46,25 +46,25 @@ struct HomeView: View {
 
     private var energyTimeLabel: String {
         let minutes = Int(appState.decaySeconds / 60.0 * energy)
-        guard minutes > 0 else { return "Sin energía" }
+        guard minutes > 0 else { return appState.t("Sin energía", "No energy") }
         let h = minutes / 60
         let m = minutes % 60
-        if h == 0 { return "\(m)m restantes" }
-        if m == 0 { return "\(h)h restantes" }
-        return "\(h)h \(m)m restantes"
+        if h == 0 { return appState.t("\(m)m restantes", "\(m)m remaining") }
+        if m == 0 { return appState.t("\(h)h restantes", "\(h)h remaining") }
+        return appState.t("\(h)h \(m)m restantes", "\(h)h \(m)m remaining")
     }
 
     private var moodText: String {
         switch normalPose {
-        case .hype:  return "¡\(dna.name) está en su mejor momento!"
-        case .happy: return "\(dna.name) está feliz, ¡sigamos!"
-        case .jump:  return "\(dna.name) tiene energía, ¿corremos?"
-        case .idle:  return "\(dna.name) está listo para correr"
-        case .angry: return "Está exigiendo que corras"
-        case .sad:   return "La energía se acaba... ¡sal a correr!"
-        case .dizzy: return "\(dna.name) está a punto de colapsar..."
-        case .dead:  return "\(dna.name) está exhausto... ¡ve a correr!"
-        default:     return "\(dna.name) está listo"
+        case .hype:  return appState.t("¡\(dna.name) está en su mejor momento!", "🔥 \(dna.name) is at their best!")
+        case .happy: return appState.t("\(dna.name) está feliz, ¡sigamos!", "\(dna.name) is happy, let's go!")
+        case .jump:  return appState.t("\(dna.name) tiene energía, ¿corremos?", "\(dna.name) has energy, shall we run?")
+        case .idle:  return appState.t("\(dna.name) está listo para correr", "\(dna.name) is ready to run")
+        case .angry: return appState.t("Está exigiendo que corras", "They're demanding you run")
+        case .sad:   return appState.t("La energía se acaba... ¡sal a correr!", "Energy fading... go run!")
+        case .dizzy: return appState.t("\(dna.name) está a punto de colapsar...", "\(dna.name) is about to collapse...")
+        case .dead:  return appState.t("\(dna.name) está exhausto... ¡ve a correr!", "\(dna.name) is exhausted... go run!")
+        default:     return appState.t("\(dna.name) está listo", "\(dna.name) is ready")
         }
     }
 
@@ -444,7 +444,7 @@ struct HomeView: View {
                     .font(.system(size: 20, weight: .black, design: .monospaced))
                     .foregroundStyle(.white)
                 Spacer()
-                Text("DÍA: \(String(format: "%02d", dayNum))/66")
+                Text(appState.t("DÍA: \(String(format: "%02d", dayNum))/66", "DAY: \(String(format: "%02d", dayNum))/66"))
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.55))
             }
@@ -557,14 +557,19 @@ struct HomeView: View {
     }
 
     private var phraseSection: some View {
-        styledPhrase(RunningPhrase.all[phraseIndex].es)
+        let text: String = {
+            let phrase = RunningPhrase.all[phraseIndex]
+            if appState.language == .en && !phrase.en.isEmpty { return phrase.en }
+            return phrase.es
+        }()
+        return styledPhrase(text)
             .font(.system(size: 20, weight: .regular, design: .rounded))
             .shadow(color: hasPhotoBackground ? .black.opacity(0.80) : .clear, radius: 12, x: 0, y: 2)
             .shadow(color: hasPhotoBackground ? .black.opacity(0.50) : .clear, radius: 4, x: 0, y: 1)
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .onTapGesture {
-                UIPasteboard.general.string = RunningPhrase.all[phraseIndex].es
+                UIPasteboard.general.string = text
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)
@@ -668,7 +673,7 @@ struct HomeView: View {
             // Message + button pinned to bottom
             VStack(spacing: 0) {
                 Spacer()
-                Text("\(dna.name) se quedó sin energía...")
+                Text(appState.t("\(dna.name) se quedó sin energía...", "\(dna.name) ran out of energy..."))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.80))
                 Spacer().frame(height: 32)
@@ -682,7 +687,7 @@ struct HomeView: View {
                         appState.selectedCharacter = nil
                     }
                 } label: {
-                    Text("Volver a intentarlo")
+                    Text(appState.t("Volver a intentarlo", "Try again"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
@@ -738,7 +743,7 @@ private struct PetStatusSheet: View {
                 .foregroundStyle(Color(hex: "#1F2933"))
 
             // Archetype pill
-            Text(dna.animalType.archetypeLabel.uppercased())
+            Text(dna.animalType.archetypeLabel(language: appState.language).uppercased())
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(1.4)
                 .foregroundStyle(bodyColor)
@@ -763,11 +768,11 @@ private struct PetStatusSheet: View {
 
             // Stats — dark HUD card
             HStack(spacing: 0) {
-                statCell(value: "\(health.totalRuns)", label: "Carreras")
+                statCell(value: "\(health.totalRuns)", label: appState.t("Carreras", "Runs"))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: String(format: "%.1f", health.totalKmAllTime), label: "km totales")
+                statCell(value: String(format: "%.1f", health.totalKmAllTime), label: appState.t("km totales", "total km"))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "\(health.bestStreak)", label: "Mejor racha")
+                statCell(value: "\(health.bestStreak)", label: appState.t("Mejor racha", "Best streak"))
             }
             .padding(.vertical, 18)
             .background(
@@ -783,7 +788,7 @@ private struct PetStatusSheet: View {
 
             // Achievements
             VStack(alignment: .leading, spacing: 10) {
-                Text("LOGROS")
+                Text(appState.t("LOGROS", "ACHIEVEMENTS"))
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .tracking(1.2)
                     .foregroundStyle(Color(hex: "#9AA5B4"))
@@ -809,7 +814,7 @@ private struct PetStatusSheet: View {
                                                          ? Color(hex: "#F9703E")
                                                          : Color(hex: "#CBD2D9"))
                                 }
-                                Text("Día \(a.day)")
+                                Text(appState.t("Día \(a.day)", "Day \(a.day)"))
                                     .font(.system(size: 9, weight: .bold, design: .rounded))
                                     .foregroundStyle(unlocked
                                                      ? Color(hex: "#F9703E")
@@ -852,6 +857,7 @@ private struct AchievementModal: View {
     let dna: PetDNA
     let onDismiss: () -> Void
 
+    @Environment(AppState.self) private var appState
     @State private var appeared = false
 
     var body: some View {
@@ -874,7 +880,7 @@ private struct AchievementModal: View {
                     Spacer().frame(height: 132)
 
                     // Day badge
-                    Text("DÍA \(achievement.day) / 66")
+                    Text(appState.t("DÍA \(achievement.day) / 66", "DAY \(achievement.day) / 66"))
                         .font(.system(size: 11, weight: .black, design: .monospaced))
                         .tracking(2)
                         .foregroundStyle(.white)
@@ -885,7 +891,7 @@ private struct AchievementModal: View {
                         .overlay(Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 1))
 
                     // Phrase
-                    achievement.displayText
+                    achievement.displayText(language: appState.language)
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .multilineTextAlignment(.center)
                         .shadow(color: Color.black.opacity(0.55), radius: 6, x: 0, y: 2)
@@ -906,7 +912,7 @@ private struct AchievementModal: View {
 
                     // CTA
                     Button(action: onDismiss) {
-                        Text("¡Vamos!")
+                        Text(appState.t("¡Vamos!", "Let's go!"))
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 48)
                             .padding(.vertical, 16)

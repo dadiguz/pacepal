@@ -27,7 +27,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("Ajustes")
+                    Text(appState.t("Ajustes", "Settings"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                     Spacer()
@@ -49,8 +49,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "questionmark.circle",
                         iconColor: "#F9703E",
-                        title: "Ver tutorial",
-                        subtitle: "Repasa cómo funciona la energía"
+                        title: appState.t("Ver tutorial", "View tutorial"),
+                        subtitle: appState.t("Repasa cómo funciona la energía", "Review how energy works")
                     ) {
                         onShowTutorial?()
                     }
@@ -58,8 +58,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "photo.on.rectangle",
                         iconColor: "#3B82F6",
-                        title: "Cambiar fondo",
-                        subtitle: "Personaliza el fondo de tu pantalla"
+                        title: appState.t("Cambiar fondo", "Change background"),
+                        subtitle: appState.t("Personaliza el fondo de tu pantalla", "Customize your screen background")
                     ) {
                         showBackgroundPicker = true
                     }
@@ -76,10 +76,10 @@ struct SettingsView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Dificultad")
+                                Text(appState.t("Dificultad", "Difficulty"))
                                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                                     .foregroundStyle(Color(hex: "#1F2933"))
-                                Text(appState.difficulty.subtitle)
+                                Text(appState.difficulty.subtitle(lang: appState.language))
                                     .font(.system(size: 12, weight: .regular, design: .rounded))
                                     .foregroundStyle(Color(hex: "#9AA5B4"))
                                     .animation(.easeInOut(duration: 0.2), value: appState.difficulty)
@@ -110,10 +110,10 @@ struct SettingsView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Sonidos")
+                            Text(appState.t("Sonidos", "Sounds"))
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(hex: "#1F2933"))
-                            Text("Efectos de sonido del compañero")
+                            Text(appState.t("Efectos de sonido del compañero", "Companion sound effects"))
                                 .font(.system(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(Color(hex: "#9AA5B4"))
                         }
@@ -130,13 +130,48 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
 
+                    // ── Language row ─────────────────────────────────────
+                    let bindableLang = Bindable(appState)
+                    HStack(spacing: 14) {
+                        Text(appState.language.flag)
+                            .font(.system(size: 18))
+                            .frame(width: 34, height: 34)
+                            .background(Color(hex: "#E2E8F0"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(appState.t("Idioma", "Language"))
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(hex: "#1F2933"))
+                            Text(appState.language.displayName)
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .foregroundStyle(Color(hex: "#9AA5B4"))
+                                .animation(.easeInOut(duration: 0.2), value: appState.language)
+                        }
+
+                        Spacer()
+
+                        Picker("", selection: bindableLang.language) {
+                            ForEach(Language.allCases, id: \.self) { lang in
+                                Text(lang.flag + " " + lang.displayName).tag(lang)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .tint(Color(hex: "#F9703E"))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+
                     // ── Subscription row ─────────────────────────────────
                     if store.isPremium {
                         settingsRow(
                             icon: "checkmark.seal.fill",
                             iconColor: "#27AE60",
-                            title: "Premium activo",
-                            subtitle: "Gestiona tu suscripción en App Store"
+                            title: appState.t("Premium activo", "Premium active"),
+                            subtitle: appState.t("Gestiona tu suscripción en App Store", "Manage your subscription in App Store")
                         ) {
                             if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
                                 UIApplication.shared.open(url)
@@ -146,8 +181,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "crown.fill",
                             iconColor: "#F9703E",
-                            title: "Activar Premium",
-                            subtitle: "7 días gratis · \(store.displayPrice) al año"
+                            title: appState.t("Activar Premium", "Activate Premium"),
+                            subtitle: appState.t("7 días gratis · \(store.displayPrice) al año", "7 days free · \(store.displayPrice) per year")
                         ) {
                             showPaywall = true
                         }
@@ -156,8 +191,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
                         iconColor: "#E12D39",
-                        title: "Restablecer compañero",
-                        subtitle: "Elige un nuevo mono desde cero"
+                        title: appState.t("Restablecer compañero", "Reset companion"),
+                        subtitle: appState.t("Elige un nuevo mono desde cero", "Choose a new companion from scratch")
                     ) {
                         showResetConfirm = true
                     }
@@ -184,8 +219,8 @@ struct SettingsView: View {
                 .environment(appState)
                 .environment(store)
         }
-        .confirmationDialog("Restablecer compañero", isPresented: $showResetConfirm) {
-            Button("Restablecer", role: .destructive) {
+        .confirmationDialog(appState.t("Restablecer compañero", "Reset companion"), isPresented: $showResetConfirm) {
+            Button(appState.t("Restablecer", "Reset"), role: .destructive) {
                 appState.onCharacterSelected()
                 saved.forEach { modelContext.delete($0) }
                 health.resetKm()
@@ -194,9 +229,9 @@ struct SettingsView: View {
                     appState.selectedCharacter = nil
                 }
             }
-            Button("Cancelar", role: .cancel) {}
+            Button(appState.t("Cancelar", "Cancel"), role: .cancel) {}
         } message: {
-            Text("Se borrará tu progreso y podrás elegir un nuevo compañero.")
+            Text(appState.t("Se borrará tu progreso y podrás elegir un nuevo compañero.", "Your progress will be deleted and you can choose a new companion."))
         }
     }
 
@@ -452,7 +487,7 @@ struct BackgroundPickerSheet: View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text("Fondos")
+                Text(appState.t("Fondos", "Backgrounds"))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
                 Spacer()
@@ -469,7 +504,7 @@ struct BackgroundPickerSheet: View {
             .padding(.top, 20)
             .padding(.bottom, 14)
 
-            Text("Desbloqueas nuevos fondos al alcanzar cada logro")
+            Text(appState.t("Desbloqueas nuevos fondos al alcanzar cada logro", "Unlock new backgrounds by reaching each milestone"))
                 .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#9AA5B4"))
                 .multilineTextAlignment(.center)
@@ -517,7 +552,7 @@ struct BackgroundPickerSheet: View {
                                             .font(.system(size: 16, weight: .semibold))
                                             .foregroundStyle(.white)
                                         if index >= 1 && index <= Achievement.all.count {
-                                            Text("Día \(Achievement.all[index - 1].day)")
+                                            Text(appState.t("Día \(Achievement.all[index - 1].day)", "Day \(Achievement.all[index - 1].day)"))
                                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white.opacity(0.85))
                                         }
@@ -545,7 +580,7 @@ struct BackgroundPickerSheet: View {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text("Día \(Achievement.all[index - 1].day)")
+                                            Text(appState.t("Día \(Achievement.all[index - 1].day)", "Day \(Achievement.all[index - 1].day)"))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white)
                                                 .shadow(color: .black.opacity(0.6), radius: 2)
