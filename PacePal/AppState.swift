@@ -381,17 +381,64 @@ final class AppState {
 
     private static let widgetDefaults = UserDefaults(suiteName: "group.io.dallio.PacePal")
 
+    /// Renders the pet sprite as PNG data using UIGraphicsImageRenderer (main app process only).
+    private func renderPetPNG(dna: PetDNA, energy: Double) -> Data? {
+        let pose: PetPose
+        if energy <= 0         { pose = .dead  }
+        else if energy <= 0.14 { pose = .dizzy }
+        else if energy <= 0.25 { pose = .sad   }
+        else if energy <= 0.50 { pose = .angry }
+        else if energy <= 0.90 { pose = .idle  }
+        else if energy <= 0.95 { pose = .happy }
+        else if energy <  0.99 { pose = .jump  }
+        else                   { pose = .hype  }
+
+        let grid = buildCharacterGrid(dna: dna, pose: pose, frame: 0)
+        let pixelSize: CGFloat = 5
+        let size = CGFloat(GRID_SIZE) * pixelSize
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
+        let img = renderer.image { ctx in
+            let cgCtx = ctx.cgContext
+            for y in 0..<GRID_SIZE {
+                for x in 0..<GRID_SIZE {
+                    guard let color = colorForCell(grid[y][x], gx: x, gy: y, dna: dna) else { continue }
+                    cgCtx.setFillColor(UIColor(color).cgColor)
+                    cgCtx.fill(CGRect(x: CGFloat(x) * pixelSize, y: CGFloat(y) * pixelSize,
+                                      width: pixelSize, height: pixelSize))
+                }
+            }
+        }
+        return img.pngData()
+    }
+
     /// Writes all widget-relevant data to the shared App Group and reloads timelines.
     func syncToWidget(km: Double) {
-        guard let dna = selectedCharacter,
-              let dnaData = try? JSONEncoder().encode(dna) else { return }
-        let d = Self.widgetDefaults
-        d?.set(energyResetDate, forKey: "w_energyResetDate")
-        d?.set(difficulty.decaySeconds, forKey: "w_decaySeconds")
-        d?.set(dnaData, forKey: "w_petDNAData")
-        d?.set(km, forKey: "w_todayKm")
+        guard let dna = selectedCharacter else {
+            print("⚠️ syncToWidget: selectedCharacter es nil")
+            return
+        }
+        guard let dnaData = try? JSONEncoder().encode(dna) else {
+            print("⚠️ syncToWidget: fallo al encodear PetDNA")
+            return
+        }
+        guard let d = Self.widgetDefaults else {
+            print("❌ syncToWidget: App Group no disponible — verifica entitlements")
+            return
+        }
+        let currentEnergy = energy(at: Date())
+        d.set(energyResetDate, forKey: "w_energyResetDate")
+        d.set(difficulty.decaySeconds, forKey: "w_decaySeconds")
+        d.set(dnaData, forKey: "w_petDNAData")
+        d.set(km, forKey: "w_todayKm")
         let day = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
-        d?.set(day, forKey: "w_challengeDay")
+        d.set(day, forKey: "w_challengeDay")
+        if let pngData = renderPetPNG(dna: dna, energy: currentEnergy) {
+            d.set(pngData, forKey: "w_petImageData")
+            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), imagen \(pngData.count)b")
+        } else {
+            d.removeObject(forKey: "w_petImageData")
+            print("⚠️ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), sin imagen")
+        }
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

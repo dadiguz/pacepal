@@ -37,7 +37,6 @@ struct PacepalApp: App {
                 if appState.healthPermissionDone {
                     health.requestAuthorizationAndFetch()
                 }
-                appState.syncToWidget(km: health.todayKm)
                 // Verify subscription is still active; if not, reset paywall so it shows again.
                 await store.refreshStatus()
                 if !store.isPremium && appState.paywallDismissed {

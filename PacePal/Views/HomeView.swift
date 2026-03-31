@@ -218,6 +218,7 @@ struct HomeView: View {
             isInitialLoad = true
             currentPose = normalPose
             lastTrackedEnergy = appState.energy(at: Date())
+            appState.syncToWidget(km: health.todayKm)
             SoundManager.shared.stopMusic(fadeDuration: 1.2)
             if energy <= 0 {
                 if !deadAudioStarted {
