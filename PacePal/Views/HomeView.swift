@@ -540,10 +540,25 @@ struct HomeView: View {
     }
 
     // MARK: – Phrase section
+    private func styledPhrase(_ text: String) -> Text {
+        let keyword = "pacepal"
+        let baseColor = hasPhotoBackground ? Color.white : Color(hex: "#7A6E68")
+        let parts = text.components(separatedBy: keyword)
+        var result = Text("")
+        for (i, part) in parts.enumerated() {
+            result = result + Text(part).foregroundStyle(baseColor)
+            if i < parts.count - 1 {
+                result = result + Text(keyword)
+                    .foregroundStyle(Color(hex: "#F9703E"))
+                    .bold()
+            }
+        }
+        return result
+    }
+
     private var phraseSection: some View {
-        Text(RunningPhrase.all[phraseIndex].es)
+        styledPhrase(RunningPhrase.all[phraseIndex].es)
             .font(.system(size: 20, weight: .regular, design: .rounded))
-            .foregroundStyle(hasPhotoBackground ? .white : Color(hex: "#7A6E68"))
             .shadow(color: hasPhotoBackground ? .black.opacity(0.80) : .clear, radius: 12, x: 0, y: 2)
             .shadow(color: hasPhotoBackground ? .black.opacity(0.50) : .clear, radius: 4, x: 0, y: 1)
             .multilineTextAlignment(.center)
