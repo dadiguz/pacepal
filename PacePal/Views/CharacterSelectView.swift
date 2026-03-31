@@ -97,6 +97,32 @@ struct CharacterSelectView: View {
                 namingScreen
                     .transition(.opacity)
             }
+
+            // ── Sound toggle (always on top) ───────────────────────────────
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        appState.soundsEnabled.toggle()
+                        if appState.soundsEnabled {
+                            SoundManager.shared.playMusic(name: "pacepal", enabled: true)
+                        } else {
+                            SoundManager.shared.stopMusic(fadeDuration: 0.4)
+                        }
+                    } label: {
+                        Image(systemName: appState.soundsEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#9AA5B4"))
+                            .padding(10)
+                            .background(Color(hex: "#F5ECE4"))
+                            .clipShape(Circle())
+                    }
+                    .padding(.trailing, 24)
+                    .padding(.top, 56)
+                }
+                Spacer()
+            }
+            .zIndex(10)
         }
         .animation(.easeInOut(duration: 0.25), value: isNaming)
     }
@@ -241,6 +267,7 @@ struct CharacterSelectView: View {
             // Angry flash: switch to angry pose then back to jump
             showNameError = true
             namingPose = .angry
+            SoundManager.shared.play(.angry, enabled: appState.soundsEnabled)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                 namingPose = .jump
                 withAnimation { showNameError = false }
@@ -257,6 +284,7 @@ struct CharacterSelectView: View {
     private func saveAndSelect(_ dna: PetDNA) {
         saveCharacter(dna)
         appState.onCharacterSelected()
+        SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
         withAnimation(.spring(duration: 0.4)) {
             appState.selectedCharacter = dna
         }
@@ -348,6 +376,10 @@ struct CharacterSelectView: View {
                             .id(i)
                             .onTapGesture {
                                 withAnimation(.spring(duration: 0.3)) { selectedIndex = i }
+                                SoundManager.shared.play(.select, enabled: appState.soundsEnabled)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                    SoundManager.shared.stopSFX(fadeDuration: 0.15)
+                                }
                             }
                     }
                 }
@@ -388,6 +420,10 @@ struct CharacterSelectView: View {
                         pet = PetDNA.random(); tries += 1
                     }
                     characters[selectedIndex] = pet
+                    SoundManager.shared.play(.select, enabled: appState.soundsEnabled)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        SoundManager.shared.stopSFX()
+                    }
                 }
             } label: {
                 HStack(spacing: 6) {
@@ -405,6 +441,8 @@ struct CharacterSelectView: View {
             }
 
             Button {
+                SoundManager.shared.stopSFX()
+                SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
                 withAnimation { isNaming = true }
             } label: {
                 Text("Seleccionar")

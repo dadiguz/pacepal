@@ -5,7 +5,7 @@ import Observation
 // 23 milestones: day 1, then every 3 days through day 64, plus day 66.
 // Each maps to background_01 … background_23 in order.
 
-struct Achievement: Identifiable {
+struct Achievement: Identifiable, Equatable {
     let day: Int
     let index: Int  // 1-based, maps to background_01 … background_23
     let phrase: String
@@ -205,6 +205,11 @@ final class AppState {
     private(set) var healthPermissionDone: Bool
     private(set) var notificationPermissionDone: Bool
 
+    // Sounds on/off
+    var soundsEnabled: Bool {
+        didSet { UserDefaults.standard.set(soundsEnabled, forKey: "soundsEnabled") }
+    }
+
     // Selected background image name (nil = default gradient)
     private(set) var selectedBackground: String?
 
@@ -223,6 +228,7 @@ final class AppState {
         self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
         let diffStr = UserDefaults.standard.string(forKey: "difficulty") ?? Difficulty.pro.rawValue
         self.difficulty = Difficulty(rawValue: diffStr) ?? .pro
+        self.soundsEnabled = UserDefaults.standard.object(forKey: "soundsEnabled") as? Bool ?? true
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
         self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")

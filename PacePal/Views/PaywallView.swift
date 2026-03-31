@@ -7,6 +7,7 @@ struct PaywallView: View {
     @State private var appeared = false
     @State private var glowPulse = false
     @State private var featurePage = 0
+    @State private var purchased = false
 
     private let features: [(icon: String, color: String, title: String, desc: String)] = [
         ("figure.run",  "#F9703E", "Reto de 66 días",   "El tiempo justo para convertirlo en hábito"),
@@ -140,7 +141,7 @@ struct PaywallView: View {
                 .blur(radius: 8)
                 .offset(y: 36)
 
-            PetAnimationView(dna: displayDNA, pose: .jump, pixelSize: 9)
+            PetAnimationView(dna: displayDNA, pose: purchased ? .hype : .jump, pixelSize: 9)
                 .scaleEffect(appeared ? 1 : 0.8)
                 .opacity(appeared ? 1 : 0)
                 .animation(.spring(duration: 0.55, bounce: 0.3).delay(0.1), value: appeared)
@@ -295,6 +296,9 @@ struct PaywallView: View {
             Task {
                 await store.purchase()
                 if store.isPremium {
+                    purchased = true
+                    SoundManager.shared.play(.hype, enabled: appState.soundsEnabled)
+                    try? await Task.sleep(for: .seconds(1.4))
                     withAnimation(.easeInOut(duration: 0.35)) {
                         appState.dismissPaywall()
                     }

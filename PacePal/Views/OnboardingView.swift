@@ -3,12 +3,39 @@ import SwiftUI
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
     @State private var appeared = false
+    @State private var leaving = false
 
     private let displayDNA = PetDNA.presets()[0]
 
     var body: some View {
         ZStack {
             AppBackground()
+
+            // Sound toggle — top right
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        appState.soundsEnabled.toggle()
+                        if appState.soundsEnabled {
+                            SoundManager.shared.playMusic(name: "pacepal", enabled: true)
+                        } else {
+                            SoundManager.shared.stopMusic(fadeDuration: 0.4)
+                        }
+                    } label: {
+                        Image(systemName: appState.soundsEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color(hex: "#9AA5B4"))
+                            .padding(10)
+                            .background(Color(hex: "#F5ECE4"))
+                            .clipShape(Circle())
+                    }
+                    .padding(.trailing, 24)
+                    .padding(.top, 56)
+                }
+                Spacer()
+            }
+            .zIndex(1)
 
             VStack(spacing: 0) {
                 Image("Logo")
@@ -98,7 +125,10 @@ struct OnboardingView: View {
                 .padding(.bottom, 48)
             }
         }
-        .onAppear { appeared = true }
+        .onAppear {
+            appeared = true
+            SoundManager.shared.playMusic(name: "pacepal", enabled: appState.soundsEnabled)
+        }
     }
 }
 

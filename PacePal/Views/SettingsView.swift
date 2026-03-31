@@ -4,12 +4,14 @@ import SwiftData
 struct SettingsView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
+    @Environment(PurchaseManager.self) private var store
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
 
     @Environment(\.dismiss) private var dismiss
     @State private var showResetConfirm = false
     @State private var showBackgroundPicker = false
+    @State private var showPaywall = false
 
     #if DEBUG
     @State private var debugNow: Date = Date()
@@ -97,6 +99,60 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
 
+                    // ── Sounds toggle ────────────────────────────────────
+                    let bindableState = Bindable(appState)
+                    HStack(spacing: 14) {
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 34, height: 34)
+                            .background(Color(hex: "#F9703E"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sonidos")
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color(hex: "#1F2933"))
+                            Text("Efectos de sonido del compañero")
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .foregroundStyle(Color(hex: "#9AA5B4"))
+                        }
+
+                        Spacer()
+
+                        Toggle("", isOn: bindableState.soundsEnabled)
+                            .labelsHidden()
+                            .tint(Color(hex: "#F9703E"))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+
+                    // ── Subscription row ─────────────────────────────────
+                    if store.isPremium {
+                        settingsRow(
+                            icon: "checkmark.seal.fill",
+                            iconColor: "#27AE60",
+                            title: "Premium activo",
+                            subtitle: "Gestiona tu suscripción en App Store"
+                        ) {
+                            if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                    } else {
+                        settingsRow(
+                            icon: "crown.fill",
+                            iconColor: "#F9703E",
+                            title: "Activar Premium",
+                            subtitle: "7 días gratis · \(store.displayPrice) al año"
+                        ) {
+                            showPaywall = true
+                        }
+                    }
+
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
                         iconColor: "#E12D39",
@@ -123,6 +179,11 @@ struct SettingsView: View {
                 .presentationDetents([.fraction(0.85)])
                 .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+                .environment(appState)
+                .environment(store)
+        }
         .confirmationDialog("Restablecer compañero", isPresented: $showResetConfirm) {
             Button("Restablecer", role: .destructive) {
                 appState.onCharacterSelected()
@@ -146,6 +207,32 @@ struct SettingsView: View {
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .tracking(1.4)
                 .foregroundStyle(Color(hex: "#9AA5B4"))
+
+            Button {
+                SoundManager.shared.playRandomHappy(enabled: true)
+            } label: {
+                Text("🔊 Test sonido (happy)")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .foregroundStyle(Color(hex: "#4A3F35"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+            }
+
+            Button {
+                SoundManager.shared.playMusic(name: "pacepal", enabled: true)
+            } label: {
+                Text("🎵 Test música (pacepal)")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .foregroundStyle(Color(hex: "#4A3F35"))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+            }
 
             HStack(spacing: 6) {
                 ForEach([

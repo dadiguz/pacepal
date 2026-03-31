@@ -4,6 +4,7 @@ import SwiftData
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
+    @Environment(PurchaseManager.self) private var store
     @Environment(\.modelContext) private var modelContext
     @Query private var saved: [SavedCharacter]
 
@@ -25,6 +26,7 @@ struct HomeView: View {
     @State private var showPetStatus = false
     @State private var pendingAchievement: Achievement? = nil
     @State private var replayAchievement: Achievement? = nil
+    @State private var deadAudioStarted = false
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -216,6 +218,17 @@ struct HomeView: View {
             isInitialLoad = true
             currentPose = normalPose
             lastTrackedEnergy = appState.energy(at: Date())
+            SoundManager.shared.stopMusic(fadeDuration: 1.2)
+            if energy <= 0 {
+                if !deadAudioStarted {
+                    deadAudioStarted = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        SoundManager.shared.playDeathSequence(enabled: appState.soundsEnabled)
+                    }
+                }
+            } else {
+                SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
+            }
             health.fetchToday()   // establece baseline al arrancar
             let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
@@ -282,6 +295,39 @@ struct HomeView: View {
         ) { _ in
             if energy > 0 { health.fetchToday() }
         }
+        .onChange(of: normalPose) { oldPose, newPose in
+            // Always stop looping SFX immediately when entering dead state (before isAnimating guard)
+            if newPose == .dead && !deadAudioStarted {
+                deadAudioStarted = true
+                SoundManager.shared.playDeathSequence(enabled: appState.soundsEnabled)
+            }
+
+            guard !isAnimating else { return }
+
+            // Stop looping SFX when leaving a looping-sound pose
+            if (oldPose == .sad || oldPose == .dizzy) && newPose != .sad && newPose != .dizzy {
+                SoundManager.shared.stopSFX()
+            }
+            if oldPose == .dead && newPose != .dead {
+                deadAudioStarted = false
+                SoundManager.shared.stopMusic(fadeDuration: 1.0)
+            }
+            switch newPose {
+            case .dead: break  // handled above the guard
+            case .dizzy: SoundManager.shared.play(.dizzy,  enabled: appState.soundsEnabled, loop: true)
+            case .sad:   SoundManager.shared.play(.crying, enabled: appState.soundsEnabled, loop: true)
+            case .angry: SoundManager.shared.play(.angry,  enabled: appState.soundsEnabled)
+            default: break
+            }
+        }
+        .onChange(of: pendingAchievement) { _, achievement in
+            guard let achievement else { return }
+            if achievement.day == 66 {
+                SoundManager.shared.play(.day66, enabled: appState.soundsEnabled)
+            } else {
+                SoundManager.shared.play(.achievement, enabled: appState.soundsEnabled)
+            }
+        }
     }
 
     // MARK: – Achievement check
@@ -313,6 +359,7 @@ struct HomeView: View {
         isAnimating = true
         let startKm = displayedKm
         currentPose = .running
+        SoundManager.shared.play(.running, enabled: appState.soundsEnabled)
         let steps = max(1, Int((delta / 0.1).rounded()))
         let stepDelay = min(0.12, 3.0 / Double(steps))
         for i in 1...steps {
@@ -326,9 +373,11 @@ struct HomeView: View {
         now = Date()
         if energy >= 0.99 {
             currentPose = .hype
+            SoundManager.shared.play(.hype, enabled: appState.soundsEnabled)
             try? await Task.sleep(for: .seconds(1.6))
         } else if delta >= 0.3 {
             currentPose = .jump
+            SoundManager.shared.play(.jump, enabled: appState.soundsEnabled)
             try? await Task.sleep(for: .seconds(0.8))
         }
         isAnimating = false
@@ -376,6 +425,7 @@ struct HomeView: View {
                 })
                 .environment(appState)
                 .environment(health)
+                .environment(store)
             }
         }
     }
@@ -472,6 +522,7 @@ struct HomeView: View {
                     guard !isAnimating && currentPose != .dead else { return }
                     let saved = currentPose
                     currentPose = .hurt
+                    SoundManager.shared.play(.hurt, enabled: appState.soundsEnabled)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                         if currentPose == .hurt { currentPose = saved }
                     }
