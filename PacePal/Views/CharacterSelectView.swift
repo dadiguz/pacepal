@@ -443,7 +443,9 @@ struct CharacterSelectView: View {
             Button {
                 SoundManager.shared.stopSFX()
                 SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
-                withAnimation { isNaming = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    withAnimation { isNaming = true }
+                }
             } label: {
                 Text("Seleccionar")
                     .font(.system(size: 15, weight: .semibold, design: .rounded))

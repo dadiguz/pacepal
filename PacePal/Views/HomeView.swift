@@ -310,7 +310,9 @@ struct HomeView: View {
             }
             if oldPose == .dead && newPose != .dead {
                 deadAudioStarted = false
-                SoundManager.shared.stopMusic(fadeDuration: 1.0)
+                if SoundManager.shared.currentMusicName != "pacepal" {
+                    SoundManager.shared.stopMusic(fadeDuration: 1.0)
+                }
             }
             switch newPose {
             case .dead: break  // handled above the guard
@@ -656,6 +658,8 @@ struct HomeView: View {
                     .foregroundStyle(.white.opacity(0.80))
                 Spacer().frame(height: 32)
                 Button {
+                    SoundManager.shared.cancelDeathSequence()
+                    SoundManager.shared.playMusic(name: "pacepal", enabled: appState.soundsEnabled)
                     appState.onCharacterSelected()
                     saved.forEach { modelContext.delete($0) }
                     health.resetKm()

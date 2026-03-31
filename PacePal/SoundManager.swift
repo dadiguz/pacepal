@@ -3,9 +3,9 @@ import AVFoundation
 // MARK: - Sound catalog
 enum AppSound: String {
     case happy       = "8bit happy"
-    case happy1      = "8bit happy1"
-    case happy2      = "8bit happy2"
-    case happy3      = "8bit happy3"
+    case happy1      = "8bit Pet happy1"
+    case happy2      = "8bit Pet happy2"
+    case happy3      = "8bit Pet happy3"
     case hype        = "8bit hype"
     case jump        = "8bit jump"
     case crying      = "8bit crying"
@@ -25,6 +25,7 @@ final class SoundManager {
 
     private var sfxPlayer: AVAudioPlayer?
     private var musicPlayer: AVAudioPlayer?
+    private var deathSequenceWork: DispatchWorkItem?
 
     private init() {
         configureSession()
@@ -62,7 +63,13 @@ final class SoundManager {
 
     // MARK: - Music
 
+    func cancelDeathSequence() {
+        deathSequenceWork?.cancel()
+        deathSequenceWork = nil
+    }
+
     func playMusic(name: String, enabled: Bool, loop: Bool = true) {
+        cancelDeathSequence()
         guard enabled else { return }
         guard let url = resolveURL(name: name, folder: "songs") else {
             print("❌ Music not found: \(name)")
@@ -74,6 +81,7 @@ final class SoundManager {
             musicPlayer?.volume = 0.5
             musicPlayer?.prepareToPlay()
             musicPlayer?.play()
+            currentMusicName = name
             print("✅ Playing music: \(name)")
         } catch {
             print("❌ Music player error: \(error)")
@@ -99,6 +107,7 @@ final class SoundManager {
             return
         }
         do {
+            deathSequenceWork?.cancel()
             musicPlayer?.stop()
             musicPlayer = try AVAudioPlayer(contentsOf: url)
             musicPlayer?.numberOfLoops = 0
@@ -107,13 +116,18 @@ final class SoundManager {
             musicPlayer?.play()
             let duration = musicPlayer?.duration ?? 1.5
             print("✅ Death sound playing, duration: \(duration)s")
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration + 0.2) { [weak self] in
+            let work = DispatchWorkItem { [weak self] in
                 self?.playMusic(name: "continue?", enabled: enabled, loop: true)
             }
+            deathSequenceWork = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration + 0.2, execute: work)
         } catch {
             print("❌ Death sequence error: \(error)")
         }
     }
+
+    var isMusicPlaying: Bool { musicPlayer?.isPlaying == true }
+    private(set) var currentMusicName: String? = nil
 
     func stopSFX(fadeDuration: TimeInterval = 0) {
         guard let player = sfxPlayer else { return }
@@ -135,6 +149,7 @@ final class SoundManager {
         DispatchQueue.main.asyncAfter(deadline: .now() + fadeDuration) { [weak self] in
             self?.musicPlayer?.stop()
             self?.musicPlayer = nil
+            self?.currentMusicName = nil
         }
     }
 
