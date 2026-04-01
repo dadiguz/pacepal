@@ -31,5 +31,14 @@
 	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Pacepal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>PacePal no escribe datos en Health.</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 </dict>
 </plist>
