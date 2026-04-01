@@ -13,7 +13,7 @@ struct SettingsView: View {
     @State private var showBackgroundPicker = false
     @State private var showPaywall = false
 
-    #if DEBUG
+    #if DEBUG && false
     @State private var debugNow: Date = Date()
     @State private var drainTimer: Timer? = nil
     #endif
@@ -129,7 +129,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                #if DEBUG
+                #if DEBUG && false
                 testingSection
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
@@ -165,7 +165,7 @@ struct SettingsView: View {
         }
     }
 
-    #if DEBUG
+    #if DEBUG && false
     private var testingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("TESTING")
