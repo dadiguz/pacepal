@@ -34,6 +34,7 @@
 		BEC0C03D2F7C655B002B9B64 /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */; };
 		BEC0C03E2F7C6560002B9B64 /* PetPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EC1A3F0DA504608DCBFA8E /* PetPalette.swift */; };
 		BEC0C03F2F7C6565002B9B64 /* PetTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CFC4735EC647C641C99A93 /* PetTypes.swift */; };
+		BEC0C0422F7DAD82002B9B64 /* WidgetPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC0C0412F7DAD81002B9B64 /* WidgetPromptView.swift */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
@@ -93,6 +94,7 @@
 		BEC0C01D2F7C6292002B9B64 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		BEC0C01F2F7C6292002B9B64 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		BEC0C0402F7C65D6002B9B64 /* PacepalWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PacepalWidgetExtension.entitlements; sourceTree = "<group>"; };
+		BEC0C0412F7DAD81002B9B64 /* WidgetPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPromptView.swift; sourceTree = "<group>"; };
 		C1918003EAED4B99DE32E955 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		C3A71F8E2B490D56F1CE8A04 /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		CC11223344556677889900DD /* songs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = songs; sourceTree = SOURCE_ROOT; };
@@ -230,6 +232,7 @@
 		D53282DAA1E8404B37271C4E /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BEC0C0412F7DAD81002B9B64 /* WidgetPromptView.swift */,
 				7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */,
 				B7D9E4F2A1C3085746B8D0F1 /* NotificationPermissionView.swift */,
 				FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */,
@@ -361,6 +364,7 @@
 				74A5B0FE1BA04E08406F3262 /* OnboardingView.swift in Sources */,
 				BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */,
 				B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */,
+				BEC0C0422F7DAD82002B9B64 /* WidgetPromptView.swift in Sources */,
 				F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */,
 				65E18912F484DC7714104362 /* PetDNA.swift in Sources */,
 				3CF3A2D4D8D88B3AFFC0769B /* PetGridBuilder.swift in Sources */,

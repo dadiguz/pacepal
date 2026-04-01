@@ -205,6 +205,7 @@ final class AppState {
     private(set) var paywallDismissed: Bool
     private(set) var healthPermissionDone: Bool
     private(set) var notificationPermissionDone: Bool
+    private(set) var widgetPromptDone: Bool
 
     // Sounds on/off
     var soundsEnabled: Bool {
@@ -234,6 +235,7 @@ final class AppState {
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
         self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")
         self.notificationPermissionDone = UserDefaults.standard.bool(forKey: "notificationPermissionDone")
+        self.widgetPromptDone = UserDefaults.standard.bool(forKey: "widgetPromptDone")
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
         self.seenAchievements = Set(seen)
         self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
@@ -263,6 +265,11 @@ final class AppState {
     func completeNotificationPermission() {
         notificationPermissionDone = true
         UserDefaults.standard.set(true, forKey: "notificationPermissionDone")
+    }
+
+    func completeWidgetPrompt() {
+        widgetPromptDone = true
+        UserDefaults.standard.set(true, forKey: "widgetPromptDone")
     }
 
     func energy(at date: Date) -> Double {

@@ -84,6 +84,12 @@ struct RootView: View {
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
+            } else if !appState.widgetPromptDone {
+                WidgetPromptView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
             } else {
                 HomeView()
                     .transition(.asymmetric(
@@ -97,6 +103,7 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
         .animation(.easeInOut(duration: 0.4), value: appState.healthPermissionDone)
         .animation(.easeInOut(duration: 0.4), value: appState.notificationPermissionDone)
+        .animation(.easeInOut(duration: 0.4), value: appState.widgetPromptDone)
         .onAppear {
             if appState.selectedCharacter == nil, let first = saved.first, let dna = first.dna {
                 appState.selectedCharacter = dna
