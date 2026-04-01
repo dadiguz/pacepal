@@ -122,7 +122,7 @@ struct SmallWidgetView: View {
     let entry: PacepalEntry
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             Color.white
             VStack(spacing: 0) {
                 Spacer(minLength: 4)
@@ -132,6 +132,11 @@ struct SmallWidgetView: View {
                     .padding(.horizontal, 12)
                     .padding(.bottom, 12)
             }
+            Text(String(format: "%.1f km", entry.todayKm))
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(hex: "#F9703E"))
+                .padding(.trailing, 12)
+                .padding(.bottom, 11)
         }
     }
 
@@ -160,13 +165,10 @@ struct SmallWidgetView: View {
                     .frame(width: 26, alignment: .trailing)
             }
             HStack {
-                Label(String(format: "%.1f km", entry.todayKm), systemImage: "figure.run")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#616E7C"))
-                Spacer()
                 Text("Día \(entry.challengeDay)")
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
+                Spacer()
             }
         }
     }
@@ -177,7 +179,7 @@ struct MediumWidgetView: View {
     let entry: PacepalEntry
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             Color.white
             HStack(spacing: 16) {
                 // Pet image
@@ -204,9 +206,6 @@ struct MediumWidgetView: View {
                             .foregroundStyle(entry.energyColor)
                     }
                     EnergyBar(energy: entry.energy, color: entry.energyColor)
-                    Label(String(format: "%.1f km hoy", entry.todayKm), systemImage: "figure.run")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#616E7C"))
                     Label("Día \(entry.challengeDay) de 66", systemImage: "calendar")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#616E7C"))
@@ -219,6 +218,11 @@ struct MediumWidgetView: View {
                 }
             }
             .padding(16)
+            Text(String(format: "%.1f km", entry.todayKm))
+                .font(.system(size: 19, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(hex: "#F9703E"))
+                .padding(.trailing, 16)
+                .padding(.bottom, 14)
         }
     }
 }
