@@ -432,13 +432,18 @@ final class AppState {
         d.set(km, forKey: "w_todayKm")
         let day = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
         d.set(day, forKey: "w_challengeDay")
-        if let pngData = renderPetPNG(dna: dna, energy: currentEnergy) {
-            d.set(pngData, forKey: "w_petImageData")
-            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), imagen \(pngData.count)b")
+        // Write PNG to shared file (more reliable than UserDefaults for binary data)
+        let spriteURL = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: "group.io.dallio.PacePal")?
+            .appendingPathComponent("petSprite.png")
+        if let pngData = renderPetPNG(dna: dna, energy: currentEnergy), let url = spriteURL {
+            try? pngData.write(to: url, options: .atomic)
+            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), imagen \(pngData.count)b → \(url.lastPathComponent)")
         } else {
-            d.removeObject(forKey: "w_petImageData")
-            print("⚠️ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), sin imagen")
+            if let url = spriteURL { try? FileManager.default.removeItem(at: url) }
+            print("⚠️ syncToWidget: escrito — sin imagen — energía \(Int(currentEnergy * 100))%, dna \(dna.name)")
         }
+        d.synchronize()
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

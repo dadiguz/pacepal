@@ -283,6 +283,7 @@ struct CharacterSelectView: View {
 
     private func saveAndSelect(_ dna: PetDNA) {
         saveCharacter(dna)
+        appState.selectedCharacter = dna   // set first so syncToWidget can read it
         appState.onCharacterSelected()
         SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
         withAnimation(.spring(duration: 0.4)) {
