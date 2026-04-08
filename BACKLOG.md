@@ -7,14 +7,15 @@
 | 1 | Fix boton HealthKit (5a) | Critica | Pendiente |
 | 2 | Revisar logica 66 dias (4) | Alta | Pendiente |
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
-| 4 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
-| 5 | Estado Sleep del monito (3) | Media | Pendiente |
-| 6 | Medalla 66 dias (2) | Media | ✅ Done |
-| 7 | Soporte millas (km/mi) | Media | Pendiente |
-| 8 | Fondo negro seleccionable | Baja | Pendiente |
-| 9 | Paletas de color custom para monitos | Baja | Pendiente |
-| 10 | Cambio de idioma en Settings | Media | Pendiente |
-| 11 | Compartir (share) | Media | Pendiente |
+| 4 | Cuestionario inicial pre-compra (6) | Alta | Pendiente |
+| 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
+| 6 | Estado Sleep del monito (3) | Media | Pendiente |
+| 7 | Medalla 66 dias (2) | Media | ✅ Done |
+| 8 | Soporte millas (km/mi) | Media | Pendiente |
+| 9 | Fondo negro seleccionable | Baja | Pendiente |
+| 10 | Paletas de color custom para monitos | Baja | Pendiente |
+| 11 | Cambio de idioma en Settings | Media | Pendiente |
+| 12 | Compartir (share) | Media | Pendiente |
 
 ---
 
@@ -86,6 +87,26 @@ Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `ch
 - [ ] **Projected finish** — calcular basado en tasa real de completados: `remaining / (completedCount / diasTranscurridos)`
 - [ ] **Widget sync** — `syncToWidget` debe enviar dias completados en vez de dia calendario
 - [ ] **Medalla y skips** — cuando el usuario tiene la medalla (66 dias completados), los dias sin carrera no deben mostrarse como taches/missed en el historico
+- [ ] **Extraer valores hardcoded a configuracion** — los valores como km-por-% de energia, threshold minimo de km, dias del challenge (66), decay rate, etc. deben vivir en un struct de configuracion centralizado (ej. `ChallengeConfig`), no hardcoded en el codigo. Esto permite que el cuestionario inicial los ajuste segun las respuestas del usuario
+
+---
+
+## 6. Cuestionario Inicial Pre-Compra
+**Prioridad:** Alta | **Complejidad:** Media
+
+Cuestionario corto que se muestra antes de la compra para personalizar las reglas del challenge segun el nivel del usuario.
+
+- [ ] Pantalla de cuestionario con pocas preguntas (3-5 max), por ejemplo:
+  - Que tan seguido corres actualmente? (Nunca / 1-2 veces/semana / 3+ veces/semana)
+  - Cual es tu distancia tipica? (< 2 km / 2-5 km / 5+ km)
+  - Que tan exigente quieres el reto? (Relajado / Normal / Intenso)
+- [ ] Las respuestas ajustan los valores en `ChallengeConfig`: km-por-% de energia, decay rate, threshold minimo, etc.
+- [ ] Guardar configuracion resultante en UserDefaults/AppState
+- [ ] Se muestra una sola vez (antes de iniciar el challenge)
+- [ ] Opcion en Settings para repetir el cuestionario (resetea config)
+- [ ] Strings en es/en
+
+> **Depende de:** Tarea 4 (extraer valores hardcoded a `ChallengeConfig`)
 
 ---
 
