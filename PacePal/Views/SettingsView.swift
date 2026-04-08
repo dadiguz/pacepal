@@ -27,7 +27,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("Ajustes")
+                    Text(L("settings.title"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                     Spacer()
@@ -49,8 +49,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "questionmark.circle",
                         iconColor: "#F9703E",
-                        title: "Ver tutorial",
-                        subtitle: "Repasa cómo funciona la energía"
+                        title: L("settings.tutorial_title"),
+                        subtitle: L("settings.tutorial_subtitle")
                     ) {
                         onShowTutorial?()
                     }
@@ -58,8 +58,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "photo.on.rectangle",
                         iconColor: "#3B82F6",
-                        title: "Cambiar fondo",
-                        subtitle: "Personaliza el fondo de tu pantalla"
+                        title: L("settings.background_title"),
+                        subtitle: L("settings.background_subtitle")
                     ) {
                         showBackgroundPicker = true
                     }
@@ -75,10 +75,10 @@ struct SettingsView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 8))
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Sonidos")
+                            Text(L("settings.sounds_title"))
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(Color(hex: "#1F2933"))
-                            Text("Efectos de sonido del compañero")
+                            Text(L("settings.sounds_subtitle"))
                                 .font(.system(size: 12, weight: .regular, design: .rounded))
                                 .foregroundStyle(Color(hex: "#9AA5B4"))
                         }
@@ -100,8 +100,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "checkmark.seal.fill",
                             iconColor: "#27AE60",
-                            title: "Premium activo",
-                            subtitle: "Gestiona tu suscripción en App Store"
+                            title: L("settings.premium_active"),
+                            subtitle: L("settings.premium_manage")
                         ) {
                             if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
                                 UIApplication.shared.open(url)
@@ -111,8 +111,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "crown.fill",
                             iconColor: "#F9703E",
-                            title: "Activar Premium",
-                            subtitle: "7 días gratis · \(store.displayPrice) al año"
+                            title: L("settings.premium_activate"),
+                            subtitle: L("settings.premium_price", store.displayPrice)
                         ) {
                             showPaywall = true
                         }
@@ -121,8 +121,8 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "arrow.triangle.2.circlepath",
                         iconColor: "#E12D39",
-                        title: "Restablecer compañero",
-                        subtitle: "Elige un nuevo mono desde cero"
+                        title: L("settings.reset_title"),
+                        subtitle: L("settings.reset_subtitle")
                     ) {
                         showResetConfirm = true
                     }
@@ -149,8 +149,8 @@ struct SettingsView: View {
                 .environment(appState)
                 .environment(store)
         }
-        .confirmationDialog("Restablecer compañero", isPresented: $showResetConfirm) {
-            Button("Restablecer", role: .destructive) {
+        .confirmationDialog(L("settings.reset_title"), isPresented: $showResetConfirm) {
+            Button(L("settings.reset_confirm"), role: .destructive) {
                 appState.onCharacterSelected()
                 saved.forEach { modelContext.delete($0) }
                 health.resetKm()
@@ -159,9 +159,9 @@ struct SettingsView: View {
                     appState.selectedCharacter = nil
                 }
             }
-            Button("Cancelar", role: .cancel) {}
+            Button(L("settings.cancel"), role: .cancel) {}
         } message: {
-            Text("Se borrará tu progreso y podrás elegir un nuevo compañero.")
+            Text(L("settings.reset_message"))
         }
     }
 
@@ -430,7 +430,7 @@ struct BackgroundPickerSheet: View {
         VStack(spacing: 0) {
             // Header
             HStack {
-                Text("Fondos")
+                Text(L("settings.backgrounds_title"))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
                 Spacer()
@@ -447,7 +447,7 @@ struct BackgroundPickerSheet: View {
             .padding(.top, 20)
             .padding(.bottom, 14)
 
-            Text("Desbloqueas nuevos fondos al alcanzar cada logro")
+            Text(L("settings.backgrounds_subtitle"))
                 .font(.system(size: 12, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#9AA5B4"))
                 .multilineTextAlignment(.center)
@@ -495,7 +495,7 @@ struct BackgroundPickerSheet: View {
                                             .font(.system(size: 16, weight: .semibold))
                                             .foregroundStyle(.white)
                                         if index >= 1 && index <= Achievement.all.count {
-                                            Text("Día \(Achievement.all[index - 1].day)")
+                                            Text(L("common.day_n", Achievement.all[index - 1].day))
                                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white.opacity(0.85))
                                         }
@@ -523,7 +523,7 @@ struct BackgroundPickerSheet: View {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text("Día \(Achievement.all[index - 1].day)")
+                                            Text(L("common.day_n", Achievement.all[index - 1].day))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white)
                                                 .shadow(color: .black.opacity(0.6), radius: 2)
@@ -542,7 +542,7 @@ struct BackgroundPickerSheet: View {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text("Original")
+                                            Text(L("settings.original"))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(Color(hex: "#4A3F35"))
                                                 .padding(.horizontal, 5)

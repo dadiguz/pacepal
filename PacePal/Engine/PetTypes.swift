@@ -112,33 +112,7 @@ enum PetBodyShape: String, Codable {
     case round, chubby, slim, pear, tall
 }
 
-// MARK: - Archetype label
-extension PetAnimalType {
-    var archetypeLabel: String {
-        switch self {
-        case .bunny:    return "Veloz"
-        case .cat:      return "Ágil"
-        case .bear:     return "Fuerza"
-        case .raccoon:  return "Adaptable"
-        case .mouse:    return "Veloz"
-        case .frog:     return "Potencia"
-        case .duck:     return "Resistente"
-        case .axolotl:  return "Resiliente"
-        case .smooth:   return "Libre"
-        case .capuchin: return "Dinámico"
-        case .mandrill: return "Salvaje"
-        case .fox:      return "Estratega"
-        case .lion:     return "Dominante"
-        case .domo:     return "Imparable"
-        case .pou:      return "Constante"
-        case .dog:        return "Leal"
-        case .tiger:      return "Feroz"
-        case .panda:      return "Tenaz"
-        case .corgi:   return "Alegre"
-        case .dragon:  return "Legendario"
-        }
-    }
-}
+// MARK: - Archetype label (localized in Localized.swift, used only by main app target)
 
 // MARK: - Grid typealias
 let GRID_SIZE = 24

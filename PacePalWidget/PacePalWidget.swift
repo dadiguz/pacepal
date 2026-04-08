@@ -2,6 +2,35 @@ import WidgetKit
 import SwiftUI
 import UIKit
 
+// MARK: - Widget localization (self-contained for widget target)
+
+private enum WLang: String {
+    case es, en
+    static var current: WLang {
+        let code = Locale.current.language.languageCode?.identifier ?? "es"
+        return WLang(rawValue: code) ?? .es
+    }
+}
+
+private func WL(_ key: String) -> String {
+    _widgetStrings[key]?[WLang.current] ?? _widgetStrings[key]?[.es] ?? key
+}
+
+private let _widgetStrings: [String: [WLang: String]] = [
+    "widget.energy":         [.es: "Energía",        .en: "Energy"],
+    "widget.day":            [.es: "Día %d",         .en: "Day %d"],
+    "widget.day_of_66":      [.es: "Día %d de 66",   .en: "Day %d of 66"],
+    "widget.description":    [.es: "Tu compañero de carrera, siempre contigo.", .en: "Your running companion, always with you."],
+    "widget.mood_exhausted": [.es: "Exhausto",       .en: "Exhausted"],
+    "widget.mood_collapsing": [.es: "Colapsando",    .en: "Collapsing"],
+    "widget.mood_drained":   [.es: "Agotado",        .en: "Drained"],
+    "widget.mood_demanding": [.es: "Exigiendo",      .en: "Demanding"],
+    "widget.mood_ready":     [.es: "Listo",          .en: "Ready"],
+    "widget.mood_happy":     [.es: "Contento",       .en: "Happy"],
+    "widget.mood_energetic": [.es: "Con energia",    .en: "Energetic"],
+    "widget.mood_on_fire":   [.es: "En racha",       .en: "On fire"],
+]
+
 // MARK: - Color hex (local copy for widget module)
 private extension Color {
     init(hex: String) {
@@ -49,14 +78,14 @@ extension PacepalEntry {
     }
 
     var moodText: String {
-        if energy <= 0    { return "Exhausto"   }
-        if energy <= 0.14 { return "Colapsando" }
-        if energy <= 0.25 { return "Agotado"    }
-        if energy <= 0.50 { return "Exigiendo"  }
-        if energy <= 0.90 { return "Listo"      }
-        if energy <= 0.95 { return "Contento"   }
-        if energy <  0.99 { return "Con energia" }
-        return "En racha"
+        if energy <= 0    { return WL("widget.mood_exhausted")  }
+        if energy <= 0.14 { return WL("widget.mood_collapsing") }
+        if energy <= 0.25 { return WL("widget.mood_drained")    }
+        if energy <= 0.50 { return WL("widget.mood_demanding")  }
+        if energy <= 0.90 { return WL("widget.mood_ready")      }
+        if energy <= 0.95 { return WL("widget.mood_happy")      }
+        if energy <  0.99 { return WL("widget.mood_energetic")  }
+        return WL("widget.mood_on_fire")
     }
 }
 
@@ -165,7 +194,7 @@ struct SmallWidgetView: View {
                     .frame(width: 26, alignment: .trailing)
             }
             HStack {
-                Text("Día \(entry.challengeDay)")
+                Text(String(format: WL("widget.day"), entry.challengeDay))
                     .font(.system(size: 9, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
                 Spacer()
@@ -197,7 +226,7 @@ struct MediumWidgetView: View {
                 // Stats
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Energía")
+                        Text(WL("widget.energy"))
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundStyle(Color(hex: "#9AA5B4"))
                         Spacer()
@@ -206,7 +235,7 @@ struct MediumWidgetView: View {
                             .foregroundStyle(entry.energyColor)
                     }
                     EnergyBar(energy: entry.energy, color: entry.energyColor)
-                    Label("Día \(entry.challengeDay) de 66", systemImage: "calendar")
+                    Label(String(format: WL("widget.day_of_66"), entry.challengeDay), systemImage: "calendar")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#616E7C"))
                     Text(entry.moodText)
@@ -250,7 +279,7 @@ struct PacepalWidget: Widget {
                 .containerBackground(.white, for: .widget)
         }
         .configurationDisplayName("PacePal")
-        .description("Tu compañero de carrera, siempre contigo.")
+        .description(WL("widget.description"))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

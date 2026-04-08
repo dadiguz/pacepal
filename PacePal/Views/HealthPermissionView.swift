@@ -90,10 +90,10 @@ struct HealthPermissionView: View {
         VStack(spacing: 20) {
             // Title
             (
-                Text("Conecta con\n")
+                Text(L("health.title_part1"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("Apple Health.")
+                + Text(L("health.title_highlight"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -102,10 +102,10 @@ struct HealthPermissionView: View {
 
             // Explanation
             (
-                Text("Así sabemos cuándo corres\ny ")
+                Text(L("health.subtitle_part1"))
                     .font(.system(size: 17, design: .rounded))
                     .foregroundStyle(Color(hex: "#52606D"))
-                + Text("tu compañero cobra vida.")
+                + Text(L("health.subtitle_highlight"))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -123,9 +123,12 @@ struct HealthPermissionView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(Color(hex: "#F9703E").opacity(0.7))
                     .padding(.top, 1)
-                Text("Si usas **Strava**, **Garmin** u otra app, activa la sync con Apple Health para que tus carreras cuenten.")
+                (Text(L("health.third_party_hint_1")).foregroundStyle(Color(hex: "#52606D"))
+                 + Text("Strava").bold().foregroundStyle(Color(hex: "#F9703E"))
+                 + Text(L("health.third_party_hint_2")).foregroundStyle(Color(hex: "#52606D"))
+                 + Text("Garmin").bold().foregroundStyle(Color(hex: "#F9703E"))
+                 + Text(L("health.third_party_hint_3")).foregroundStyle(Color(hex: "#52606D")))
                     .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(Color(hex: "#52606D"))
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -145,8 +148,8 @@ struct HealthPermissionView: View {
 
     private var dataReadPills: some View {
         HStack(spacing: 10) {
-            dataPill(icon: "figure.run", label: "Distancia")
-            dataPill(icon: "lock.fill",  label: "Solo lectura")
+            dataPill(icon: "figure.run", label: L("health.pill_distance"))
+            dataPill(icon: "lock.fill",  label: L("health.pill_readonly"))
         }
         .padding(.horizontal, 24)
     }
@@ -170,11 +173,11 @@ struct HealthPermissionView: View {
     private var deniedContent: some View {
         VStack(spacing: 14) {
             (
-                Text(health.authState == .unavailable ? "Apple Health no\nestá disponible" : "Acceso a Health\n")
+                Text(health.authState == .unavailable ? L("health.unavailable_title") : L("health.denied_title_part1"))
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
                 + (health.authState == .unavailable ? Text("") :
-                    Text("no activado.")
+                    Text(L("health.denied_title_part2"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#E12D39"))
                 )
@@ -183,8 +186,8 @@ struct HealthPermissionView: View {
             .padding(.horizontal, 32)
 
             Text(health.authState == .unavailable
-                 ? "Apple Health no está disponible en este dispositivo. Pacepal requiere un iPhone con Apple Health para funcionar."
-                 : "Sin acceso, Pacepal no puede detectar tus carreras y tu compañero no podrá crecer contigo.\n\nVe a Ajustes → Privacidad → Salud → Pacepal y activa Distancia en caminata y carrera.")
+                 ? L("health.unavailable_body")
+                 : L("health.denied_body"))
                 .font(.system(size: 15, design: .rounded))
                 .foregroundStyle(Color(hex: "#52606D"))
                 .multilineTextAlignment(.center)
@@ -212,7 +215,7 @@ struct HealthPermissionView: View {
                     }
                     Image(systemName: "heart.fill")
                         .font(.system(size: 15))
-                    Text(health.authState == .requesting ? "Esperando permiso..." : "Activar Apple Health")
+                    Text(health.authState == .requesting ? L("health.requesting") : L("health.activate_button"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                 }
                 .frame(maxWidth: .infinity)
@@ -235,7 +238,7 @@ struct HealthPermissionView: View {
                         UIApplication.shared.open(url)
                     }
                 } label: {
-                    Text("Abrir Ajustes")
+                    Text(L("health.open_settings"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 17)
@@ -246,7 +249,7 @@ struct HealthPermissionView: View {
                 }
 
                 // Retry (re-triggers the dialog if .notDetermined, or silently completes)
-                Button("Intentar de nuevo") {
+                Button(L("health.retry")) {
                     health.requestFromPermissionScreen()
                 }
                 .font(.system(size: 14, weight: .medium, design: .rounded))

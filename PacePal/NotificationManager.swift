@@ -121,14 +121,14 @@ struct NotificationManager {
             (0.95, petName,                                    randomPhrase(),                                          "energy_95"),
             (0.75, petName,                                    randomPhrase(),                                          "energy_75"),
             (0.60, petName,                                    randomPhrase(),                                          "energy_60"),
-            (0.50, "\(petName) está exigiendo que corras",     "Tienes que salir a correr o perderá energía",           "energy_50"),
-            (0.25, "La energía de \(petName) se acaba",        "¡Sal a correr ahora antes de que colapse!",             "energy_25"),
-            (0.14, "\(petName) está a punto de colapsar",      "Está en estado crítico. ¡Corre o lo perderás todo!",    "energy_14"),
-            (0.05, "Tu \(petName) necesita que corras",        "De inmediato, ¡está a punto de quedarse sin energía!",  "energy_5"),
+            (0.50, L("notif.demanding_title", petName),        L("notif.demanding_body"),                               "energy_50"),
+            (0.25, L("notif.low_energy_title", petName),       L("notif.low_energy_body"),                              "energy_25"),
+            (0.14, L("notif.collapsing_title", petName),       L("notif.collapsing_body"),                              "energy_14"),
+            (0.05, L("notif.critical_title", petName),         L("notif.critical_body"),                                "energy_5"),
         ]
     }
 
     private static func randomPhrase() -> String {
-        RunningPhrase.all.randomElement()?.es ?? "¡Sal a correr!"
+        RunningPhrase.all.randomElement()?.localized ?? L("notif.fallback")
     }
 }

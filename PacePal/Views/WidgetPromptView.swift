@@ -73,7 +73,7 @@ struct WidgetPromptView: View {
             // Right: stats
             VStack(alignment: .leading, spacing: 7) {
                 HStack {
-                    Text("Energía")
+                    Text(L("widget_prompt.energy_label"))
                         .font(.system(size: 9, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                     Spacer()
@@ -85,13 +85,13 @@ struct WidgetPromptView: View {
                     Capsule().fill(Color(hex: "#E2E8F0")).frame(height: 4)
                     Capsule().fill(Color(hex: "#4ADE80")).frame(width: 86, height: 4)
                 }
-                Label("3.2 km hoy", systemImage: "figure.run")
+                Label(L("widget_prompt.km_today", 3.2), systemImage: "figure.run")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#616E7C"))
-                Label("Día 14 de 66", systemImage: "calendar")
+                Label(L("widget_prompt.day_of_66", 14), systemImage: "calendar")
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#616E7C"))
-                Text("Contento")
+                Text(L("widget_prompt.mood_happy"))
                     .font(.system(size: 9, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(hex: "#4A3F35"))
                     .padding(.horizontal, 7)
@@ -117,10 +117,10 @@ struct WidgetPromptView: View {
     private var pitchContent: some View {
         VStack(spacing: 20) {
             (
-                Text("Tenlo siempre\n")
+                Text(L("widget_prompt.title_part1"))
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("a la vista.")
+                + Text(L("widget_prompt.title_highlight"))
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -128,7 +128,7 @@ struct WidgetPromptView: View {
             .padding(.horizontal, 32)
             .padding(.top, 28)
 
-            Text("Agrega el widget a tu pantalla principal\ny mira su estado sin abrir la app.")
+            Text(L("widget_prompt.subtitle"))
                 .font(.system(size: 16, design: .rounded))
                 .foregroundStyle(Color(hex: "#52606D"))
                 .multilineTextAlignment(.center)
@@ -137,9 +137,9 @@ struct WidgetPromptView: View {
 
             // Steps
             VStack(spacing: 10) {
-                step(number: "1", text: "Mantén presionado el home screen")
-                step(number: "2", text: "Toca el botón  +  de la esquina")
-                step(number: "3", text: "Busca Pacepal y elige el widget")
+                step(number: "1", text: L("widget_prompt.step1"))
+                step(number: "2", text: L("widget_prompt.step2"))
+                step(number: "3", text: L("widget_prompt.step3"))
             }
             .padding(.top, 4)
             .padding(.horizontal, 32)
@@ -175,7 +175,7 @@ struct WidgetPromptView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "rectangle.stack.fill")
                         .font(.system(size: 15))
-                    Text("Entendido")
+                    Text(L("widget_prompt.got_it"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                 }
                 .frame(maxWidth: .infinity)
@@ -191,7 +191,7 @@ struct WidgetPromptView: View {
                     appState.completeWidgetPrompt()
                 }
             } label: {
-                Text("Ahora no")
+                Text(L("widget_prompt.not_now"))
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }

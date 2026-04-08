@@ -46,25 +46,25 @@ struct HomeView: View {
 
     private var energyTimeLabel: String {
         let minutes = Int(appState.decaySeconds / 60.0 * energy)
-        guard minutes > 0 else { return "Sin energía" }
+        guard minutes > 0 else { return L("home.no_energy") }
         let h = minutes / 60
         let m = minutes % 60
-        if h == 0 { return "\(m)m restantes" }
-        if m == 0 { return "\(h)h restantes" }
-        return "\(h)h \(m)m restantes"
+        if h == 0 { return L("home.time_minutes", m) }
+        if m == 0 { return L("home.time_hours", h) }
+        return L("home.time_hours_minutes", h, m)
     }
 
     private var moodText: String {
         switch normalPose {
-        case .hype:  return "¡\(dna.name) está en su mejor momento!"
-        case .happy: return "\(dna.name) está feliz, ¡sigamos!"
-        case .jump:  return "\(dna.name) tiene energía, ¿corremos?"
-        case .idle:  return "\(dna.name) está listo para correr"
-        case .angry: return "Está exigiendo que corras"
-        case .sad:   return "La energía se acaba... ¡sal a correr!"
-        case .dizzy: return "\(dna.name) está a punto de colapsar..."
-        case .dead:  return "\(dna.name) está exhausto... ¡ve a correr!"
-        default:     return "\(dna.name) está listo"
+        case .hype:  return L("home.mood_hype", dna.name)
+        case .happy: return L("home.mood_happy", dna.name)
+        case .jump:  return L("home.mood_jump", dna.name)
+        case .idle:  return L("home.mood_idle", dna.name)
+        case .angry: return L("home.mood_angry")
+        case .sad:   return L("home.mood_sad")
+        case .dizzy: return L("home.mood_dizzy", dna.name)
+        case .dead:  return L("home.mood_dead", dna.name)
+        default:     return L("home.mood_default", dna.name)
         }
     }
 
@@ -449,14 +449,14 @@ struct HomeView: View {
                     .font(.system(size: 20, weight: .black, design: .monospaced))
                     .foregroundStyle(.white)
                 Spacer()
-                Text("DÍA: \(String(format: "%02d", dayNum))/66")
+                Text(L("home.day_counter", String(format: "%02d", dayNum)))
                     .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.55))
             }
 
             // ── HP bar row ────────────────────────────────────────────────
             HStack(spacing: 10) {
-                Text("HP")
+                Text(L("home.hp"))
                     .font(.system(size: 14, weight: .black, design: .monospaced))
                     .foregroundStyle(energyColor)
 
@@ -562,14 +562,14 @@ struct HomeView: View {
     }
 
     private var phraseSection: some View {
-        styledPhrase(RunningPhrase.all[phraseIndex].es)
+        styledPhrase(RunningPhrase.all[phraseIndex].localized)
             .font(.system(size: 20, weight: .regular, design: .rounded))
             .shadow(color: hasPhotoBackground ? .black.opacity(0.80) : .clear, radius: 12, x: 0, y: 2)
             .shadow(color: hasPhotoBackground ? .black.opacity(0.50) : .clear, radius: 4, x: 0, y: 1)
             .multilineTextAlignment(.center)
             .lineLimit(2)
             .onTapGesture {
-                UIPasteboard.general.string = RunningPhrase.all[phraseIndex].es
+                UIPasteboard.general.string = RunningPhrase.all[phraseIndex].localized
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)
@@ -599,7 +599,7 @@ struct HomeView: View {
                     .shadow(color: hasPhotoBackground ? .black.opacity(0.55) : .clear, radius: 6, x: 0, y: 1)
                     .contentTransition(.numericText())
                     .animation(.spring(duration: 0.3), value: displayedKm)
-                Text("km")
+                Text(L("home.km"))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E").opacity(0.65))
                     .shadow(color: hasPhotoBackground ? .black.opacity(0.45) : .clear, radius: 4, x: 0, y: 1)
@@ -673,7 +673,7 @@ struct HomeView: View {
             // Message + button pinned to bottom
             VStack(spacing: 0) {
                 Spacer()
-                Text("\(dna.name) se quedó sin energía...")
+                Text(L("home.game_over", dna.name))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.80))
                 Spacer().frame(height: 32)
@@ -687,7 +687,7 @@ struct HomeView: View {
                         appState.selectedCharacter = nil
                     }
                 } label: {
-                    Text("Volver a intentarlo")
+                    Text(L("home.retry"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
@@ -768,11 +768,11 @@ private struct PetStatusSheet: View {
 
             // Stats — dark HUD card
             HStack(spacing: 0) {
-                statCell(value: "\(health.totalRuns)", label: "Carreras")
+                statCell(value: "\(health.totalRuns)", label: L("home.stat_runs"))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: String(format: "%.1f", health.totalKmAllTime), label: "km totales")
+                statCell(value: String(format: "%.1f", health.totalKmAllTime), label: L("home.stat_total_km"))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "\(health.bestStreak)", label: "Mejor racha")
+                statCell(value: "\(health.bestStreak)", label: L("home.stat_best_streak"))
             }
             .padding(.vertical, 18)
             .background(
@@ -788,7 +788,7 @@ private struct PetStatusSheet: View {
 
             // Achievements
             VStack(alignment: .leading, spacing: 10) {
-                Text("LOGROS")
+                Text(L("home.achievements_title"))
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .tracking(1.2)
                     .foregroundStyle(Color(hex: "#9AA5B4"))
@@ -814,7 +814,7 @@ private struct PetStatusSheet: View {
                                                          ? Color(hex: "#F9703E")
                                                          : Color(hex: "#CBD2D9"))
                                 }
-                                Text("Día \(a.day)")
+                                Text(L("common.day_n", a.day))
                                     .font(.system(size: 9, weight: .bold, design: .rounded))
                                     .foregroundStyle(unlocked
                                                      ? Color(hex: "#F9703E")
@@ -879,7 +879,7 @@ private struct AchievementModal: View {
                     Spacer().frame(height: 132)
 
                     // Day badge
-                    Text("DÍA \(achievement.day) / 66")
+                    Text(L("home.achievement_badge", achievement.day))
                         .font(.system(size: 11, weight: .black, design: .monospaced))
                         .tracking(2)
                         .foregroundStyle(.white)
@@ -911,7 +911,7 @@ private struct AchievementModal: View {
 
                     // CTA
                     Button(action: onDismiss) {
-                        Text("¡Vamos!")
+                        Text(L("home.achievement_dismiss"))
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
                             .padding(.horizontal, 48)
                             .padding(.vertical, 16)

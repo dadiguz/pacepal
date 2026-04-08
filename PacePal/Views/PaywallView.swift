@@ -9,10 +9,10 @@ struct PaywallView: View {
     @State private var featurePage = 0
     @State private var purchased = false
 
-    private let features: [(icon: String, color: String, title: String, desc: String)] = [
-        ("figure.run",  "#F9703E", "Reto de 66 días",   "El tiempo justo para convertirlo en hábito"),
-        ("heart.fill",  "#E12D39", "Apple Health",       "Tus km se sincronizan solos"),
-        ("flame.fill",  "#DE911D", "Rachas y progreso",  "Cada día del reto en tu historial"),
+    private let features: [(icon: String, color: String, titleKey: String, descKey: String)] = [
+        ("figure.run",  "#F9703E", "paywall.feature_challenge_title", "paywall.feature_challenge_desc"),
+        ("heart.fill",  "#E12D39", "paywall.feature_health_title",    "paywall.feature_health_desc"),
+        ("flame.fill",  "#DE911D", "paywall.feature_streaks_title",   "paywall.feature_streaks_desc"),
     ]
 
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
@@ -85,7 +85,7 @@ struct PaywallView: View {
                     Button {
                         Task { await store.restore() }
                     } label: {
-                        Text(store.isRestoring ? "Buscando compra..." : "Restaurar compra")
+                        Text(store.isRestoring ? L("paywall.restoring") : L("paywall.restore"))
                             .font(.system(size: 13, weight: .regular, design: .rounded))
                             .foregroundStyle(Color(hex: "#9AA5B4"))
                     }
@@ -155,26 +155,26 @@ struct PaywallView: View {
         VStack(spacing: 6) {
             if let name = petName {
                 (
-                    Text("Mantén a ")
+                    Text(L("paywall.headline_keep_part1"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                     + Text(name)
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#F9703E"))
-                    + Text(" con vida.")
+                    + Text(L("paywall.headline_keep_part2"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                 )
                 .multilineTextAlignment(.center)
             } else {
                 (
-                    Text("Empieza tu ")
+                    Text(L("paywall.headline_start_part1"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
-                    + Text("prueba gratis")
+                    + Text(L("paywall.headline_start_highlight"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#F9703E"))
-                    + Text(" hoy mismo.")
+                    + Text(L("paywall.headline_start_part3"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
                 )
@@ -182,12 +182,12 @@ struct PaywallView: View {
             }
 
             HStack(spacing: 6) {
-                Label("7 días gratis", systemImage: "checkmark.seal.fill")
+                Label(L("paywall.free_trial_badge"), systemImage: "checkmark.seal.fill")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
                 Text("·")
                     .foregroundStyle(Color(hex: "#CBD2D9"))
-                Text("Cancela cuando quieras")
+                Text(L("paywall.cancel_anytime"))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
@@ -226,7 +226,7 @@ struct PaywallView: View {
         }
     }
 
-    private func featureCard(_ f: (icon: String, color: String, title: String, desc: String)) -> some View {
+    private func featureCard(_ f: (icon: String, color: String, titleKey: String, descKey: String)) -> some View {
         HStack(spacing: 16) {
             Image(systemName: f.icon)
                 .font(.system(size: 22, weight: .semibold))
@@ -236,10 +236,10 @@ struct PaywallView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(f.title)
+                Text(L(f.titleKey))
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                Text(f.desc)
+                Text(L(f.descKey))
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
@@ -258,13 +258,13 @@ struct PaywallView: View {
 
     private var priceCard: some View {
         HStack(spacing: 0) {
-            pricePill(top: "HOY", main: "GRATIS", sub: "7 días de prueba", highlighted: true)
+            pricePill(top: L("paywall.price_today"), main: L("paywall.price_free"), sub: L("paywall.price_trial_days"), highlighted: true)
 
             Rectangle()
                 .fill(Color(hex: "#E4E7EB"))
                 .frame(width: 1, height: 56)
 
-            pricePill(top: "DESPUÉS", main: store.displayPrice, sub: "al año", highlighted: false)
+            pricePill(top: L("paywall.price_after"), main: store.displayPrice, sub: L("paywall.price_per_year"), highlighted: false)
         }
         .frame(height: 82)
         .background(.white)
@@ -311,7 +311,7 @@ struct PaywallView: View {
                         .tint(.white)
                         .scaleEffect(0.85)
                 }
-                Text(store.isPurchasing ? "Procesando..." : "Comenzar prueba gratuita")
+                Text(store.isPurchasing ? L("paywall.processing") : L("paywall.start_trial"))
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
             }
             .frame(maxWidth: .infinity)

@@ -21,7 +21,7 @@ struct HistoryView: View {
     @State private var selectedDayIndex: SelectedDay? = nil
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 5), count: 7)
-    private let weekLabels = ["D", "L", "M", "M", "J", "V", "S"]
+    private var weekLabels: [String] { [L("history.weekday_sun"), L("history.weekday_mon"), L("history.weekday_tue"), L("history.weekday_wed"), L("history.weekday_thu"), L("history.weekday_fri"), L("history.weekday_sat")] }
 
     // ── Derived ──────────────────────────────────────────────────────────────
 
@@ -44,12 +44,12 @@ struct HistoryView: View {
 
     private var projectedFinish: String {
         let remaining = totalDays - completedCount
-        guard remaining > 0 else { return "¡Reto completado!" }
+        guard remaining > 0 else { return L("history.challenge_complete") }
         let today = Calendar.current.startOfDay(for: Date())
         if let finish = Calendar.current.date(byAdding: .day, value: remaining, to: today) {
             let fmt = DateFormatter()
-            fmt.locale = Locale(identifier: "es_MX")
-            fmt.dateFormat = "d 'de' MMMM"
+            fmt.locale = Locale(identifier: AppLang.current == .en ? "en_US" : "es_MX")
+            fmt.dateFormat = AppLang.current == .en ? "MMMM d" : "d 'de' MMMM"
             return fmt.string(from: finish)
         }
         return "—"
@@ -119,10 +119,10 @@ struct HistoryView: View {
         VStack(spacing: 6) {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Reto 66 Días")
+                    Text(L("history.title"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
-                    Text("Día \(min(todayIndex + 1, totalDays))/\(totalDays)")
+                    Text(L("history.day_progress", min(todayIndex + 1, totalDays), totalDays))
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                 }
@@ -196,12 +196,12 @@ struct HistoryView: View {
         VStack(spacing: 16) {
             // Dark HUD card — matches energy card style
             HStack(spacing: 0) {
-                statCell(value: "\(completedCount)", label: "Completados", valueColor: Color(hex: "#F9703E"))
+                statCell(value: "\(completedCount)", label: L("history.completed"), valueColor: Color(hex: "#F9703E"))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "\(missedCount)",   label: "Faltas",
+                statCell(value: "\(missedCount)",   label: L("history.missed"),
                          valueColor: missedCount > 0 ? Color(hex: "#E12D39") : Color.white.opacity(0.35))
                 Rectangle().fill(Color.white.opacity(0.12)).frame(width: 1, height: 32)
-                statCell(value: "\(streakCount)",   label: "Racha",
+                statCell(value: "\(streakCount)",   label: L("history.streak"),
                          valueColor: streakCount >= 7 ? Color(hex: "#F9703E") : .white)
             }
             .padding(.vertical, 18)
@@ -219,7 +219,7 @@ struct HistoryView: View {
                 Image(systemName: "flag.checkered")
                     .font(.system(size: 13))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
-                Text("Fin estimado: \(projectedFinish)")
+                Text(L("history.estimated_finish", projectedFinish))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
                 Spacer()
@@ -342,12 +342,12 @@ private struct DayDetailView: View {
 
     private var dateLabel: String {
         let fmt = DateFormatter()
-        fmt.locale = Locale(identifier: "es_MX")
-        fmt.dateFormat = "EEEE d 'de' MMMM"
+        fmt.locale = Locale(identifier: AppLang.current == .en ? "en_US" : "es_MX")
+        fmt.dateFormat = AppLang.current == .en ? "EEEE, MMMM d" : "EEEE d 'de' MMMM"
         return fmt.string(from: date).capitalized
     }
 
-    private var dayLabel: String { "Día \(dayIndex + 1)" }
+    private var dayLabel: String { L("common.day_n", dayIndex + 1) }
 
     var body: some View {
         ZStack {
@@ -413,10 +413,10 @@ private struct DayDetailView: View {
 
     private var stateLabel: String {
         switch state {
-        case .completed: return "Completado ✓"
-        case .missed:    return "Sin actividad"
-        case .today:     return km >= runThreshold ? "Completado ✓" : "En progreso"
-        case .future:    return "Próximamente"
+        case .completed: return L("history.state_completed")
+        case .missed:    return L("history.state_missed")
+        case .today:     return km >= runThreshold ? L("history.state_completed") : L("history.state_in_progress")
+        case .future:    return L("history.state_upcoming")
         }
     }
 }

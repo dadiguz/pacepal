@@ -49,13 +49,29 @@
 ---
 
 ## 4. Revision Logica de 66 Dias + Skip Days
-**Prioridad:** Alta | **Complejidad:** Baja
+**Prioridad:** Alta | **Complejidad:** Media
 
-- [ ] Auditar que el reto requiere 66 dias completos (con carrera), no 66 dias calendario
-- [ ] Si el usuario hace skip, el grid historico muestra ese dia vacio pero sigue contando
-- [ ] Ejemplo: 1 skip = 67 cuadritos en el grid (66 completos + 1 skip)
-- [ ] Verificar que logros se disparan por dias completados, no dias transcurridos
-- [ ] Verificar que la fecha estimada de finalizacion se ajusta con los skips
+### Resultado de la auditoria
+
+Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `challengeStartDate`, no dias completados con carrera:
+
+| # | Problema | Archivo | Linea |
+|---|----------|---------|-------|
+| 1 | dayNum, achievements, grid: todo cuenta desde challengeStartDate sin importar si corriste | AppState:330, HomeView:442, HistoryView:31 | |
+| 2 | Grid fijo en 66 cuadros — si hay skips deberia mostrar mas (66 completos + N skips) | HistoryView:178 `0..<totalDays` | |
+| 3 | Achievements se disparan por dia calendario — Dia 7 se desbloquea a los 7 dias aunque no hayas corrido | AppState:330-331 | |
+| 4 | Threshold inconsistente — HistoryView usa 0.5 km, HealthManager usa 0.05 km | HistoryView:4 vs HealthManager:98 | |
+| 5 | Fecha estimada no considera skips — asume 1 completado por dia calendario futuro | HistoryView:45-56 | |
+| 6 | Widget muestra dia calendario en vez de dias completados | AppState:440 | |
+
+### Fixes necesarios
+
+- [ ] **Unificar threshold** a 0.5 km en `HealthManager.fetchRunStats` (linea 98: cambiar `> 0.05` a `>= 0.5`)
+- [ ] **Achievements por dias completados** — `pendingAchievement` en AppState debe contar dias con >= 0.5 km, no dias calendario. Requiere que AppState tenga acceso al conteo de dias completados (inyectar desde HealthManager o calcular)
+- [ ] **Grid dinamico** — HistoryView debe mostrar `max(66, diasCalendarioTranscurridos)` cuadros. Los dias completados llevan check, los skips llevan X, los futuros quedan grises. El progreso (barra, contador) se basa en completados/66
+- [ ] **HomeView dayNum** — cambiar `DIA: XX/66` para que muestre dias completados, no calendario
+- [ ] **Projected finish** — calcular basado en tasa real de completados: `remaining / (completedCount / diasTranscurridos)`
+- [ ] **Widget sync** — `syncToWidget` debe enviar dias completados en vez de dia calendario
 
 ---
 

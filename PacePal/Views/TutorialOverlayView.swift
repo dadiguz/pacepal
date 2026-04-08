@@ -13,20 +13,22 @@ struct TutorialFrameKey: PreferenceKey {
 
 struct TutorialStep {
     let frameKey: String
-    let title: String
-    let body: String
+    let titleKey: String
+    let bodyKey: String
+    var title: String { L(titleKey) }
+    var body: String { L(bodyKey) }
 }
 
 let tutorialSteps: [TutorialStep] = [
     TutorialStep(
         frameKey: "energy",
-        title: "Tu energía",
-        body: "Baja con el tiempo. Si llega a 0% tu compañero se agota y tendrás que elegir uno nuevo."
+        titleKey: "tutorial.energy_title",
+        bodyKey: "tutorial.energy_body"
     ),
     TutorialStep(
         frameKey: "km",
-        title: "Kilómetros",
-        body: "Cada km que corres suma 10% de energía. ¡Corre 4 km diarios para mantener a tu compañero al máximo!"
+        titleKey: "tutorial.km_title",
+        bodyKey: "tutorial.km_body"
     ),
 ]
 
@@ -120,13 +122,13 @@ struct TutorialOverlayView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack {
-                Button("Saltar") { onSkip() }
+                Button(L("tutorial.skip")) { onSkip() }
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
 
                 Spacer()
 
-                Button(isLast ? "Entendido ✓" : "Siguiente →") { onNext() }
+                Button(isLast ? L("tutorial.done") : L("tutorial.next")) { onNext() }
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 18)

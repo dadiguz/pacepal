@@ -67,10 +67,10 @@ struct NotificationPermissionView: View {
     private var pitchContent: some View {
         VStack(spacing: 20) {
             (
-                Text("Que nada te haga\n")
+                Text(L("notif_perm.title_part1"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text("perderle el ritmo.")
+                + Text(L("notif_perm.title_highlight"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -78,10 +78,10 @@ struct NotificationPermissionView: View {
             .padding(.horizontal, 32)
 
             (
-                Text("Te avisamos cuando tu compañero\npierda energía para que ")
+                Text(L("notif_perm.subtitle_part1"))
                     .font(.system(size: 17, design: .rounded))
                     .foregroundStyle(Color(hex: "#52606D"))
-                + Text("nunca se quede solo.")
+                + Text(L("notif_perm.subtitle_highlight"))
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
             )
@@ -91,8 +91,8 @@ struct NotificationPermissionView: View {
 
             // Benefit pills
             HStack(spacing: 10) {
-                benefitPill(icon: "bolt.fill",    label: "Alertas de energía")
-                benefitPill(icon: "figure.run",   label: "Motivación diaria")
+                benefitPill(icon: "bolt.fill",    label: L("notif_perm.pill_alerts"))
+                benefitPill(icon: "figure.run",   label: L("notif_perm.pill_motivation"))
             }
             .padding(.top, 4)
         }
@@ -139,7 +139,7 @@ struct NotificationPermissionView: View {
                     }
                     Image(systemName: "bell.fill")
                         .font(.system(size: 15))
-                    Text(requesting ? "Esperando permiso..." : "Activar notificaciones")
+                    Text(requesting ? L("notif_perm.requesting") : L("notif_perm.activate_button"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                 }
                 .frame(maxWidth: .infinity)
@@ -157,7 +157,7 @@ struct NotificationPermissionView: View {
                     appState.completeNotificationPermission()
                 }
             } label: {
-                Text("Omitir por ahora")
+                Text(L("notif_perm.skip"))
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
