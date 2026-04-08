@@ -114,8 +114,9 @@ struct PacepalProvider: TimelineProvider {
         let rawDay       = def?.integer(forKey: kChallengeDay) ?? 0
         let challengeDay = rawDay > 0 ? rawDay : 1
 
+        let medalEarned  = def?.bool(forKey: "w_medalEarned") ?? false
         let elapsed = date.timeIntervalSince(resetDate)
-        let energy  = max(0, min(1, 1.0 - elapsed / decaySeconds))
+        let energy  = medalEarned ? 1.0 : max(0, min(1, 1.0 - elapsed / decaySeconds))
 
         let dna: PetDNA? = (def?.data(forKey: kPetDNA))
             .flatMap { try? JSONDecoder().decode(PetDNA.self, from: $0) }

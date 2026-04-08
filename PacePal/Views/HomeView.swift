@@ -27,6 +27,7 @@ struct HomeView: View {
     @State private var pendingAchievement: Achievement? = nil
     @State private var replayAchievement: Achievement? = nil
     @State private var deadAudioStarted = false
+    @State private var showMedalTutorial = false
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -45,6 +46,7 @@ struct HomeView: View {
     }
 
     private var energyTimeLabel: String {
+        if appState.medalEarned { return L("medal.energy_permanent") }
         let minutes = Int(appState.decaySeconds / 60.0 * energy)
         guard minutes > 0 else { return L("home.no_energy") }
         let h = minutes / 60
@@ -69,6 +71,7 @@ struct HomeView: View {
     }
 
     private var normalPose: PetPose {
+        if appState.medalEarned { return .idle }
         if energy <= 0    { return .dead  }
         if energy >= 0.99 { return .hype  }
         if energy > 0.95  { return .happy }
@@ -187,6 +190,12 @@ struct HomeView: View {
                 AchievementModal(achievement: achievement, dna: dna) {
                     appState.markAchievementSeen(achievement.day)
                     withAnimation(.spring(duration: 0.35)) { pendingAchievement = nil }
+                    if achievement.day == 66 {
+                        appState.grantMedal()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            withAnimation(.spring(duration: 0.4)) { showMedalTutorial = true }
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
@@ -201,6 +210,15 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .transition(.opacity)
                 .zIndex(20)
+            }
+
+            // ── Medal tutorial (shown after day 66 modal dismiss) ────────
+            if showMedalTutorial {
+                MedalTutorialOverlay {
+                    withAnimation(.spring(duration: 0.35)) { showMedalTutorial = false }
+                }
+                .transition(.opacity)
+                .zIndex(25)
             }
         }
         .background { AppBackground(imageName: appState.selectedBackground) }
@@ -449,9 +467,16 @@ struct HomeView: View {
                     .font(.system(size: 20, weight: .black, design: .monospaced))
                     .foregroundStyle(.white)
                 Spacer()
-                Text(L("home.day_counter", String(format: "%02d", dayNum)))
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.55))
+                HStack(spacing: 6) {
+                    if appState.medalEarned {
+                        Image(systemName: "medal.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Color(hex: "#FFD700"))
+                    }
+                    Text(L("home.day_counter", String(format: "%02d", dayNum)))
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundStyle(.white.opacity(0.55))
+                }
             }
 
             // ── HP bar row ────────────────────────────────────────────────
@@ -523,7 +548,8 @@ struct HomeView: View {
                 .blur(radius: 12)
                 .padding(.bottom, 8)
 
-            PetAnimationView(dna: dna, pose: currentPose, pixelSize: 9.07)
+            PetAnimationView(dna: dna, pose: currentPose, pixelSize: 9.07,
+                             accessories: appState.medalEarned ? [.medal66] : [])
                 .id(dna.id)
                 .onTapGesture {
                     guard !isAnimating && currentPose != .dead else { return }
@@ -932,6 +958,68 @@ private struct AchievementModal: View {
         .onAppear {
             withAnimation { appeared = true }
         }
+    }
+}
+
+// MARK: – Medal tutorial overlay
+
+private struct MedalTutorialOverlay: View {
+    let onDismiss: () -> Void
+    @State private var appeared = false
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.7)
+                .ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Spacer()
+
+                // Medal icon
+                Image(systemName: "medal.fill")
+                    .font(.system(size: 72))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(hex: "#FFD700"), Color(hex: "#FFA500")],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .shadow(color: Color(hex: "#FFD700").opacity(0.5), radius: 20)
+                    .scaleEffect(appeared ? 1.0 : 0.3)
+                    .animation(.spring(duration: 0.5, bounce: 0.3), value: appeared)
+
+                Text(L("medal.tutorial_title"))
+                    .font(.system(size: 24, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeOut(duration: 0.4).delay(0.15), value: appeared)
+
+                Text(L("medal.tutorial_body"))
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeOut(duration: 0.4).delay(0.25), value: appeared)
+
+                Spacer()
+
+                Button(action: onDismiss) {
+                    Text(L("medal.tutorial_dismiss"))
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .padding(.horizontal, 48)
+                        .padding(.vertical, 16)
+                }
+                .foregroundStyle(.white)
+                .background(Color(hex: "#F9703E"))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
+                .padding(.bottom, 76)
+                .opacity(appeared ? 1 : 0)
+                .animation(.easeOut(duration: 0.3).delay(0.35), value: appeared)
+            }
+        }
+        .onAppear { withAnimation { appeared = true } }
     }
 }
 

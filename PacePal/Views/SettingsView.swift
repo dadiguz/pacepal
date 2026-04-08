@@ -13,7 +13,7 @@ struct SettingsView: View {
     @State private var showBackgroundPicker = false
     @State private var showPaywall = false
 
-    #if DEBUG && false
+    #if DEBUG
     @State private var debugNow: Date = Date()
     @State private var drainTimer: Timer? = nil
     #endif
@@ -129,7 +129,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                #if DEBUG && false
+                #if DEBUG
                 testingSection
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
@@ -165,7 +165,7 @@ struct SettingsView: View {
         }
     }
 
-    #if DEBUG && false
+    #if DEBUG
     private var testingSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("TESTING")
@@ -353,6 +353,42 @@ struct SettingsView: View {
                 Text("DÍA \(dayNum)")
                     .font(.system(size: 11, weight: .black, design: .monospaced))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
+            }
+
+            // Medal controls
+            HStack(spacing: 6) {
+                Button {
+                    appState.grantMedal()
+                } label: {
+                    Text("🏅 Dar medalla")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#4A3F35"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(appState.medalEarned ? Color(hex: "#FFF9E6") : Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(
+                            appState.medalEarned ? Color(hex: "#FFD700") : Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+
+                Button {
+                    appState.revokeMedal()
+                } label: {
+                    Text("❌ Quitar medalla")
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(hex: "#E12D39"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+                }
+            }
+
+            if appState.medalEarned {
+                Text("MEDALLA ACTIVA")
+                    .font(.system(size: 10, weight: .black, design: .monospaced))
+                    .foregroundStyle(Color(hex: "#FFD700"))
             }
         }
     }

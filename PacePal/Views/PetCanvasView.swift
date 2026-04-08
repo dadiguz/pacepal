@@ -84,21 +84,118 @@ func colorForCell(_ cell: PetCell, gx: Int, gy: Int, dna: PetDNA) -> Color? {
     }
 }
 
+// MARK: - Accessories
+
+enum PetAccessory: String, CaseIterable {
+    case medal66
+}
+
+/// Pixel-art accessory definitions. Each has multiple frames for animation.
+private struct AccessorySprite {
+    let frames: [[[(r: UInt8, g: UInt8, b: UInt8)?]]]  // [frame][row][col]
+    let offsetX: Int
+    let offsetY: Int
+    var frameCount: Int { frames.count }
+}
+
+private let medal66Sprite: AccessorySprite = {
+    let B: (UInt8, UInt8, UInt8)? = (0x1B, 0x50, 0xE5) // vivid cobalt blue ribbon
+    let S: (UInt8, UInt8, UInt8)? = (0x0E, 0x36, 0xA8) // ribbon shadow
+    let G: (UInt8, UInt8, UInt8)? = (0xFF, 0xCC, 0x00) // gold
+    let D: (UInt8, UInt8, UInt8)? = (0xDA, 0xA5, 0x00) // gold dark
+    let W: (UInt8, UInt8, UInt8)? = (0xFF, 0xE5, 0x66) // gold highlight
+    let H: (UInt8, UInt8, UInt8)? = (0xFF, 0xFF, 0xFF) // white sparkle
+    let n: (UInt8, UInt8, UInt8)? = nil
+
+    // 4 frames: sparkle moves across the medal
+    return AccessorySprite(
+        frames: [
+            // Frame 0: sparkle top-left
+            [
+                [B, n, B],
+                [n, S, n],
+                [H, W, G],
+                [G, D, G],
+            ],
+            // Frame 1: no sparkle
+            [
+                [B, n, B],
+                [n, S, n],
+                [G, W, G],
+                [G, D, G],
+            ],
+            // Frame 2: sparkle bottom-right
+            [
+                [B, n, B],
+                [n, S, n],
+                [G, W, G],
+                [G, D, H],
+            ],
+            // Frame 3: no sparkle
+            [
+                [B, n, B],
+                [n, S, n],
+                [G, W, G],
+                [G, D, G],
+            ],
+        ],
+        offsetX: -2,
+        offsetY: 3
+    )
+}()
+
+private func spriteFor(_ accessory: PetAccessory) -> AccessorySprite {
+    switch accessory {
+    case .medal66: return medal66Sprite
+    }
+}
+
 // MARK: - Single-frame canvas
 struct PetSpriteView: View {
     let grid: PetGrid
     let dna: PetDNA
     let pixelSize: CGFloat
+    var accessories: [PetAccessory] = []
+    var accessoryFrame: Int = 0
 
     var body: some View {
         Canvas { ctx, _ in
+            let hideGold = !accessories.isEmpty
+            // Draw pet
             for y in 0..<GRID_SIZE {
                 for x in 0..<GRID_SIZE {
-                    guard let color = colorForCell(grid[y][x], gx: x, gy: y, dna: dna) else { continue }
+                    let cell = grid[y][x]
+                    if hideGold && cell == .gold { continue }
+                    guard let color = colorForCell(cell, gx: x, gy: y, dna: dna) else { continue }
                     let rect = CGRect(x: CGFloat(x) * pixelSize,
                                      y: CGFloat(y) * pixelSize,
                                      width: pixelSize, height: pixelSize)
                     ctx.fill(Path(rect), with: .color(color))
+                }
+            }
+            // Draw accessories on top
+            let cx = Int(dna.bodyCx)
+            let cy = Int(dna.bodyCy)
+            for acc in accessories {
+                let sprite = spriteFor(acc)
+                let f = accessoryFrame % sprite.frameCount
+                let pixels = sprite.frames[f]
+                for (row, line) in pixels.enumerated() {
+                    for (col, pixel) in line.enumerated() {
+                        guard let p = pixel else { continue }
+                        let gx = cx + sprite.offsetX + col
+                        let gy = cy + sprite.offsetY + row
+                        guard gx >= 0, gx < GRID_SIZE, gy >= 0, gy < GRID_SIZE else { continue }
+                        let rect = CGRect(x: CGFloat(gx) * pixelSize,
+                                         y: CGFloat(gy) * pixelSize,
+                                         width: pixelSize, height: pixelSize)
+                        ctx.fill(Path(rect), with: .color(Color(
+                            .sRGB,
+                            red: Double(p.r) / 255,
+                            green: Double(p.g) / 255,
+                            blue: Double(p.b) / 255
+                        )))
+                    }
                 }
             }
         }
@@ -113,8 +210,10 @@ struct PetAnimationView: View {
     let pose: PetPose
     let pixelSize: CGFloat
     var fps: Double = 6
+    var accessories: [PetAccessory] = []
 
     @State private var frame: Int = 0
+    @State private var accessoryFrame: Int = 0
     @State private var grids: [PetGrid]
 
     // Idle uses 8 frames (frame 6 = parpadeo) a 3 fps → ciclo ~2.67s
@@ -122,11 +221,12 @@ struct PetAnimationView: View {
     private static func frameCount(for pose: PetPose) -> Int { pose == .idle ? 8 : 4 }
     private func interval() -> Double { pose == .idle ? 1.0 / 3.0 : 1.0 / fps }
 
-    init(dna: PetDNA, pose: PetPose = .idle, pixelSize: CGFloat, fps: Double = 6) {
+    init(dna: PetDNA, pose: PetPose = .idle, pixelSize: CGFloat, fps: Double = 6, accessories: [PetAccessory] = []) {
         self.dna = dna
         self.pose = pose
         self.pixelSize = pixelSize
         self.fps = fps
+        self.accessories = accessories
         let count = Self.frameCount(for: pose)
         self._grids = State(initialValue: (0..<count).map {
             buildCharacterGrid(dna: dna, pose: pose, frame: $0)
@@ -134,7 +234,8 @@ struct PetAnimationView: View {
     }
 
     var body: some View {
-        PetSpriteView(grid: grids[min(frame, grids.count - 1)], dna: dna, pixelSize: pixelSize)
+        PetSpriteView(grid: grids[min(frame, grids.count - 1)], dna: dna, pixelSize: pixelSize,
+                       accessories: accessories, accessoryFrame: accessoryFrame)
             .task(id: pose) {
                 let count = Self.frameCount(for: pose)
                 frame = 0
@@ -142,6 +243,14 @@ struct PetAnimationView: View {
                 while !Task.isCancelled {
                     try? await Task.sleep(for: .seconds(interval()))
                     frame = (frame + 1) % count
+                }
+            }
+            .task {
+                // Accessory sparkle animation — slower than pet animation
+                guard !accessories.isEmpty else { return }
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(0.4))
+                    accessoryFrame += 1
                 }
             }
     }

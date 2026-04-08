@@ -9,11 +9,12 @@
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
 | 4 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 5 | Estado Sleep del monito (3) | Media | Pendiente |
-| 6 | Medalla 66 dias (2) | Media | Pendiente |
+| 6 | Medalla 66 dias (2) | Media | ✅ Done |
 | 7 | Soporte millas (km/mi) | Media | Pendiente |
 | 8 | Fondo negro seleccionable | Baja | Pendiente |
 | 9 | Paletas de color custom para monitos | Baja | Pendiente |
 | 10 | Cambio de idioma en Settings | Media | Pendiente |
+| 11 | Compartir (share) | Media | Pendiente |
 
 ---
 
@@ -31,14 +32,20 @@
 
 ---
 
-## 2. Medalla 66 Dias (Asset + Logica)
-**Prioridad:** Media | **Complejidad:** Media
+## 2. Medalla 66 Dias (Asset + Logica) ✅
+**Prioridad:** Media | **Complejidad:** Media | **Estado:** Done
 
-- [ ] Disenar/agregar asset de medalla con liston azul y dorado con el numero "66"
-- [ ] Se otorga al completar 66 dias completos del reto
-- [ ] Efecto especial: al obtenerla, el monito ya no pierde energia (decay = 0)
-- [ ] Agregar pantalla de tutorial post-logro explicando la medalla y su beneficio
-- [ ] Mostrar medalla en HomeView o perfil como badge permanente
+- [x] Medalla pixel-art (liston azul cobalto #1B50E5 + circulo dorado) como accesorio sobre el mono
+- [x] Sistema de accesorios extensible (`PetAccessory` enum) en PetCanvasView
+- [x] Se otorga al cerrar modal del dia 66 → `grantMedal()`
+- [x] Energia permanente (decay = 0): `energy(at:)` retorna 1.0, widget tambien
+- [x] Tutorial post-logro: `MedalTutorialOverlay` con icono, titulo y explicacion
+- [x] Badge dorado `medal.fill` junto al contador de dias en HomeView
+- [x] energyTimeLabel muestra "Energia permanente" en vez del countdown
+- [x] Mono en pose `.idle` con parpadeo, sin brillos dorados, medalla con sparkle blanco animado
+- [x] Botones debug: dar/quitar medalla en SettingsView
+- [x] Se resetea al cambiar personaje
+- [x] Strings en es/en
 
 ---
 
@@ -78,6 +85,7 @@ Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `ch
 - [ ] **HomeView dayNum** — cambiar `DIA: XX/66` para que muestre dias completados, no calendario
 - [ ] **Projected finish** — calcular basado en tasa real de completados: `remaining / (completedCount / diasTranscurridos)`
 - [ ] **Widget sync** — `syncToWidget` debe enviar dias completados en vez de dia calendario
+- [ ] **Medalla y skips** — cuando el usuario tiene la medalla (66 dias completados), los dias sin carrera no deben mostrarse como taches/missed en el historico
 
 ---
 
@@ -136,3 +144,12 @@ Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `ch
 - [ ] Agregar selector de idioma en SettingsView (Espanol / English)
 - [ ] Persistir preferencia en UserDefaults y que `AppLang.current` la respete sobre el idioma del dispositivo
 - [ ] Refrescar toda la UI al cambiar idioma
+
+---
+
+## 11. Compartir (Share)
+**Prioridad:** Media | **Complejidad:** Media
+
+- [ ] Agregar boton de compartir en HomeView o PetStatusSheet
+- [ ] Generar imagen con el monito, stats (energia, dia, km) y branding PacePal
+- [ ] Usar ShareLink o UIActivityViewController para compartir a redes sociales, mensajes, etc.

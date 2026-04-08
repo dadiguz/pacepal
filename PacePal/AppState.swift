@@ -147,6 +147,9 @@ final class AppState {
     // True once the user logs their first run — gates achievement triggers
     private(set) var challengeStarted: Bool
 
+    // True once the 66-day challenge is completed — stops energy decay permanently
+    private(set) var medalEarned: Bool
+
     /// Seconds from 100% to 0% — driven by difficulty
     var decaySeconds: Double { difficulty.decaySeconds }
 
@@ -165,6 +168,7 @@ final class AppState {
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
         self.seenAchievements = Set(seen)
         self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
+        self.medalEarned = UserDefaults.standard.bool(forKey: "medalEarned")
         self.selectedBackground = UserDefaults.standard.string(forKey: "selectedBackground")
     }
 
@@ -199,6 +203,7 @@ final class AppState {
     }
 
     func energy(at date: Date) -> Double {
+        if medalEarned { return 1.0 }
         let elapsed = date.timeIntervalSince(energyResetDate)
         return max(0, min(1, 1.0 - elapsed / decaySeconds))
     }
@@ -244,6 +249,12 @@ final class AppState {
         UserDefaults.standard.set(km, forKey: "kmCountedForEnergy")
     }
 
+    func grantMedal() {
+        medalEarned = true
+        UserDefaults.standard.set(true, forKey: "medalEarned")
+        resetEnergy()
+    }
+
     func confirmChallengeStart() {
         guard !challengeStarted else { return }
         challengeStarted = true
@@ -285,6 +296,11 @@ final class AppState {
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
     }
 
+    func revokeMedal() {
+        medalEarned = false
+        UserDefaults.standard.set(false, forKey: "medalEarned")
+    }
+
     /// Resets the challenge to day 1 and clears all seen achievements.
     func resetChallengeToToday() {
         challengeStartDate = Calendar.current.startOfDay(for: Date())
@@ -304,6 +320,8 @@ final class AppState {
         UserDefaults.standard.set([] as [Int], forKey: "seenAchievements")
         challengeStarted = false
         UserDefaults.standard.set(false, forKey: "challengeStarted")
+        medalEarned = false
+        UserDefaults.standard.set(false, forKey: "medalEarned")
         isFirstRunForCharacter = true
         selectedBackground = nil
         UserDefaults.standard.removeObject(forKey: "selectedBackground")
@@ -365,6 +383,7 @@ final class AppState {
         d.set(km, forKey: "w_todayKm")
         let day = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
         d.set(day, forKey: "w_challengeDay")
+        d.set(medalEarned, forKey: "w_medalEarned")
         // Write PNG to shared file (more reliable than UserDefaults for binary data)
         let spriteURL = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: "group.io.dallio.PacePal")?

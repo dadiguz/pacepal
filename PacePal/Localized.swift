@@ -35,7 +35,7 @@ private let _allStrings: [String: [AppLang: String]] = {
         _common, _difficulty,
         _onboarding, _paywall, _healthPerm, _notifPerm, _widgetPrompt,
         _charSelect, _home, _history, _settings, _tutorial, _notifications,
-        _achievements, _archetypes,
+        _achievements, _archetypes, _medal,
     ] {
         d.merge(section) { _, new in new }
     }
@@ -431,4 +431,14 @@ private let _archetypes: [String: [AppLang: String]] = [
     "archetype.panda":    [.es: "Tenaz",       .en: "Tenacious"],
     "archetype.corgi":    [.es: "Alegre",      .en: "Cheerful"],
     "archetype.dragon":   [.es: "Legendario",  .en: "Legendary"],
+]
+
+// MARK: - Medal (66-day completion)
+
+private let _medal: [String: [AppLang: String]] = [
+    "medal.tutorial_title":    [.es: "¡Medalla desbloqueada!",   .en: "Medal unlocked!"],
+    "medal.tutorial_body":     [.es: "Completaste el reto de 66 días. Tu compañero ya no pierde energía. ¡Sigue corriendo!",
+                                .en: "You completed the 66-day challenge. Your companion no longer loses energy. Keep running!"],
+    "medal.tutorial_dismiss":  [.es: "¡Increíble!",             .en: "Amazing!"],
+    "medal.energy_permanent":  [.es: "Energía permanente",      .en: "Permanent energy"],
 ]
