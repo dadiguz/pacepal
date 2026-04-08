@@ -15,9 +15,10 @@
 | 9 | Fondo negro seleccionable | Baja | ✅ Completado |
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
-| 12 | Compartir (share) | Media | Pendiente |
+| 12 | Compartir logro (share) | Media | ✅ Completado |
 | 13 | Tips diarios de correr (12) | Media | Pendiente |
 | 14 | Parpadeo rojo al colapsar (13) | Baja | Pendiente |
+| 15 | Editor foto + stickers para compartir (14) | Baja | Pendiente |
 
 ---
 
@@ -172,12 +173,13 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 
 ---
 
-## 11. Compartir (Share)
-**Prioridad:** Media | **Complejidad:** Media
+## 11. Compartir (Share) ✅
+**Prioridad:** Media | **Complejidad:** Media | **Estado:** Completado
 
-- [ ] Agregar boton de compartir en HomeView o PetStatusSheet
-- [ ] Generar imagen con el monito, stats (energia, dia, km) y branding PacePal
-- [ ] Usar ShareLink o UIActivityViewController para compartir a redes sociales, mensajes, etc.
+- [x] Boton "Compartir" en el modal de logros (solo primera vez, no en replay)
+- [x] Genera imagen 1080x1920 con: fondo del logro, badge del dia, frase, monito animado, branding PacePal
+- [x] Share sheet nativo via `UIActivityViewController`
+- [x] Strings en es/en (`share.button`)
 
 ---
 
@@ -204,3 +206,17 @@ Cuando el monito esta colapsando (energia = 0 / pose `.dead`), el fondo parpadea
 - [ ] Overlay rojo semi-transparente con animacion de pulso/parpadeo sobre el fondo actual
 - [ ] Sutil (no agresivo) — opacidad baja con easing suave
 - [ ] Se detiene cuando la energia sube de 0
+
+---
+
+## 14. Editor Foto + Stickers para Compartir
+**Prioridad:** Baja | **Complejidad:** Alta
+
+Segunda opcion de compartir: tomar una foto y agregar stickers del monito y stats.
+
+- [ ] Opcion "Tomar foto" en el modal de compartir logro (junto a "Compartir asi")
+- [ ] Abrir camara o photo picker
+- [ ] Canvas de edicion con la foto de fondo
+- [ ] Stickers arrastrables: monito (pose actual), badge de km corridos, badge del dia
+- [ ] Render del composite a imagen final
+- [ ] Compartir via share sheet

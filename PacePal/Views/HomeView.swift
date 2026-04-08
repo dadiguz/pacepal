@@ -187,7 +187,7 @@ struct HomeView: View {
 
             // ── Achievement overlays (auto-trigger + replay) ──────────────
             if let achievement = pendingAchievement {
-                AchievementModal(achievement: achievement, dna: dna) {
+                AchievementModal(achievement: achievement, dna: dna, isFirstTime: true, todayKm: health.todayKm) {
                     appState.markAchievementSeen(achievement.day)
                     withAnimation(.spring(duration: 0.35)) { pendingAchievement = nil }
                     if achievement.day == 66 {
@@ -203,7 +203,7 @@ struct HomeView: View {
                 .zIndex(20)
             }
             if let achievement = replayAchievement {
-                AchievementModal(achievement: achievement, dna: dna) {
+                AchievementModal(achievement: achievement, dna: dna, isFirstTime: false, todayKm: health.todayKm) {
                     withAnimation(.spring(duration: 0.35)) { replayAchievement = nil }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -881,9 +881,14 @@ private struct PetStatusSheet: View {
 private struct AchievementModal: View {
     let achievement: Achievement
     let dna: PetDNA
+    let isFirstTime: Bool
+    let todayKm: Double
     let onDismiss: () -> Void
 
     @State private var appeared = false
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
+    @State private var isRendering = false
 
     var body: some View {
         GeometryReader { geo in
@@ -935,20 +940,57 @@ private struct AchievementModal: View {
                         .animation(.easeOut(duration: 0.4).delay(0.2), value: appeared)
                         .padding(.bottom, 32)
 
-                    // CTA
-                    Button(action: onDismiss) {
-                        Text(L("home.achievement_dismiss"))
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
-                            .padding(.horizontal, 48)
-                            .padding(.vertical, 16)
+                    // Buttons
+                    VStack(spacing: 12) {
+                        // Share button (first time only)
+                        if isFirstTime {
+                            Button {
+                                guard !isRendering else { return }
+                                isRendering = true
+                                Task {
+                                    let img = Self.renderShareImage(achievement: achievement, dna: dna, todayKm: todayKm)
+                                    shareImage = img
+                                    isRendering = false
+                                    showShareSheet = true
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    if isRendering {
+                                        ProgressView()
+                                            .tint(Color(hex: "#F9703E"))
+                                    } else {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .font(.system(size: 15, weight: .semibold))
+                                    }
+                                    Text(L("share.button"))
+                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                }
+                                .padding(.horizontal, 36)
+                                .padding(.vertical, 14)
+                            }
+                            .foregroundStyle(Color(hex: "#F9703E"))
+                            .background(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: Color.black.opacity(0.25), radius: 10, y: 4)
+                            .opacity(appeared ? 1 : 0)
+                            .animation(.easeOut(duration: 0.3).delay(0.25), value: appeared)
+                        }
+
+                        // CTA
+                        Button(action: onDismiss) {
+                            Text(L("home.achievement_dismiss"))
+                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                .padding(.horizontal, 48)
+                                .padding(.vertical, 16)
+                        }
+                        .foregroundStyle(.white)
+                        .background(Color(hex: "#F9703E"))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
+                        .opacity(appeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.3).delay(0.3), value: appeared)
                     }
-                    .foregroundStyle(.white)
-                    .background(Color(hex: "#F9703E"))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .shadow(color: Color.black.opacity(0.3), radius: 12, y: 5)
-                    .padding(.bottom, 76)
-                    .opacity(appeared ? 1 : 0)
-                    .animation(.easeOut(duration: 0.3).delay(0.3), value: appeared)
+                    .padding(.bottom, 56)
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
             }
@@ -958,7 +1000,126 @@ private struct AchievementModal: View {
         .onAppear {
             withAnimation { appeared = true }
         }
+        .sheet(isPresented: $showShareSheet) {
+            if let shareImage {
+                ShareSheet(image: shareImage)
+                    .presentationDetents([.medium, .large])
+            }
+        }
     }
+
+    // MARK: – Render shareable image
+
+    @MainActor
+    private static func renderShareImage(achievement: Achievement, dna: PetDNA, todayKm: Double) -> UIImage {
+        let w: CGFloat = 1080
+        let h: CGFloat = 1920
+
+        let grid = buildCharacterGrid(dna: dna, pose: achievement.pose, frame: 0)
+        let view = AchievementShareCard(
+            achievement: achievement,
+            dna: dna,
+            petGrid: grid,
+            todayKm: todayKm,
+            width: w,
+            height: h
+        )
+
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 1.0
+        return renderer.uiImage ?? UIImage()
+    }
+}
+
+// MARK: – Share card (rendered to image)
+
+private struct AchievementShareCard: View {
+    let achievement: Achievement
+    let dna: PetDNA
+    let petGrid: PetGrid
+    let todayKm: Double
+    let width: CGFloat
+    let height: CGFloat
+
+    var body: some View {
+        ZStack {
+            Image(achievement.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: width, height: height)
+                .clipped()
+
+            LinearGradient(
+                colors: [Color.black.opacity(0.10), Color.black.opacity(0.70)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            VStack(spacing: 0) {
+                // Logo at top
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 64)
+                    .opacity(0.6)
+                    .padding(.top, height * 0.08)
+
+                Spacer().frame(height: height * 0.04)
+
+                // Day badge
+                Text(L("home.achievement_badge", achievement.day))
+                    .font(.system(size: 28, weight: .black, design: .monospaced))
+                    .tracking(3)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 14)
+                    .background(Color.white.opacity(0.18))
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.35), lineWidth: 2))
+
+                // Phrase
+                achievement.displayText
+                    .font(.system(size: 64, weight: .bold, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .shadow(color: Color.black.opacity(0.55), radius: 8, x: 0, y: 3)
+                    .frame(width: width * 0.82)
+                    .padding(.top, 48)
+
+                Spacer()
+
+                // Pet (static frame — no animation needed for image render)
+                PetSpriteView(grid: petGrid, dna: dna, pixelSize: 14)
+                    .padding(.bottom, 24)
+
+                // KM display (same style as HomeView)
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
+                    Text(String(format: "%.1f", todayKm))
+                        .font(.system(size: 112, weight: .black, design: .rounded))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                    Text("km")
+                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .foregroundStyle(Color(hex: "#F9703E").opacity(0.65))
+                        .padding(.bottom, 12)
+                }
+                .shadow(color: Color.black.opacity(0.55), radius: 8, x: 0, y: 3)
+                .padding(.bottom, height * 0.08)
+            }
+        }
+        .frame(width: width, height: height)
+        .clipped()
+    }
+}
+
+// MARK: – UIKit Share Sheet wrapper
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let image: UIImage
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [image], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // MARK: – Medal tutorial overlay

@@ -182,6 +182,7 @@ private let _home: [String: [AppLang: String]] = [
     "home.game_over":           [.es: "%@ se quedó sin energía...", .en: "%@ ran out of energy..."],
     "home.retry":               [.es: "Volver a intentarlo", .en: "Try again"],
     "home.achievement_dismiss": [.es: "¡Vamos!",            .en: "Let's go!"],
+    "share.button":             [.es: "Compartir",           .en: "Share"],
     "home.achievement_badge":   [.es: "DÍA %d / 66",       .en: "DAY %d / 66"],
     "home.stat_runs":           [.es: "Carreras",           .en: "Runs"],
     "home.stat_total_km":       [.es: "km totales",         .en: "Total km"],
