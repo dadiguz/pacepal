@@ -26,7 +26,8 @@ struct SplashView: View {
                     Spacer().frame(height: 28)
 
                     // Pet — anchored at same position as HomeView
-                    PetAnimationView(dna: dna, pose: .running, pixelSize: 9.07)
+                    PetAnimationView(dna: dna, pose: appState.medalEarned ? .idle : .running, pixelSize: 9.07,
+                                     accessories: appState.medalEarned ? [.medal66] : [])
                         .opacity(petAppeared ? 1 : 0)
                         .scaleEffect(petAppeared ? 1 : 0.85)
                         .animation(.spring(duration: 0.55, bounce: 0.25).delay(0.2), value: petAppeared)

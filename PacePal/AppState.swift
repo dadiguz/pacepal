@@ -335,28 +335,39 @@ final class AppState {
     /// Renders the pet sprite as PNG data using UIGraphicsImageRenderer (main app process only).
     private func renderPetPNG(dna: PetDNA, energy: Double) -> Data? {
         let pose: PetPose
-        if energy <= 0         { pose = .dead  }
-        else if energy <= 0.14 { pose = .dizzy }
-        else if energy <= 0.25 { pose = .sad   }
-        else if energy <= 0.50 { pose = .angry }
-        else if energy <= 0.90 { pose = .idle  }
-        else if energy <= 0.95 { pose = .happy }
-        else if energy <  0.99 { pose = .jump  }
-        else                   { pose = .hype  }
+        if medalEarned              { pose = .idle  }
+        else if energy <= 0         { pose = .dead  }
+        else if energy <= 0.14      { pose = .dizzy }
+        else if energy <= 0.25      { pose = .sad   }
+        else if energy <= 0.50      { pose = .angry }
+        else if energy <= 0.90      { pose = .idle  }
+        else if energy <= 0.95      { pose = .happy }
+        else if energy <  0.99      { pose = .jump  }
+        else                        { pose = .hype  }
 
+        let accessories: [PetAccessory] = medalEarned ? [.medal66] : []
         let grid = buildCharacterGrid(dna: dna, pose: pose, frame: 0)
         let pixelSize: CGFloat = 5
         let size = CGFloat(GRID_SIZE) * pixelSize
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
         let img = renderer.image { ctx in
             let cgCtx = ctx.cgContext
+            let hideGold = !accessories.isEmpty
             for y in 0..<GRID_SIZE {
                 for x in 0..<GRID_SIZE {
-                    guard let color = colorForCell(grid[y][x], gx: x, gy: y, dna: dna) else { continue }
+                    let cell = grid[y][x]
+                    if hideGold && cell == .gold { continue }
+                    guard let color = colorForCell(cell, gx: x, gy: y, dna: dna) else { continue }
                     cgCtx.setFillColor(UIColor(color).cgColor)
                     cgCtx.fill(CGRect(x: CGFloat(x) * pixelSize, y: CGFloat(y) * pixelSize,
                                       width: pixelSize, height: pixelSize))
                 }
+            }
+            // Draw accessories
+            for p in accessoryPixels(for: accessories, bodyCx: Int(dna.bodyCx), bodyCy: Int(dna.bodyCy)) {
+                cgCtx.setFillColor(CGColor(srgbRed: CGFloat(p.r)/255, green: CGFloat(p.g)/255, blue: CGFloat(p.b)/255, alpha: 1))
+                cgCtx.fill(CGRect(x: CGFloat(p.x) * pixelSize, y: CGFloat(p.y) * pixelSize,
+                                  width: pixelSize, height: pixelSize))
             }
         }
         return img.pngData()

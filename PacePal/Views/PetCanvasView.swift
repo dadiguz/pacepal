@@ -150,6 +150,26 @@ private func spriteFor(_ accessory: PetAccessory) -> AccessorySprite {
     }
 }
 
+/// Returns accessory pixel data for external renderers (e.g. widget PNG).
+/// Each entry: (gridX, gridY, r, g, b) for frame 0.
+func accessoryPixels(for accessories: [PetAccessory], bodyCx: Int, bodyCy: Int) -> [(x: Int, y: Int, r: UInt8, g: UInt8, b: UInt8)] {
+    var result: [(x: Int, y: Int, r: UInt8, g: UInt8, b: UInt8)] = []
+    for acc in accessories {
+        let sprite = spriteFor(acc)
+        let pixels = sprite.frames[0]
+        for (row, line) in pixels.enumerated() {
+            for (col, pixel) in line.enumerated() {
+                guard let p = pixel else { continue }
+                let gx = bodyCx + sprite.offsetX + col
+                let gy = bodyCy + sprite.offsetY + row
+                guard gx >= 0, gx < GRID_SIZE, gy >= 0, gy < GRID_SIZE else { continue }
+                result.append((gx, gy, p.r, p.g, p.b))
+            }
+        }
+    }
+    return result
+}
+
 // MARK: - Single-frame canvas
 struct PetSpriteView: View {
     let grid: PetGrid
