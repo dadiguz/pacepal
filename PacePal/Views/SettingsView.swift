@@ -446,20 +446,29 @@ struct BackgroundPickerSheet: View {
         (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
     }
 
+    // Tile layout: 0 = default gradient, 1 = solid black, 2..24 = achievement backgrounds
+    private let solidBlackIndex = 1
+    private let achievementOffset = 2 // achievement tiles start at this index
+
     private func isUnlocked(_ index: Int) -> Bool {
-        guard index >= 1 && index <= Achievement.all.count else { return true } // 0 = default always unlocked
+        if index <= solidBlackIndex { return true } // default + black always unlocked
+        let achIdx = index - achievementOffset
+        guard achIdx >= 0 && achIdx < Achievement.all.count else { return true }
         guard appState.challengeStarted else { return false }
-        return currentDay >= Achievement.all[index - 1].day
+        return currentDay >= Achievement.all[achIdx].day
     }
 
-    private func imageName(for index: Int) -> String? {
-        guard index >= 1 else { return nil }
-        return String(format: "background_%02d", index)
+    private func backgroundValue(for index: Int) -> String? {
+        if index == 0 { return nil } // default gradient
+        if index == solidBlackIndex { return "solid_black" }
+        return String(format: "background_%02d", index - achievementOffset + 1)
     }
 
     private var selectedIndex: Int? {
         guard let bg = appState.selectedBackground else { return 0 }
-        return Achievement.all.first { String(format: "background_%02d", $0.index) == bg }?.index
+        if bg == "solid_black" { return solidBlackIndex }
+        return Achievement.all.first { String(format: "background_%02d", $0.index) == bg }
+            .map { $0.index + achievementOffset - 1 }
     }
 
     var body: some View {
@@ -492,22 +501,31 @@ struct BackgroundPickerSheet: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
-                    // Index 0 = default background
-                    ForEach(0...23, id: \.self) { index in
+                    // Index 0 = default, 1 = solid black, 2..24 = achievement backgrounds
+                    ForEach(0...24, id: \.self) { index in
                         let unlocked = isUnlocked(index)
                         let isSelected = selectedIndex == index
-                        let name = imageName(for: index)
+                        let bgValue = backgroundValue(for: index)
 
                         Button {
                             guard unlocked else { return }
                             withAnimation(.spring(duration: 0.25)) {
-                                appState.selectBackground(name)
+                                appState.selectBackground(bgValue)
                             }
                         } label: {
                             ZStack {
                                 // Thumbnail
-                                if let name {
-                                    Image(name)
+                                if bgValue == "solid_black" {
+                                    ZStack {
+                                        Color(hex: "#2B2420")
+                                        RadialGradient(
+                                            colors: [Color(hex: "#F9703E").opacity(0.30), .clear],
+                                            center: .init(x: 0.5, y: 0.15),
+                                            startRadius: 0, endRadius: 80
+                                        )
+                                    }
+                                } else if let bgValue {
+                                    Image(bgValue)
                                         .resizable()
                                         .scaledToFill()
                                         .clipped()
@@ -530,8 +548,9 @@ struct BackgroundPickerSheet: View {
                                         Image(systemName: "lock.fill")
                                             .font(.system(size: 16, weight: .semibold))
                                             .foregroundStyle(.white)
-                                        if index >= 1 && index <= Achievement.all.count {
-                                            Text(L("common.day_n", Achievement.all[index - 1].day))
+                                        let achIdx = index - achievementOffset
+                                        if achIdx >= 0 && achIdx < Achievement.all.count {
+                                            Text(L("common.day_n", Achievement.all[achIdx].day))
                                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white.opacity(0.85))
                                         }
@@ -554,12 +573,13 @@ struct BackgroundPickerSheet: View {
                                     }
                                 }
 
-                                // Day label for unlocked (non-default)
-                                if unlocked && index >= 1 {
+                                // Day label for unlocked achievement tiles
+                                let achIdx = index - achievementOffset
+                                if unlocked && achIdx >= 0 && achIdx < Achievement.all.count {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text(L("common.day_n", Achievement.all[index - 1].day))
+                                            Text(L("common.day_n", Achievement.all[achIdx].day))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                                                 .foregroundStyle(.white)
                                                 .shadow(color: .black.opacity(0.6), radius: 2)
@@ -573,17 +593,17 @@ struct BackgroundPickerSheet: View {
                                     }
                                 }
 
-                                // "Original" label for default tile
-                                if index == 0 {
+                                // Label for default and black tiles
+                                if index == 0 || index == solidBlackIndex {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text(L("settings.original"))
+                                            Text(L(index == 0 ? "settings.original" : "settings.black"))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
-                                                .foregroundStyle(Color(hex: "#4A3F35"))
+                                                .foregroundStyle(index == 0 ? Color(hex: "#4A3F35") : .white.opacity(0.85))
                                                 .padding(.horizontal, 5)
                                                 .padding(.vertical, 3)
-                                                .background(Color.white.opacity(0.70))
+                                                .background(index == 0 ? Color.white.opacity(0.70) : Color.white.opacity(0.15))
                                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                             Spacer()
                                         }

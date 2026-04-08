@@ -12,7 +12,7 @@
 | 6 | Estado Sleep del monito (3) | Media | Pendiente |
 | 7 | Medalla 66 dias (2) | Media | ✅ Done |
 | 8 | Soporte millas (km/mi) | Media | Pendiente |
-| 9 | Fondo negro seleccionable | Baja | Pendiente |
+| 9 | Fondo negro seleccionable | Baja | ✅ Completado |
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
 | 12 | Compartir (share) | Media | Pendiente |
@@ -143,11 +143,13 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 
 ---
 
-## 8. Fondo Negro Seleccionable
-**Prioridad:** Baja | **Complejidad:** Baja
+## 8. Fondo Negro Seleccionable ✅
+**Prioridad:** Baja | **Complejidad:** Baja | **Estado:** Completado
 
-- [ ] Agregar opcion de fondo negro en el BackgroundPickerSheet (igual que el blanco pero negro)
-- [ ] Ajustar textos/iconos para que sean legibles sobre fondo oscuro
+- [x] Tile "Negro" en BackgroundPickerSheet (index 1, siempre desbloqueado, junto al Original)
+- [x] `AppBackground` maneja `"solid_black"` como fondo negro puro
+- [x] Textos/iconos usan estilos claros (misma logica que photo backgrounds via `hasPhotoBackground`)
+- [x] Strings en es/en (`settings.black`)
 
 ---
 

@@ -341,7 +341,15 @@ struct AppBackground: View {
 
     var body: some View {
         ZStack {
-            if let imageName {
+            if imageName == "solid_black" {
+                Color(hex: "#2B2420")
+                RadialGradient(
+                    colors: [Color(hex: "#F9703E").opacity(0.18), .clear],
+                    center: .init(x: 0.5, y: 0.25),
+                    startRadius: 0,
+                    endRadius: 400
+                )
+            } else if let imageName {
                 Image(imageName)
                     .resizable()
                     .scaledToFill()

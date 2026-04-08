@@ -247,6 +247,7 @@ private let _settings: [String: [AppLang: String]] = [
     "settings.backgrounds_subtitle": [.es: "Desbloqueas nuevos fondos al alcanzar cada logro",
                                       .en: "You unlock new backgrounds by reaching each milestone"],
     "settings.original":            [.es: "Original",          .en: "Original"],
+    "settings.black":               [.es: "Negro",             .en: "Black"],
 ]
 
 // MARK: - Tutorial
