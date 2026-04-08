@@ -16,6 +16,8 @@
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
 | 12 | Compartir (share) | Media | Pendiente |
+| 13 | Tips diarios de correr (12) | Media | Pendiente |
+| 14 | Parpadeo rojo al colapsar (13) | Baja | Pendiente |
 
 ---
 
@@ -176,3 +178,29 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 - [ ] Agregar boton de compartir en HomeView o PetStatusSheet
 - [ ] Generar imagen con el monito, stats (energia, dia, km) y branding PacePal
 - [ ] Usar ShareLink o UIActivityViewController para compartir a redes sociales, mensajes, etc.
+
+---
+
+## 12. Tips Diarios de Correr
+**Prioridad:** Media | **Complejidad:** Alta
+
+66 tips de running, uno por dia del challenge. Se muestran en un modal similar al de logros.
+
+- [ ] 66 tips de running en es/en (tecnica, hidratacion, calentamiento, descanso, motivacion, etc.)
+- [ ] Modal tipo logro que aparece una vez al dia al abrir la app (despues del tip del dia correspondiente)
+- [ ] Nueva animacion del monito: pose `.teaching` — con lentes y escribiendo en un cuaderno
+- [ ] Persistir tips vistos en UserDefaults/AppState
+- [ ] Seccion "Tips" accesible desde Settings o HistoryView para revisar tips anteriores (solo los ya desbloqueados)
+- [ ] Strings en es/en
+
+---
+
+## 13. Parpadeo Rojo al Colapsar
+**Prioridad:** Baja | **Complejidad:** Baja
+
+Cuando el monito esta colapsando (energia = 0 / pose `.dead`), el fondo parpadea rojo como alerta visual.
+
+- [ ] Detectar estado de colapso (energy <= 0)
+- [ ] Overlay rojo semi-transparente con animacion de pulso/parpadeo sobre el fondo actual
+- [ ] Sutil (no agresivo) — opacidad baja con easing suave
+- [ ] Se detiene cuando la energia sube de 0
