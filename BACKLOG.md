@@ -7,21 +7,27 @@
 | 1 | Fix boton HealthKit (5a) | Critica | Pendiente |
 | 2 | Revisar logica 66 dias (4) | Alta | Pendiente |
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
-| 4 | Internacionalizacion ingles (1) | Alta | Pendiente |
+| 4 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 5 | Estado Sleep del monito (3) | Media | Pendiente |
 | 6 | Medalla 66 dias (2) | Media | Pendiente |
+| 7 | Soporte millas (km/mi) | Media | Pendiente |
+| 8 | Fondo negro seleccionable | Baja | Pendiente |
+| 9 | Paletas de color custom para monitos | Baja | Pendiente |
+| 10 | Cambio de idioma en Settings | Media | Pendiente |
 
 ---
 
-## 1. Internacionalizacion (i18n) - Idioma Ingles
-**Prioridad:** Alta | **Complejidad:** Media-Alta
+## 1. Internacionalizacion (i18n) - Idioma Ingles ✅
+**Prioridad:** Alta | **Complejidad:** Media-Alta | **Estado:** Completado
 
-- [ ] Crear sistema de localizacion con `Localizable.strings` (es/en)
-- [ ] Crear helper o extension de `String` para hacer el sistema extensible a futuros idiomas
-- [ ] Extraer todos los textos hardcodeados de Views, AppState, RunningPhrases, NotificationManager, Widget
-- [ ] Traducir al ingles: UI, frases motivacionales, logros, tutoriales, textos del widget
-- [ ] Actualizar `Info.plist` con descripciones en ambos idiomas
-- [ ] El idioma se selecciona automaticamente segun el dispositivo
+- [x] Sistema de localizacion con diccionario Swift inline (`Localized.swift`) — `L()` para app, `WL()` para widget
+- [x] `AppLang` enum extensible a futuros idiomas (solo agregar case + traducciones)
+- [x] Extraidos todos los textos de: Views, AppState, RunningPhrases, NotificationManager, Widget, PetTypes
+- [x] Traducido al ingles: UI completa, 300 frases motivacionales, 23 logros, tutorial, widget, archetypes
+- [x] Idioma se selecciona automaticamente segun el dispositivo
+- [ ] Pendiente: Localizar `Info.plist` (NSHealthShareUsageDescription, NSHealthUpdateUsageDescription)
+
+> **NOTA PARA AGENTS:** Cualquier texto nuevo que se agregue al proyecto debe incluirse en **todos los idiomas disponibles** (es/en) en `Localized.swift` usando `L()`. Nunca hardcodear strings en español o inglés directamente en las vistas.
 
 ---
 
@@ -95,3 +101,38 @@ Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `ch
 - [ ] Usar CoreLocation para tracking de distancia (no depende de HealthKit)
 - [ ] Los KM trackeados se suman a la energia igual que los de HealthKit
 - [ ] Permite que la app funcione sin permisos de HealthKit
+
+---
+
+## 7. Soporte Millas (km/mi)
+**Prioridad:** Media | **Complejidad:** Baja-Media
+
+- [ ] Agregar opcion en Settings para elegir unidad de distancia (km o millas)
+- [ ] Persistir preferencia en UserDefaults
+- [ ] Convertir todas las visualizaciones de distancia (HomeView, HistoryView, Widget, Tracker)
+- [ ] Mantener almacenamiento interno siempre en km, solo convertir al mostrar
+
+---
+
+## 8. Fondo Negro Seleccionable
+**Prioridad:** Baja | **Complejidad:** Baja
+
+- [ ] Agregar opcion de fondo negro en el BackgroundPickerSheet (igual que el blanco pero negro)
+- [ ] Ajustar textos/iconos para que sean legibles sobre fondo oscuro
+
+---
+
+## 9. Paletas de Color Custom para Monitos
+**Prioridad:** Baja | **Complejidad:** Por definir
+
+- [ ] Agregar paletas de color especificas (por definir cuales)
+- [ ] Integrar en CharacterSelectView o Settings como opcion de personalizacion
+
+---
+
+## 10. Cambio de Idioma en Settings
+**Prioridad:** Media | **Complejidad:** Baja
+
+- [ ] Agregar selector de idioma en SettingsView (Espanol / English)
+- [ ] Persistir preferencia en UserDefaults y que `AppLang.current` la respete sobre el idioma del dispositivo
+- [ ] Refrescar toda la UI al cambiar idioma
