@@ -941,7 +941,7 @@ private struct AchievementModal: View {
                         .padding(.bottom, 32)
 
                     // Buttons
-                    VStack(spacing: 12) {
+                    HStack(spacing: 12) {
                         // Share button (first time only)
                         if isFirstTime {
                             Button {
@@ -954,19 +954,19 @@ private struct AchievementModal: View {
                                     showShareSheet = true
                                 }
                             } label: {
-                                HStack(spacing: 8) {
+                                HStack(spacing: 6) {
                                     if isRendering {
                                         ProgressView()
                                             .tint(Color(hex: "#F9703E"))
                                     } else {
                                         Image(systemName: "square.and.arrow.up")
-                                            .font(.system(size: 15, weight: .semibold))
+                                            .font(.system(size: 14, weight: .semibold))
                                     }
                                     Text(L("share.button"))
-                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 }
-                                .padding(.horizontal, 36)
-                                .padding(.vertical, 14)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
                             }
                             .foregroundStyle(Color(hex: "#F9703E"))
                             .background(.white)
@@ -979,8 +979,8 @@ private struct AchievementModal: View {
                         // CTA
                         Button(action: onDismiss) {
                             Text(L("home.achievement_dismiss"))
-                                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                                .padding(.horizontal, 48)
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                         }
                         .foregroundStyle(.white)
@@ -990,6 +990,7 @@ private struct AchievementModal: View {
                         .opacity(appeared ? 1 : 0)
                         .animation(.easeOut(duration: 0.3).delay(0.3), value: appeared)
                     }
+                    .padding(.horizontal, 32)
                     .padding(.bottom, 56)
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
