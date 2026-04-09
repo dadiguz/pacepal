@@ -66,6 +66,12 @@ struct RootView: View {
                         insertion: .move(edge: .trailing),
                         removal: .move(edge: .leading)
                     ))
+            } else if !appState.questionnaireCompleted {
+                QuestionnaireView()
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing),
+                        removal: .move(edge: .leading)
+                    ))
             } else if !appState.paywallDismissed {
                 PaywallView()
                     .transition(.asymmetric(
@@ -100,6 +106,7 @@ struct RootView: View {
         }
         .animation(.easeInOut(duration: 0.4), value: appState.onboardingCompleted)
         .animation(.easeInOut(duration: 0.4), value: appState.selectedCharacter?.id)
+        .animation(.easeInOut(duration: 0.4), value: appState.questionnaireCompleted)
         .animation(.easeInOut(duration: 0.4), value: appState.paywallDismissed)
         .animation(.easeInOut(duration: 0.4), value: appState.healthPermissionDone)
         .animation(.easeInOut(duration: 0.4), value: appState.notificationPermissionDone)

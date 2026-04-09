@@ -80,30 +80,40 @@ struct Achievement: Identifiable, Equatable {
     ]
 }
 
-// MARK: - Difficulty
+// MARK: - Challenge level
 
-enum Difficulty: String, CaseIterable {
-    case pequeñines = "pequeñines"
-    case pro        = "pro"
+enum ChallengeLevel: String, CaseIterable {
+    case habito      = "habito"
+    case resistencia = "resistencia"
+    case rendimiento = "rendimiento"
 
-    var decaySeconds: Double {
+    /// Energy gained per km run (fraction 0–1)
+    var energyPerKm: Double {
         switch self {
-        case .pequeñines: return 7 * 24 * 3600   // 7 days
-        case .pro:        return 36 * 3600         // 36 hours
+        case .habito:      return 0.15   // 1 km = 15%, ~6.7 km to fill
+        case .resistencia: return 0.10   // 1 km = 10%, 10 km to fill
+        case .rendimiento: return 0.07   // 1 km = 7%,  ~14 km to fill
         }
     }
 
-    var label: String {
+    var label: String { L("level.\(rawValue).label") }
+    var subtitle: String { L("level.\(rawValue).subtitle") }
+
+    /// SF Symbol name for this level
+    var icon: String {
         switch self {
-        case .pequeñines: return L("difficulty.casual_label")
-        case .pro:        return L("difficulty.pro_label")
+        case .habito:      return "leaf.fill"
+        case .resistencia: return "flame.fill"
+        case .rendimiento: return "bolt.fill"
         }
     }
 
-    var subtitle: String {
+    /// Accent color for this level
+    var color: Color {
         switch self {
-        case .pequeñines: return L("difficulty.casual_subtitle")
-        case .pro:        return L("difficulty.pro_subtitle")
+        case .habito:      return Color(hex: "#27AB83")  // teal-green
+        case .resistencia: return Color(hex: "#F9703E")  // orange
+        case .rendimiento: return Color(hex: "#FADB5F")  // electric yellow
         }
     }
 }
@@ -121,10 +131,16 @@ final class AppState {
     // Date when the 66-day challenge started
     private(set) var challengeStartDate: Date
 
-    // Difficulty mode
-    var difficulty: Difficulty {
-        didSet { UserDefaults.standard.set(difficulty.rawValue, forKey: "difficulty") }
+    // Challenge level (determines energyPerKm)
+    var challengeLevel: ChallengeLevel {
+        didSet { UserDefaults.standard.set(challengeLevel.rawValue, forKey: "challengeLevel") }
     }
+
+    // Completed run days (days with >= 0.5 km)
+    private(set) var completedDays: Int
+
+    // True once the user finishes the questionnaire
+    private(set) var questionnaireCompleted: Bool
 
     // Onboarding & paywall state
     private(set) var onboardingCompleted: Bool
@@ -153,15 +169,17 @@ final class AppState {
     // True once the 66-day challenge is completed — stops energy decay permanently
     private(set) var medalEarned: Bool
 
-    /// Seconds from 100% to 0% — driven by difficulty
-    var decaySeconds: Double { difficulty.decaySeconds }
+    /// Seconds from 100% to 0% — fixed at 48 hours for all levels
+    let decaySeconds: Double = 48 * 3600
 
     init() {
         self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
         self.kmCountedForEnergy = UserDefaults.standard.double(forKey: "kmCountedForEnergy")
         self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
-        let diffStr = UserDefaults.standard.string(forKey: "difficulty") ?? Difficulty.pro.rawValue
-        self.difficulty = Difficulty(rawValue: diffStr) ?? .pro
+        let lvlStr = UserDefaults.standard.string(forKey: "challengeLevel") ?? ChallengeLevel.habito.rawValue
+        self.challengeLevel = ChallengeLevel(rawValue: lvlStr) ?? .habito
+        self.completedDays = UserDefaults.standard.integer(forKey: "completedDays")
+        self.questionnaireCompleted = UserDefaults.standard.bool(forKey: "questionnaireCompleted")
         self.soundsEnabled = UserDefaults.standard.object(forKey: "soundsEnabled") as? Bool ?? true
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
@@ -218,10 +236,10 @@ final class AppState {
         UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
     }
 
-    /// 1 km = 10% energy, capped at 100%.
+    /// Energy per km depends on challenge level, capped at 100%.
     func addEnergy(km: Double, at date: Date = Date()) {
         let current    = energy(at: date)
-        let target     = min(1.0, current + km * 0.10)
+        let target     = min(1.0, current + km * challengeLevel.energyPerKm)
         let newElapsed = (1.0 - target) * decaySeconds
         energyResetDate = date.addingTimeInterval(-newElapsed)
         UserDefaults.standard.set(energyResetDate, forKey: "energyResetDate")
@@ -266,11 +284,21 @@ final class AppState {
         UserDefaults.standard.set(true, forKey: "challengeStarted")
     }
 
+    func updateCompletedDays(_ count: Int) {
+        completedDays = count
+        UserDefaults.standard.set(count, forKey: "completedDays")
+    }
+
+    func completeQuestionnaire(level: ChallengeLevel) {
+        challengeLevel = level
+        questionnaireCompleted = true
+        UserDefaults.standard.set(true, forKey: "questionnaireCompleted")
+    }
+
     // Returns the first milestone that's been reached but not yet shown
     var pendingAchievement: Achievement? {
         guard challengeStarted else { return nil }
-        let dayNum = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
-        return Achievement.all.first { dayNum >= $0.day && !seenAchievements.contains($0.day) }
+        return Achievement.all.first { completedDays >= $0.day && !seenAchievements.contains($0.day) }
     }
 
     func selectBackground(_ name: String?) {
@@ -286,12 +314,12 @@ final class AppState {
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
     }
 
-    /// Returns the tip number (1-66) for the current day if not yet seen, nil otherwise.
+    /// Returns the tip number (1-66) for the current completed-day count if not yet seen, nil otherwise.
     var pendingTip: Int? {
         guard challengeStarted else { return nil }
-        let dayNum = min(66, max(1, (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1))
-        guard !seenTips.contains(dayNum) else { return nil }
-        return dayNum
+        let tipDay = min(66, max(1, completedDays))
+        guard !seenTips.contains(tipDay) else { return nil }
+        return tipDay
     }
 
     func markTipSeen(_ day: Int) {
@@ -309,12 +337,11 @@ final class AppState {
     #if DEBUG
     /// Shifts the challenge start date backwards and auto-marks passed milestones as seen.
     func shiftChallengeDay(by days: Int) {
-        challengeStartDate = Calendar.current.date(byAdding: .day, value: -days, to: challengeStartDate) ?? challengeStartDate
-        UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
-        let dayNum = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
+        completedDays = min(66, completedDays + days)
+        UserDefaults.standard.set(completedDays, forKey: "completedDays")
         // Mark all reached milestones except the most recent one as seen,
         // so the latest milestone stays pending and the modal can trigger.
-        let reached = Achievement.all.filter { $0.day <= dayNum }
+        let reached = Achievement.all.filter { $0.day <= completedDays }
         var updated = seenAchievements
         for a in reached.dropLast() { updated.insert(a.day) }
         seenAchievements = updated
@@ -341,15 +368,20 @@ final class AppState {
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
         kmCountedForEnergy = 0
         UserDefaults.standard.set(0.0, forKey: "kmCountedForEnergy")
+        completedDays = 0
+        UserDefaults.standard.set(0, forKey: "completedDays")
         seenAchievements = []
         UserDefaults.standard.set([] as [Int], forKey: "seenAchievements")
         challengeStarted = false
         UserDefaults.standard.set(false, forKey: "challengeStarted")
         medalEarned = false
         UserDefaults.standard.set(false, forKey: "medalEarned")
+        seenTips = []
+        UserDefaults.standard.removeObject(forKey: "seenTips")
         isFirstRunForCharacter = true
         selectedBackground = nil
         UserDefaults.standard.removeObject(forKey: "selectedBackground")
+        // questionnaireCompleted intentionally kept — user keeps their level when switching characters
         syncToWidget(km: 0)
     }
 
@@ -414,11 +446,10 @@ final class AppState {
         }
         let currentEnergy = energy(at: Date())
         d.set(energyResetDate, forKey: "w_energyResetDate")
-        d.set(difficulty.decaySeconds, forKey: "w_decaySeconds")
+        d.set(decaySeconds, forKey: "w_decaySeconds")
         d.set(dnaData, forKey: "w_petDNAData")
         d.set(km, forKey: "w_todayKm")
-        let day = (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1
-        d.set(day, forKey: "w_challengeDay")
+        d.set(completedDays, forKey: "w_challengeDay")
         d.set(medalEarned, forKey: "w_medalEarned")
         // Write PNG to shared file (more reliable than UserDefaults for binary data)
         let spriteURL = FileManager.default
@@ -426,7 +457,7 @@ final class AppState {
             .appendingPathComponent("petSprite.png")
         if let pngData = renderPetPNG(dna: dna, energy: currentEnergy), let url = spriteURL {
             try? pngData.write(to: url, options: .atomic)
-            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(day), dna \(dna.name), imagen \(pngData.count)b → \(url.lastPathComponent)")
+            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(completedDays), dna \(dna.name), imagen \(pngData.count)b → \(url.lastPathComponent)")
         } else {
             if let url = spriteURL { try? FileManager.default.removeItem(at: url) }
             print("⚠️ syncToWidget: escrito — sin imagen — energía \(Int(currentEnergy * 100))%, dna \(dna.name)")

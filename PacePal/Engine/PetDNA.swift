@@ -85,11 +85,11 @@ struct PetDNA: Identifiable, Codable {
                                .capuchin, .fox, .lion, .domo, .pou, .dog, .tiger, .panda,
                                .corgi, .dragon])
         } else if earTopY >= 3 {
-            animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .duck, .axolotl, .smooth,
+            animalType = pick([.bear, .bear, .raccoon, .raccoon, .frog, .axolotl, .smooth,
                                .capuchin, .mandrill, .fox, .lion, .domo, .pou, .dog, .tiger, .panda,
                                .dragon])
         } else {
-            animalType = pick([.frog, .frog, .raccoon, .duck, .smooth, .mandrill])
+            animalType = pick([.frog, .frog, .raccoon, .smooth, .mandrill])
         }
 
         let earSp     = (bodyRx * 0.5).rounded()
@@ -206,7 +206,7 @@ struct PetDNA: Identifiable, Codable {
                    spots: [PetSpot(dx:-1,dy:2,colorIndex:0), PetSpot(dx:2,dy:-1,colorIndex:1),
                            PetSpot(dx:-3,dy:0,colorIndex:0), PetSpot(dx:1,dy:3,colorIndex:1),
                            PetSpot(dx:-2,dy:-2,colorIndex:0), PetSpot(dx:3,dy:2,colorIndex:1)],
-                   palette: { var p = PALETTES[11]; p.accent1 = "#9AA5B4"; p.accent2 = "#E2E8F0"; return p }(),
+                   palette: { var p = PetPalette("slate", body: "#1F2933", shade: "#3E4C59", face: "#F0F4F8", eyeP: "#1F2933", cheek: "#F35627"); p.accent1 = "#9AA5B4"; p.accent2 = "#E2E8F0"; return p }(),
                    name: ""),
 
             // Mouse – Gengar purple

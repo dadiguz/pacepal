@@ -82,6 +82,7 @@ struct CharacterSelectView: View {
 
                     Spacer()
 
+                    paletteStrip.padding(.bottom, 16)
                     characterStrip.padding(.bottom, 8)
                     pageDots.padding(.bottom, 28)
 
@@ -363,6 +364,54 @@ struct CharacterSelectView: View {
             withAnimation(.linear(duration: 8.5).repeatForever(autoreverses: false)) {
                 glowAngle2 = 360
             }
+        }
+    }
+
+    // MARK: – Palette strip
+
+    private var paletteStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(PALETTES, id: \.name) { palette in
+                    let isSelected = selected.palette.name == palette.name
+                    ZStack {
+                        Circle()
+                            .fill(Color(hex: palette.body))
+                            .frame(width: 32, height: 32)
+                        // Face color dot
+                        Circle()
+                            .fill(Color(hex: palette.face))
+                            .frame(width: 13, height: 13)
+                            .offset(x: 6, y: -6)
+                        // Selection ring
+                        if isSelected {
+                            Circle()
+                                .strokeBorder(Color(hex: palette.body), lineWidth: 2)
+                                .frame(width: 40, height: 40)
+                        }
+                    }
+                    .frame(width: 40, height: 40)
+                    .onTapGesture {
+                        var updated = characters[selectedIndex]
+                        updated.palette = PetPalette(
+                            palette.name,
+                            body: palette.body, shade: palette.shade,
+                            face: palette.face, eyeP: palette.eyeP,
+                            cheek: palette.cheek,
+                            accent1: updated.palette.accent1,
+                            accent2: updated.palette.accent2
+                        )
+                        characters[selectedIndex] = updated
+                        SoundManager.shared.play(.select, enabled: appState.soundsEnabled)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            SoundManager.shared.stopSFX()
+                        }
+                    }
+                    .animation(.spring(duration: 0.25), value: isSelected)
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 4)
         }
     }
 

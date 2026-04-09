@@ -14,7 +14,7 @@
 | 7 | Medalla 66 dias (2) | Media | ✅ Done |
 | 8 | Soporte millas (km/mi) | Media | Movido a P2 |
 | 9 | Fondo negro seleccionable | Baja | ✅ Completado |
-| 10 | Paletas de color custom para monitos | Baja | Pendiente |
+| 10 | Paletas de color custom para monitos | Baja | ✅ Completado |
 | 11 | Cambio de idioma en Settings | Media | ✅ Completado |
 | 12 | Compartir logro (share) | Media | ✅ Completado |
 | 13 | Tips diarios de correr (12) | Media | ✅ Completado |

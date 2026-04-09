@@ -45,8 +45,18 @@ struct HistoryView: View {
     private var projectedFinish: String {
         let remaining = totalDays - completedCount
         guard remaining > 0 else { return L("history.challenge_complete") }
+        let daysElapsed = todayIndex + 1
+        // Estimate calendar days needed to reach remaining runs, based on actual run rate.
+        // If no runs logged yet, assume 1 run/day as baseline.
+        let daysNeeded: Int
+        if completedCount > 0 {
+            let rate = Double(completedCount) / Double(daysElapsed)   // runs per calendar day
+            daysNeeded = Int(ceil(Double(remaining) / rate))
+        } else {
+            daysNeeded = remaining
+        }
         let today = Calendar.current.startOfDay(for: Date())
-        if let finish = Calendar.current.date(byAdding: .day, value: remaining, to: today) {
+        if let finish = Calendar.current.date(byAdding: .day, value: daysNeeded, to: today) {
             let fmt = DateFormatter()
             fmt.locale = Locale(identifier: AppLang.current == .en ? "en_US" : "es_MX")
             fmt.dateFormat = AppLang.current == .en ? "MMMM d" : "d 'de' MMMM"

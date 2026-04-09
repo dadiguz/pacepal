@@ -95,7 +95,7 @@ final class HealthManager {
         let today = cal.startOfDay(for: now)
         var runs = 0, currentStreak = 0, best = 0
         while day <= today {
-            if (dayKm[day] ?? 0) > 0.05 {
+            if (dayKm[day] ?? 0) >= 0.5 {
                 runs += 1
                 currentStreak += 1
                 best = max(best, currentStreak)

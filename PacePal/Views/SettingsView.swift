@@ -15,6 +15,7 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var showLanguagePicker = false
     @State private var langRefresh = UUID()
+    @State private var showLevelPicker = false
 
     #if DEBUG
     @State private var debugNow: Date = Date()
@@ -107,6 +108,16 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
 
+                    // ── Challenge level selector ─────────────────────────
+                    settingsRow(
+                        icon: "flame.fill",
+                        iconColor: "#F9703E",
+                        title: L("settings.level_title"),
+                        subtitle: appState.challengeLevel.label
+                    ) {
+                        showLevelPicker = true
+                    }
+
                     // ── Language selector ────────────────────────────────
                     settingsRow(
                         icon: "globe",
@@ -176,6 +187,12 @@ struct SettingsView: View {
             PaywallView()
                 .environment(appState)
                 .environment(store)
+        }
+        .sheet(isPresented: $showLevelPicker) {
+            LevelPickerSheet()
+                .environment(appState)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showLanguagePicker, onDismiss: { langRefresh = UUID() }) {
             LanguagePickerSheet()
@@ -326,7 +343,6 @@ struct SettingsView: View {
             }
 
             // Day controls
-            let dayNum = (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
             HStack(spacing: 6) {
                 Button {
                     appState.resetChallengeToToday()
@@ -384,7 +400,7 @@ struct SettingsView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
                 }
 
-                Text("DÍA \(dayNum)")
+                Text("DÍA \(appState.completedDays)")
                     .font(.system(size: 11, weight: .black, design: .monospaced))
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
@@ -438,6 +454,28 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
             }
+
+            // Questionnaire reset
+            Button {
+                UserDefaults.standard.set(false, forKey: "questionnaireCompleted")
+                withAnimation(.spring(duration: 0.4)) {
+                    appState.selectedCharacter = nil
+                }
+                dismiss()
+            } label: {
+                Text("📋 Reset cuestionario")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(hex: "#E12D39"))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+            }
+
+            Text("DÍAS COMPLETADOS: \(appState.completedDays)")
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
         }
     }
     #endif
@@ -490,9 +528,7 @@ struct BackgroundPickerSheet: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
-    private var currentDay: Int {
-        (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
-    }
+    private var currentDay: Int { appState.completedDays }
 
     // Tile layout: 0 = default gradient, 1 = solid black, 2 = pattern, 3..25 = achievement backgrounds
     private let solidBlackIndex = 1
@@ -698,9 +734,7 @@ struct TipsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTipDay: Int? = nil
 
-    private var currentDay: Int {
-        (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
-    }
+    private var currentDay: Int { appState.completedDays }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -870,6 +904,79 @@ private struct LanguagePickerSheet: View {
                     .strokeBorder(isSelected ? Color(hex: "#F9703E").opacity(0.5) : Color(hex: "#E2E8F0"), lineWidth: isSelected ? 1.5 : 1)
             )
         }
+    }
+}
+
+// MARK: - Level Picker Sheet
+
+struct LevelPickerSheet: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(L("settings.level_title"))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .padding(8)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 20)
+
+            VStack(spacing: 8) {
+                ForEach(ChallengeLevel.allCases, id: \.rawValue) { level in
+                    let isSelected = appState.challengeLevel == level
+                    Button {
+                        appState.challengeLevel = level
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: level.icon)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(level.color)
+                                .frame(width: 28)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(level.label)
+                                    .font(.system(size: 16, weight: isSelected ? .semibold : .regular, design: .rounded))
+                                    .foregroundStyle(Color(hex: "#1F2933"))
+                                Text(level.subtitle)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                            }
+                            Spacer()
+                            if isSelected {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Color(hex: "#F9703E"))
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(isSelected ? Color(hex: "#F9703E").opacity(0.5) : Color(hex: "#E2E8F0"), lineWidth: isSelected ? 1.5 : 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
+        }
+        .background(Color(hex: "#F5F8FC").ignoresSafeArea())
     }
 }
 

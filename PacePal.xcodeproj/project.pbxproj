@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0061DE2AC33314850435DCAD /* CharacterSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */; };
+		06602B9A41B14FE2A8044C3C /* QuestionnaireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942BCB968B724F5A980ADA26 /* QuestionnaireView.swift */; };
 		1B8540E3E208B4546AE2A881 /* PetPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EC1A3F0DA504608DCBFA8E /* PetPalette.swift */; };
 		1EAD1E1908DA981BFDBDF376 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1918003EAED4B99DE32E955 /* HealthKit.framework */; };
 		2DABBE3DFD0832F5A5ABF17C /* RunningPhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */; };
@@ -84,6 +85,7 @@
 		5BF0218419DD8150496DC2B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningPhrases.swift; sourceTree = "<group>"; };
 		7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
+		942BCB968B724F5A980ADA26 /* QuestionnaireView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionnaireView.swift; sourceTree = "<group>"; };
 		87722B94D0D1737F52EC447F /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayView.swift; sourceTree = "<group>"; };
 		9D24656B4F85773EF6FC7FE9 /* Pacepal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pacepal.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -243,6 +245,7 @@
 				FAFD71C59100C3272E16C7E9 /* HomeView.swift */,
 				08C361822464750003249082 /* OnboardingView.swift */,
 				87722B94D0D1737F52EC447F /* PaywallView.swift */,
+				942BCB968B724F5A980ADA26 /* QuestionnaireView.swift */,
 				AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */,
 				248137B2B6AAC42E29F22ACC /* SettingsView.swift */,
 				4EF3C2194692874670A6BB4F /* SplashView.swift */,
@@ -367,6 +370,7 @@
 				74A5B0FE1BA04E08406F3262 /* OnboardingView.swift in Sources */,
 				BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */,
 				B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */,
+				06602B9A41B14FE2A8044C3C /* QuestionnaireView.swift in Sources */,
 				BEC0C0422F7DAD82002B9B64 /* WidgetPromptView.swift in Sources */,
 				F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */,
 				65E18912F484DC7714104362 /* PetDNA.swift in Sources */,

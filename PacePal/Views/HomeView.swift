@@ -516,9 +516,6 @@ struct HomeView: View {
 
     // MARK: – Energy section (Pokémon HUD card)
     private var energySection: some View {
-        let dayNum = max(1, (Calendar.current.dateComponents([.day],
-            from: appState.challengeStartDate, to: Date()).day ?? 0) + 1)
-
         return VStack(alignment: .leading, spacing: 14) {
             // ── Name + Day row ────────────────────────────────────────────
             HStack(alignment: .firstTextBaseline) {
@@ -532,7 +529,7 @@ struct HomeView: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Color(hex: "#FFD700"))
                     }
-                    Text(L("home.day_counter", String(format: "%02d", dayNum)))
+                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, appState.completedDays + 1))))
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -918,6 +915,7 @@ private struct PetStatusSheet: View {
         } // ScrollView
         .task {
             await health.fetchRunStats(since: appState.challengeStartDate)
+            appState.updateCompletedDays(health.totalRuns)
         }
     }
 

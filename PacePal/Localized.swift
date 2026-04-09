@@ -54,7 +54,7 @@ func L(_ key: String, _ args: CVarArg...) -> String {
 private let _allStrings: [String: [AppLang: String]] = {
     var d: [String: [AppLang: String]] = [:]
     for section in [
-        _common, _difficulty,
+        _common, _challengeLevel, _questionnaire,
         _onboarding, _paywall, _healthPerm, _notifPerm, _widgetPrompt,
         _charSelect, _home, _history, _settings, _tutorial, _notifications,
         _achievements, _archetypes, _medal, _tips, _tipDetails,
@@ -72,13 +72,56 @@ private let _common: [String: [AppLang: String]] = [
     "common.day_n":             [.es: "Día %d",      .en: "Day %d"],
 ]
 
-// MARK: - Difficulty
+// MARK: - Challenge level
 
-private let _difficulty: [String: [AppLang: String]] = [
-    "difficulty.casual_label":    [.es: "🧸 Pequeñín",            .en: "🧸 Casual"],
-    "difficulty.pro_label":       [.es: "🐺 Pro",                 .en: "🐺 Pro"],
-    "difficulty.casual_subtitle": [.es: "La energía dura 7 días", .en: "Energy lasts 7 days"],
-    "difficulty.pro_subtitle":    [.es: "La energía dura 36 horas", .en: "Energy lasts 36 hours"],
+private let _challengeLevel: [String: [AppLang: String]] = [
+    "level.habito.label":         [.es: "Hábito",      .en: "Habit"],
+    "level.habito.subtitle":      [.es: "1 km = 15% energía", .en: "1 km = 15% energy"],
+    "level.resistencia.label":    [.es: "Resistencia", .en: "Endurance"],
+    "level.resistencia.subtitle": [.es: "1 km = 10% energía", .en: "1 km = 10% energy"],
+    "level.rendimiento.label":    [.es: "Rendimiento", .en: "Performance"],
+    "level.rendimiento.subtitle": [.es: "1 km = 7% energía",  .en: "1 km = 7% energy"],
+]
+
+// MARK: - Questionnaire
+
+private let _questionnaire: [String: [AppLang: String]] = [
+    "q.intro_title_part1":      [.es: "¿Quieres personalizar tu ", .en: "Want to personalize your "],
+    "q.intro_title_highlight":  [.es: "reto",                      .en: "challenge"],
+    "q.intro_title_part2":      [.es: "?",                         .en: "?"],
+    "q.intro_subtitle":         [.es: "Responde 4 preguntas rápidas y te digo qué nivel se adapta mejor a ti. Esto determina cuánto debes correr cada día.", .en: "Answer 4 quick questions and I'll tell you which level fits you best. This determines how far you need to run each day."],
+    "q.intro_cta":              [.es: "¡Responder!",               .en: "Let's go!"],
+    "q.next":                   [.es: "Siguiente",                 .en: "Next"],
+    "q.done":                   [.es: "Ver resultado",             .en: "See result"],
+    "q.back":                   [.es: "Atrás",                     .en: "Back"],
+    "q.skip":                   [.es: "Saltar",                    .en: "Skip"],
+    "q1.question":              [.es: "¿Qué tan seguido corres?",     .en: "How often do you run?"],
+    "q1.a":                     [.es: "Nunca o casi nunca",           .en: "Never or rarely"],
+    "q1.b":                     [.es: "1-2 veces por semana",         .en: "1-2 times a week"],
+    "q1.c":                     [.es: "3 o más veces por semana",     .en: "3+ times a week"],
+
+    "q2.question":              [.es: "¿Cuánto sueles correr?",       .en: "How far do you usually run?"],
+    "q2.a":                     [.es: "Menos de 2 km",                .en: "Less than 2 km"],
+    "q2.b":                     [.es: "2 a 5 km",                     .en: "2 to 5 km"],
+    "q2.c":                     [.es: "Más de 5 km",                  .en: "More than 5 km"],
+
+    "q3.question":              [.es: "¿Qué tan exigente quieres el reto?", .en: "How demanding should the challenge be?"],
+    "q3.a":                     [.es: "Relajado, para crear el hábito",   .en: "Relaxed, just build the habit"],
+    "q3.b":                     [.es: "Normal, un buen balance",           .en: "Moderate, a good balance"],
+    "q3.c":                     [.es: "Intenso, quiero exigirme",          .en: "Intense, I want to push myself"],
+
+    "q4.question":              [.es: "¿Cuál es tu meta principal?",  .en: "What is your main goal?"],
+    "q4.a":                     [.es: "Convertir correr en hábito",   .en: "Make running a habit"],
+    "q4.b":                     [.es: "Mejorar mi resistencia",       .en: "Improve my endurance"],
+    "q4.c":                     [.es: "Rendir al máximo",             .en: "Perform at my best"],
+
+    "q.result_title":           [.es: "Tu nivel recomendado",         .en: "Your recommended level"],
+    "q.result_body_habito":     [.es: "Empezar con Hábito te ayuda a construir una rutina sólida sin agobiarte.", .en: "Starting with Habit helps you build a solid routine without pressure."],
+    "q.result_body_resistencia":[.es: "Resistencia es el balance perfecto para corredores regulares.", .en: "Endurance is the perfect balance for regular runners."],
+    "q.result_body_rendimiento":[.es: "Rendimiento es para quienes ya corren fuerte y quieren un desafío real.", .en: "Performance is for those who already run hard and want a real challenge."],
+    "q.result_badge":           [.es: "TU NIVEL",                     .en: "YOUR LEVEL"],
+    "q.result_change":          [.es: "Cambiar nivel",                .en: "Change level"],
+    "q.result_confirm":         [.es: "Empezar con este nivel",       .en: "Start with this level"],
 ]
 
 // MARK: - Onboarding
@@ -276,6 +319,7 @@ private let _settings: [String: [AppLang: String]] = [
     "settings.original":            [.es: "Original",          .en: "Original"],
     "settings.black":               [.es: "Negro",             .en: "Black"],
     "settings.pattern":             [.es: "Patrón",            .en: "Pattern"],
+    "settings.level_title":         [.es: "Nivel del reto",    .en: "Challenge level"],
     "settings.language_title":      [.es: "Idioma",            .en: "Language"],
     "settings.language_subtitle":   [.es: "Cambia el idioma de la app", .en: "Change app language"],
     "settings.language_auto":       [.es: "Automático (dispositivo)", .en: "Automatic (device)"],

@@ -30,44 +30,55 @@ let ALEBRIJE_ACCENTS: [String] = [
 
 // MARK: - Palette library
 let PALETTES: [PetPalette] = [
-    // Blues
-    PetPalette("sapphire",   body: "#002159", shade: "#2186EB", face: "#B6E0FE", eyeP: "#002159", cheek: "#F191C1"),
-    PetPalette("ocean",      body: "#003E6B", shade: "#2680C2", face: "#DCEEFB", eyeP: "#003E6B", cheek: "#F9703E"),
-    PetPalette("indigo",     body: "#19216C", shade: "#4C63B6", face: "#BED0F7", eyeP: "#19216C", cheek: "#F9703E"),
-    // Greens
-    PetPalette("bulbasaur",  body: "#185020", shade: "#50BC54", face: "#D0F5D4", eyeP: "#0A2810", cheek: "#F9703E"),
-    PetPalette("deepteal",   body: "#003D38", shade: "#2A9484", face: "#CCF0EC", eyeP: "#001E1B", cheek: "#F9703E"),
-    PetPalette("lime",       body: "#2D5A00", shade: "#6DC40A", face: "#E8FFD0", eyeP: "#162C00", cheek: "#F9703E"),
-    // Pinks & reds
-    PetPalette("jigglypuff", body: "#C03070", shade: "#F570A8", face: "#FFE0F0", eyeP: "#620830", cheek: "#F9703E"),
-    PetPalette("sylveon",    body: "#980066", shade: "#DC40A0", face: "#FFD0F2", eyeP: "#4A0030", cheek: "#FADB5F"),
-    // Yellows & warm
-    PetPalette("pikachu",    body: "#C07800", shade: "#F0C030", face: "#FFFACC", eyeP: "#5A3400", cheek: "#F9703E"),
-    // Purples
-    PetPalette("gengar",     body: "#3A0E70", shade: "#8040C8", face: "#ECD8FF", eyeP: "#1C0638", cheek: "#F9703E"),
-    PetPalette("mew",        body: "#6030A8", shade: "#B070F0", face: "#F0E0FF", eyeP: "#301860", cheek: "#F9703E"),
-    // Neutrals
-    PetPalette("slate",      body: "#1F2933", shade: "#3E4C59", face: "#F0F4F8", eyeP: "#1F2933", cheek: "#F35627"),
-    PetPalette("steel",      body: "#243B53", shade: "#627D98", face: "#D9E2EC", eyeP: "#102A43", cheek: "#F9703E"),
-    // New
-    PetPalette("celeste",    body: "#1A6FAD", shade: "#65BAE8", face: "#DCEEFB", eyeP: "#0A3660", cheek: "#F9703E"),
-    PetPalette("tangerine",  body: "#C25D10", shade: "#F9A45C", face: "#FFF3E4", eyeP: "#7A3000", cheek: "#F191C1"),
-    PetPalette("pearl",      body: "#8AAFC8", shade: "#C8DEF0", face: "#FFFFFF", eyeP: "#3A5470", cheek: "#F9703E"),
-    PetPalette("mint",       body: "#045E50", shade: "#2CC9A8", face: "#CCFAF2", eyeP: "#012E27", cheek: "#F9703E"),
-    PetPalette("rose",       body: "#A8294A", shade: "#F0709A", face: "#FFE4EE", eyeP: "#540018", cheek: "#FADB5F"),
-    // New themed palettes
-    PetPalette("planta",         body: "#1E5C6A", shade: "#4FA3B8", face: "#C8EEF5", eyeP: "#1E5C6A", cheek: "#E88995", accent1: "#5FA77A", accent2: "#E88995"),
-    PetPalette("fuego",          body: "#8A4A00", shade: "#F28C28", face: "#FFF0D6", eyeP: "#8A4A00", cheek: "#E94B35", accent1: "#E94B35", accent2: "#2F8F9D"),
-    PetPalette("agua",           body: "#1B6A96", shade: "#4DA8DA", face: "#D6F0FF", eyeP: "#1B6A96", cheek: "#F9703E", accent1: "#F6D55C", accent2: "#4DA8DA"),
-    PetPalette("veneno",         body: "#6A3580", shade: "#B97ACB", face: "#EED6F8", eyeP: "#6A3580", cheek: "#F191C1", accent1: "#E8D8EE", accent2: "#6FAF9C"),
-    PetPalette("psiquico",       body: "#1A4E78", shade: "#4A90C2", face: "#C8E4F5", eyeP: "#1A4E78", cheek: "#F25F5C", accent1: "#F25F5C", accent2: "#EAD2AC"),
-    PetPalette("fuego_canino",   body: "#8A4800", shade: "#F08A24", face: "#FFF0D0", eyeP: "#2E2A2A", cheek: "#F5E6C8", accent1: "#2E2A2A", accent2: "#F5E6C8"),
-    PetPalette("lucha",          body: "#4A5C62", shade: "#9FAFB3", face: "#E8F0F2", eyeP: "#4A5C62", cheek: "#E94B3C", accent1: "#F4D35E", accent2: "#E94B3C"),
-    PetPalette("planta_simple",  body: "#7A9A20", shade: "#CDE46B", face: "#F2FBCE", eyeP: "#3A5000", cheek: "#D9A5A5", accent1: "#7FB77E", accent2: "#D9A5A5"),
-    PetPalette("agua_roca",      body: "#3A3C6A", shade: "#6C6FA3", face: "#D8D9EE", eyeP: "#1E2040", cheek: "#D96C6C", accent1: "#E3C94A", accent2: "#D96C6C"),
-    PetPalette("psiquico_fairy", body: "#C06080", shade: "#F5C6D6", face: "#FFECF2", eyeP: "#2F4F6F", cheek: "#F28CA3", accent1: "#F28CA3", accent2: "#2F4F6F"),
-    PetPalette("fuego_luchador", body: "#8A2E00", shade: "#F06A2F", face: "#FFDEC8", eyeP: "#1F2A44", cheek: "#F2D16B", accent1: "#F2D16B", accent2: "#1F2A44"),
-    PetPalette("digital",        body: "#7A1010", shade: "#D94C4C", face: "#FFD0D0", eyeP: "#7A1010", cheek: "#F9703E", accent1: "#4FA3B8", accent2: "#D9D9D9"),
-    PetPalette("agua_cocodrilo", body: "#1A6364", shade: "#4CA7A8", face: "#C8F0F0", eyeP: "#1A6364", cheek: "#F9703E", accent1: "#F4D06F", accent2: "#A63D40"),
-    PetPalette("planta_pajaro",  body: "#2E6C10", shade: "#6DBE45", face: "#D8F7C4", eyeP: "#1A3A08", cheek: "#F9703E", accent1: "#F2D94E", accent2: "#D94C4C"),
+    PetPalette("sapphire",   body: "#002159", shade: "#2186EB", face: "#B6E0FE", eyeP: "#002159",  cheek: "#F191C1"),
+    PetPalette("slate",      body: "#1F2933", shade: "#3E4C59", face: "#F0F4F8", eyeP: "#1F2933",  cheek: "#F35627"),
+
+    // Dusty pink and navy — body: navy, face: dusty pink
+    PetPalette("rosa_navy",  body: "#1B3458", shade: "#2D5080", face: "#D4A0A8", eyeP: "#0D1E35",  cheek: "#E8C8CC"),
+    // Olive and gold — body: olive, face: gold
+    PetPalette("oliva_oro",  body: "#4A5A22", shade: "#6B8030", face: "#D4A835", eyeP: "#252E0F",  cheek: "#E8CC6A"),
+    // Plum and cream — body: plum, face: cream
+    PetPalette("ciruela",    body: "#4A1040", shade: "#6B2060", face: "#F0E0C8", eyeP: "#250820",  cheek: "#D4B090"),
+    // Burnt orange and teal — body: teal, face: burnt orange
+    PetPalette("naranja_teal", body: "#1A5C6A", shade: "#267080", face: "#E8782A", eyeP: "#0D2E35", cheek: "#F0A860"),
+    // Mustard and grey — body: dark mustard, face: mustard, cheek: grey
+    PetPalette("mostaza",    body: "#5A4810", shade: "#8A7020", face: "#CCA030", eyeP: "#2D2508",  cheek: "#9A9A9A"),
+    // Black cherry and blush — body: black cherry, face: blush
+    PetPalette("cereza",     body: "#4A0820", shade: "#700C30", face: "#F0C0C8", eyeP: "#200410",  cheek: "#E8A0B0"),
+    // Forest green and sand — body: forest green, face: sand
+    PetPalette("bosque",     body: "#1A4028", shade: "#286040", face: "#D8C8A0", eyeP: "#0D2014",  cheek: "#E8D8B8"),
+    // Copper and white — body: copper, face: white
+    PetPalette("cobre",      body: "#8A4A20", shade: "#B06030", face: "#F8F0E8", eyeP: "#3A1C08",  cheek: "#D4A878"),
+    // Rust and off-white — body: rust, face: off-white
+    PetPalette("oxido",      body: "#8A2C1A", shade: "#B04030", face: "#F5EDE0", eyeP: "#3A1008",  cheek: "#D4A090"),
+    // Denim blue and taupe — body: denim, face: taupe
+    PetPalette("denim",      body: "#2A3D6A", shade: "#405A9A", face: "#C8B8A8", eyeP: "#141E35",  cheek: "#A89888"),
+    // Chocolate and peach — body: chocolate, face: peach
+    PetPalette("chocolate",  body: "#2A1408", shade: "#40200C", face: "#F0B898", eyeP: "#140A04",  cheek: "#E8A880"),
+    // Mint and silver grey — body: dark mint, face: silver
+    PetPalette("menta",      body: "#2A6A50", shade: "#409070", face: "#C0D0C8", eyeP: "#143028",  cheek: "#A8B8B0"),
+    // Eggplant and light grey — body: eggplant, face: light grey
+    PetPalette("berenjena",  body: "#3A1860", shade: "#5A2890", face: "#D0C8D8", eyeP: "#1C0C30",  cheek: "#B0A8C0"),
+    // Turquoise and coral — body: turquoise, face: coral
+    PetPalette("turquesa",   body: "#0A7878", shade: "#109898", face: "#F0806A", eyeP: "#053C3C",  cheek: "#F8B0A0"),
+    // Burgundy and gold — body: burgundy, face: gold
+    PetPalette("bordo",      body: "#5A0818", shade: "#880C24", face: "#D4A830", eyeP: "#2D0408",  cheek: "#E8CC70"),
+    // Stone blue and ivory — body: stone blue, face: ivory
+    PetPalette("piedra",     body: "#3A4E6A", shade: "#5A7098", face: "#F0ECD8", eyeP: "#1C2635",  cheek: "#D8D4C0"),
+    // Lemon yellow and navy — body: navy, face: lemon
+    PetPalette("limon",      body: "#1A2858", shade: "#283C88", face: "#E8D020", eyeP: "#0D1428",  cheek: "#F0E060"),
+    // Moss green and cream — body: moss, face: cream
+    PetPalette("musgo",      body: "#3A5020", shade: "#587830", face: "#F0E8D0", eyeP: "#1C2810",  cheek: "#D8D0B0"),
+    // Rose gold and charcoal — body: charcoal, face: rose gold
+    PetPalette("carbon",     body: "#2A2A30", shade: "#404048", face: "#C89088", eyeP: "#141418",  cheek: "#E0B0A8"),
+    // Lavender and slate — body: slate, face: lavender
+    PetPalette("lavanda",    body: "#404858", shade: "#5A6478", face: "#C8B8D8", eyeP: "#202430",  cheek: "#A898B8"),
+    // Sandy brown and teal — body: teal, face: sandy
+    PetPalette("arena",      body: "#1A5860", shade: "#287888", face: "#C8A870", eyeP: "#0D2C30",  cheek: "#E0C898"),
+    // Red and beige — body: red, face: beige
+    PetPalette("rojo_beige", body: "#8A1818", shade: "#B02020", face: "#E8D8C0", eyeP: "#3A0808",  cheek: "#D0B898"),
+    // Sky blue and bronze — body: bronze, face: sky blue
+    PetPalette("bronce",     body: "#7A5020", shade: "#A86828", face: "#A8C8E0", eyeP: "#3A2810",  cheek: "#D4A848"),
+    // Deep green and blush — body: deep green, face: blush
+    PetPalette("pino",       body: "#0A3020", shade: "#185040", face: "#F0C0C8", eyeP: "#051810",  cheek: "#E8A8B0"),
 ]
