@@ -349,6 +349,18 @@ struct AppBackground: View {
                     startRadius: 0,
                     endRadius: 400
                 )
+            } else if imageName == "pattern" {
+                Color(hex: "#F9F496")
+                Image("pattern")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.3)
+                RadialGradient(
+                    colors: [Color.white.opacity(0.4), .clear],
+                    center: .init(x: 0.5, y: 0.3),
+                    startRadius: 0,
+                    endRadius: 400
+                )
             } else if let imageName {
                 Image(imageName)
                     .resizable()

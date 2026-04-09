@@ -253,6 +253,7 @@ private let _settings: [String: [AppLang: String]] = [
                                       .en: "You unlock new backgrounds by reaching each milestone"],
     "settings.original":            [.es: "Original",          .en: "Original"],
     "settings.black":               [.es: "Negro",             .en: "Black"],
+    "settings.pattern":             [.es: "Patrón",            .en: "Pattern"],
 ]
 
 // MARK: - Tutorial

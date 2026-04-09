@@ -476,12 +476,13 @@ struct BackgroundPickerSheet: View {
         (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
     }
 
-    // Tile layout: 0 = default gradient, 1 = solid black, 2..24 = achievement backgrounds
+    // Tile layout: 0 = default gradient, 1 = solid black, 2 = pattern, 3..25 = achievement backgrounds
     private let solidBlackIndex = 1
-    private let achievementOffset = 2 // achievement tiles start at this index
+    private let patternIndex = 2
+    private let achievementOffset = 3 // achievement tiles start at this index
 
     private func isUnlocked(_ index: Int) -> Bool {
-        if index <= solidBlackIndex { return true } // default + black always unlocked
+        if index <= patternIndex { return true } // default + black + pattern always unlocked
         let achIdx = index - achievementOffset
         guard achIdx >= 0 && achIdx < Achievement.all.count else { return true }
         guard appState.challengeStarted else { return false }
@@ -491,12 +492,14 @@ struct BackgroundPickerSheet: View {
     private func backgroundValue(for index: Int) -> String? {
         if index == 0 { return nil } // default gradient
         if index == solidBlackIndex { return "solid_black" }
+        if index == patternIndex { return "pattern" }
         return String(format: "background_%02d", index - achievementOffset + 1)
     }
 
     private var selectedIndex: Int? {
         guard let bg = appState.selectedBackground else { return 0 }
         if bg == "solid_black" { return solidBlackIndex }
+        if bg == "pattern" { return patternIndex }
         return Achievement.all.first { String(format: "background_%02d", $0.index) == bg }
             .map { $0.index + achievementOffset - 1 }
     }
@@ -531,8 +534,8 @@ struct BackgroundPickerSheet: View {
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 10) {
-                    // Index 0 = default, 1 = solid black, 2..24 = achievement backgrounds
-                    ForEach(0...24, id: \.self) { index in
+                    // Index 0 = default, 1 = solid black, 2 = pattern, 3..25 = achievement backgrounds
+                    ForEach(0...25, id: \.self) { index in
                         let unlocked = isUnlocked(index)
                         let isSelected = selectedIndex == index
                         let bgValue = backgroundValue(for: index)
@@ -553,6 +556,14 @@ struct BackgroundPickerSheet: View {
                                             center: .init(x: 0.5, y: 0.15),
                                             startRadius: 0, endRadius: 80
                                         )
+                                    }
+                                } else if bgValue == "pattern" {
+                                    ZStack {
+                                        Color(hex: "#F9F496")
+                                        Image("pattern")
+                                            .resizable()
+                                            .scaledToFill()
+                                            .opacity(0.3)
                                     }
                                 } else if let bgValue {
                                     Image(bgValue)
@@ -624,16 +635,16 @@ struct BackgroundPickerSheet: View {
                                 }
 
                                 // Label for default and black tiles
-                                if index == 0 || index == solidBlackIndex {
+                                if index == 0 || index == solidBlackIndex || index == patternIndex {
                                     VStack {
                                         Spacer()
                                         HStack {
-                                            Text(L(index == 0 ? "settings.original" : "settings.black"))
+                                            Text(L(index == 0 ? "settings.original" : index == solidBlackIndex ? "settings.black" : "settings.pattern"))
                                                 .font(.system(size: 9, weight: .semibold, design: .rounded))
-                                                .foregroundStyle(index == 0 ? Color(hex: "#4A3F35") : .white.opacity(0.85))
+                                                .foregroundStyle(index == 0 ? Color(hex: "#4A3F35") : index == patternIndex ? Color(hex: "#4A3F35") : .white.opacity(0.85))
                                                 .padding(.horizontal, 5)
                                                 .padding(.vertical, 3)
-                                                .background(index == 0 ? Color.white.opacity(0.70) : Color.white.opacity(0.15))
+                                                .background(index == solidBlackIndex ? Color.white.opacity(0.15) : Color.white.opacity(0.70))
                                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                                             Spacer()
                                         }

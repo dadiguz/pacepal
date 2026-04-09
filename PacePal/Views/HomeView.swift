@@ -32,7 +32,7 @@ struct HomeView: View {
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
-    private var hasPhotoBackground: Bool { appState.selectedBackground != nil }
+    private var hasPhotoBackground: Bool { appState.selectedBackground != nil && appState.selectedBackground != "pattern" }
 
     private var energy: Double { appState.energy(at: now) }
 
