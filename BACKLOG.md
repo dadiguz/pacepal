@@ -16,7 +16,7 @@
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
 | 12 | Compartir logro (share) | Media | ✅ Completado |
-| 13 | Tips diarios de correr (12) | Media | Pendiente |
+| 13 | Tips diarios de correr (12) | Media | ✅ Completado |
 | 14 | Parpadeo rojo al colapsar (13) | Baja | Pendiente |
 | 15 | Editor foto + stickers para compartir (14) | Baja | Pendiente |
 
@@ -183,17 +183,17 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 
 ---
 
-## 12. Tips Diarios de Correr
-**Prioridad:** Media | **Complejidad:** Alta
+## 12. Tips Diarios de Correr ✅
+**Prioridad:** Media | **Complejidad:** Alta | **Estado:** Completado
 
-66 tips de running, uno por dia del challenge. Se muestran en un modal similar al de logros.
-
-- [ ] 66 tips de running en es/en (tecnica, hidratacion, calentamiento, descanso, motivacion, etc.)
-- [ ] Modal tipo logro que aparece una vez al dia al abrir la app (despues del tip del dia correspondiente)
-- [ ] Nueva animacion del monito: pose `.teaching` — con lentes y escribiendo en un cuaderno
-- [ ] Persistir tips vistos en UserDefaults/AppState
-- [ ] Seccion "Tips" accesible desde Settings o HistoryView para revisar tips anteriores (solo los ya desbloqueados)
-- [ ] Strings en es/en
+- [x] 66 tips de running en es/en (tecnica, hidratacion, calentamiento, descanso, motivacion, etc.)
+- [x] Modal tipo logro con fondo oscuro (#2B2420) que aparece una vez al dia al abrir la app
+- [x] Tip se muestra despues de achievements (si hay achievement pendiente, aparece primero)
+- [x] Nueva pose `.teaching` — monito con lentes (marcos gray alrededor de ojos + puente) y escribiendo
+- [x] `seenTips: Set<Int>` en AppState, persistido en UserDefaults
+- [x] Seccion "Tips" en SettingsView con lista scrolleable (desbloqueados vs locked)
+- [x] Boton debug para resetear tips
+- [x] Strings en es/en (`tip.badge`, `tip.dismiss`, `tip.section_title`, `tip.locked`)
 
 ---
 

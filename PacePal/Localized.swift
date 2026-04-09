@@ -35,7 +35,7 @@ private let _allStrings: [String: [AppLang: String]] = {
         _common, _difficulty,
         _onboarding, _paywall, _healthPerm, _notifPerm, _widgetPrompt,
         _charSelect, _home, _history, _settings, _tutorial, _notifications,
-        _achievements, _archetypes, _medal,
+        _achievements, _archetypes, _medal, _tips, _tipDetails,
     ] {
         d.merge(section) { _, new in new }
     }
@@ -183,6 +183,10 @@ private let _home: [String: [AppLang: String]] = [
     "home.retry":               [.es: "Volver a intentarlo", .en: "Try again"],
     "home.achievement_dismiss": [.es: "¡Vamos!",            .en: "Let's go!"],
     "share.button":             [.es: "Compartir",           .en: "Share"],
+    "tip.dismiss":              [.es: "Entendido",           .en: "Got it"],
+    "tip.badge":                [.es: "TIP DÍA %d",         .en: "DAY %d TIP"],
+    "tip.section_title":        [.es: "Tips",                .en: "Tips"],
+    "tip.locked":               [.es: "Día %d",              .en: "Day %d"],
     "home.achievement_badge":   [.es: "DÍA %d / 66",       .en: "DAY %d / 66"],
     "home.stat_runs":           [.es: "Carreras",           .en: "Runs"],
     "home.stat_total_km":       [.es: "km totales",         .en: "Total km"],
@@ -443,4 +447,434 @@ private let _medal: [String: [AppLang: String]] = [
                                 .en: "You completed the 66-day challenge. Your companion no longer loses energy. Keep running!"],
     "medal.tutorial_dismiss":  [.es: "¡Increíble!",             .en: "Amazing!"],
     "medal.energy_permanent":  [.es: "Energía permanente",      .en: "Permanent energy"],
+]
+
+// MARK: - Daily Tips (66 days)
+
+private let _tips: [String: [AppLang: String]] = [
+    // Days 1-10: Getting started / beginner advice
+    "tip.1":  [.es: "Hoy solo tienes que salir. No importa la distancia, lo que importa es empezar.",
+               .en: "Today you just have to get out. Distance doesn't matter — starting does."],
+    "tip.2":  [.es: "Corre a un ritmo en el que puedas mantener una conversación. Si jadeas, ve más lento.",
+               .en: "Run at a pace where you can hold a conversation. If you're gasping, slow down."],
+    "tip.3":  [.es: "No te compares con nadie. Tu único rival es el tú de ayer.",
+               .en: "Don't compare yourself to anyone. Your only rival is yesterday's you."],
+    "tip.4":  [.es: "Caminar entre intervalos de carrera está perfecto. Es parte del proceso.",
+               .en: "Walking between running intervals is perfectly fine. It's part of the process."],
+    "tip.5":  [.es: "Elige una hora fija para correr cada día. La rutina crea el hábito.",
+               .en: "Pick a fixed time to run each day. Routine builds the habit."],
+    "tip.6":  [.es: "Tus zapatillas son tu herramienta más importante. Asegúrate de que sean cómodas.",
+               .en: "Your shoes are your most important tool. Make sure they're comfortable."],
+    "tip.7":  [.es: "Una semana corriendo. Tu cuerpo ya se está adaptando aunque no lo notes.",
+               .en: "One week running. Your body is already adapting even if you don't notice."],
+    "tip.8":  [.es: "Hidrátate antes de salir. Un vaso de agua 30 minutos antes marca la diferencia.",
+               .en: "Hydrate before heading out. A glass of water 30 minutes before makes a difference."],
+    "tip.9":  [.es: "Escucha a tu cuerpo. Si algo duele, no lo ignores — ajusta el ritmo.",
+               .en: "Listen to your body. If something hurts, don't ignore it — adjust your pace."],
+    "tip.10": [.es: "10 días seguidos. Estás construyendo algo grande. No pares.",
+               .en: "10 days in a row. You're building something big. Don't stop."],
+
+    // Days 11-20: Form, breathing, warm-up
+    "tip.11": [.es: "Calienta al menos 3 minutos antes de correr. Tus músculos te lo agradecerán.",
+               .en: "Warm up for at least 3 minutes before running. Your muscles will thank you."],
+    "tip.12": [.es: "Intenta respirar por la nariz y exhalar por la boca. Encuentra tu ritmo respiratorio.",
+               .en: "Try breathing in through your nose and out through your mouth. Find your breathing rhythm."],
+    "tip.13": [.es: "Mantén los hombros relajados y las manos sueltas. La tensión gasta energía.",
+               .en: "Keep your shoulders relaxed and hands loose. Tension wastes energy."],
+    "tip.14": [.es: "Pasos cortos y frecuentes son mejor que zancadas largas. Cuida tus articulaciones.",
+               .en: "Short, frequent steps are better than long strides. Protect your joints."],
+    "tip.15": [.es: "Estira después de correr, nunca antes. Los músculos calientes se estiran mejor.",
+               .en: "Stretch after running, never before. Warm muscles stretch better."],
+    "tip.16": [.es: "Mira al frente, no al suelo. Tu postura mejora y respiras mejor.",
+               .en: "Look ahead, not at the ground. Your posture improves and you breathe better."],
+    "tip.17": [.es: "Si te cuesta respirar, prueba el patrón 3-2: tres pasos inhala, dos pasos exhala.",
+               .en: "If breathing is hard, try the 3-2 pattern: three steps inhale, two steps exhale."],
+    "tip.18": [.es: "Corre erguido, como si un hilo tirara de tu cabeza hacia arriba.",
+               .en: "Run tall, as if a string is pulling your head upward."],
+    "tip.19": [.es: "Un buen calentamiento incluye caminata rápida, rotación de tobillos y rodillas altas.",
+               .en: "A good warm-up includes brisk walking, ankle rotations, and high knees."],
+    "tip.20": [.es: "Ya llevas 20 días. La constancia es tu superpoder, y lo estás demostrando.",
+               .en: "You're at 20 days. Consistency is your superpower, and you're proving it."],
+
+    // Days 21-30: Nutrition, hydration, rest
+    "tip.21": [.es: "Come algo ligero 1-2 horas antes de correr. Un plátano o unas tostadas van genial.",
+               .en: "Eat something light 1-2 hours before running. A banana or toast works great."],
+    "tip.22": [.es: "El descanso es parte del entrenamiento. Tus músculos se fortalecen mientras descansas.",
+               .en: "Rest is part of training. Your muscles get stronger while you rest."],
+    "tip.23": [.es: "Bebe agua durante todo el día, no solo antes de correr.",
+               .en: "Drink water throughout the day, not just before running."],
+    "tip.24": [.es: "Si sientes las piernas pesadas, un día de carrera suave está bien. No todo tiene que ser intenso.",
+               .en: "If your legs feel heavy, an easy run day is fine. Not everything has to be intense."],
+    "tip.25": [.es: "Mitad del reto. Cuida tu alimentación: proteínas para recuperar, carbohidratos para la energía.",
+               .en: "Halfway there. Watch your nutrition: protein to recover, carbs for energy."],
+    "tip.26": [.es: "Dormir bien es tan importante como correr. Apunta a 7-8 horas por noche.",
+               .en: "Sleeping well is as important as running. Aim for 7-8 hours per night."],
+    "tip.27": [.es: "Evita comidas pesadas justo antes de correr. Tu estómago necesita tranquilidad.",
+               .en: "Avoid heavy meals right before running. Your stomach needs calm."],
+    "tip.28": [.es: "Un mes corriendo. Tu metabolismo ya está cambiando. ¡Sigue así!",
+               .en: "A month of running. Your metabolism is already changing. Keep it up!"],
+    "tip.29": [.es: "Los días de descanso activo (caminar, estirar) ayudan a la recuperación sin perder el ritmo.",
+               .en: "Active rest days (walking, stretching) help recovery without losing momentum."],
+    "tip.30": [.es: "Si corres de mañana, un café 30 minutos antes puede darte un buen impulso.",
+               .en: "If you run in the morning, a coffee 30 minutes before can give you a nice boost."],
+
+    // Days 31-40: Injury prevention, weather, gear
+    "tip.31": [.es: "Revisa tus zapatillas. Si tienen más de 500 km, considera cambiarlas.",
+               .en: "Check your shoes. If they have more than 500 km, consider replacing them."],
+    "tip.32": [.es: "En días de calor, corre temprano o al atardecer. Evita las horas de sol fuerte.",
+               .en: "On hot days, run early or at sunset. Avoid peak sun hours."],
+    "tip.33": [.es: "Fortalece tobillos y rodillas con ejercicios simples. La prevención es la mejor medicina.",
+               .en: "Strengthen ankles and knees with simple exercises. Prevention is the best medicine."],
+    "tip.34": [.es: "Vístete como si hiciera 10 grados más de lo que marca el termómetro. Entrarás en calor rápido.",
+               .en: "Dress as if it's 10 degrees warmer than the thermometer says. You'll warm up fast."],
+    "tip.35": [.es: "Si llueve, no te detengas. Correr bajo la lluvia puede ser una experiencia increíble.",
+               .en: "If it rains, don't stop. Running in the rain can be an amazing experience."],
+    "tip.36": [.es: "Usa ropa transpirable. El algodón absorbe el sudor y te hace sentir más pesado.",
+               .en: "Wear breathable clothes. Cotton absorbs sweat and makes you feel heavier."],
+    "tip.37": [.es: "Si sientes un tirón, para y estira suavemente. Forzar una lesión nunca vale la pena.",
+               .en: "If you feel a pull, stop and stretch gently. Forcing an injury is never worth it."],
+    "tip.38": [.es: "Varía tus rutas. Terrenos diferentes fortalecen músculos diferentes.",
+               .en: "Vary your routes. Different terrains strengthen different muscles."],
+    "tip.39": [.es: "En días fríos, calienta un poco más antes de salir. Los músculos fríos se lesionan más fácil.",
+               .en: "On cold days, warm up a bit longer. Cold muscles are more prone to injury."],
+    "tip.40": [.es: "40 días. Más de la mitad del camino. Tu cuerpo y mente ya son de corredor.",
+               .en: "40 days. More than halfway. Your body and mind are already those of a runner."],
+
+    // Days 41-50: Speed, distance, mental game
+    "tip.41": [.es: "Prueba a variar tu ritmo: 1 minuto rápido, 2 minutos suave. Así ganas velocidad.",
+               .en: "Try varying your pace: 1 minute fast, 2 minutes easy. That's how you gain speed."],
+    "tip.42": [.es: "Cuando la mente diga 'para', responde con 'un minuto más'. Siempre puedes dar un poco más.",
+               .en: "When your mind says 'stop', answer with 'one more minute'. You can always give a bit more."],
+    "tip.43": [.es: "Aumenta la distancia gradualmente. No más del 10% por semana para evitar lesiones.",
+               .en: "Increase distance gradually. No more than 10% per week to avoid injuries."],
+    "tip.44": [.es: "Corre con música que te motive. El ritmo correcto puede hacerte volar.",
+               .en: "Run with music that motivates you. The right beat can make you fly."],
+    "tip.45": [.es: "En las subidas, acorta el paso y mantén el esfuerzo. No intentes mantener el mismo ritmo.",
+               .en: "On hills, shorten your stride and maintain effort. Don't try to keep the same pace."],
+    "tip.46": [.es: "Visualiza la meta antes de salir. Verte cruzando la línea te da poder mental.",
+               .en: "Visualize the finish before heading out. Seeing yourself crossing the line gives mental power."],
+    "tip.47": [.es: "Los días malos también cuentan. Salir cuando no quieres es donde se forja el hábito.",
+               .en: "Bad days count too. Going out when you don't want to is where the habit is forged."],
+    "tip.48": [.es: "Enfócate en el esfuerzo, no en la velocidad. El progreso viene solo.",
+               .en: "Focus on effort, not speed. Progress will come on its own."],
+    "tip.49": [.es: "Siete semanas corriendo. La mayoría hubiera abandonado. Tú sigues aquí.",
+               .en: "Seven weeks running. Most would have quit. You're still here."],
+    "tip.50": [.es: "Prueba correr sin música un día. Escucha tu respiración y tus pasos. Es meditación en movimiento.",
+               .en: "Try running without music one day. Listen to your breathing and steps. It's meditation in motion."],
+
+    // Days 51-58: Cool-down, advanced tips, mindset
+    "tip.51": [.es: "Después de correr, camina 5 minutos para enfriar. Tu corazón te lo agradecerá.",
+               .en: "After running, walk 5 minutes to cool down. Your heart will thank you."],
+    "tip.52": [.es: "Estira los cuádriceps, gemelos e isquiotibiales después de cada carrera. Solo 5 minutos bastan.",
+               .en: "Stretch your quads, calves, and hamstrings after every run. Just 5 minutes is enough."],
+    "tip.53": [.es: "Corre por sensaciones, no solo por números. Tu cuerpo sabe más que el reloj.",
+               .en: "Run by feel, not just by numbers. Your body knows more than the watch."],
+    "tip.54": [.es: "Un rodillo de espuma después de correr ayuda a soltar la tensión muscular.",
+               .en: "A foam roller after running helps release muscle tension."],
+    "tip.55": [.es: "Solo 11 días más. Ya eres un corredor. Esto ya no es un reto, es tu estilo de vida.",
+               .en: "Only 11 days left. You're already a runner. This is no longer a challenge, it's your lifestyle."],
+    "tip.56": [.es: "El enfriamiento es tan importante como el calentamiento. No lo saltes.",
+               .en: "Cooling down is as important as warming up. Don't skip it."],
+    "tip.57": [.es: "Cuando termines de correr, respira profundo 5 veces. Calma tu sistema nervioso.",
+               .en: "When you finish running, take 5 deep breaths. Calm your nervous system."],
+    "tip.58": [.es: "Celebra cada salida, no solo las marcas personales. Salir ya es ganar.",
+               .en: "Celebrate every outing, not just personal records. Showing up is winning."],
+
+    // Days 59-66: Celebration, milestones, looking ahead
+    "tip.59": [.es: "Piensa en cómo te sentías el día 1. Mira cuánto has crecido desde entonces.",
+               .en: "Think about how you felt on day 1. Look how much you've grown since then."],
+    "tip.60": [.es: "Comparte tu progreso con alguien. Inspirar a otros multiplica tu logro.",
+               .en: "Share your progress with someone. Inspiring others multiplies your achievement."],
+    "tip.61": [.es: "Solo 5 días más. Cada kilómetro que corras ahora es pura victoria.",
+               .en: "Just 5 more days. Every kilometer you run now is pure victory."],
+    "tip.62": [.es: "Correr ya es parte de ti. Cuando terminen los 66 días, no vas a querer parar.",
+               .en: "Running is already part of you. When the 66 days end, you won't want to stop."],
+    "tip.63": [.es: "Piensa en tu próximo objetivo después del reto. Una carrera de 5K, quizás.",
+               .en: "Think about your next goal after the challenge. A 5K race, maybe."],
+    "tip.64": [.es: "A dos días del final. Lo que construiste nadie te lo quita.",
+               .en: "Two days from the end. What you built, no one can take away."],
+    "tip.65": [.es: "Mañana es el último día. Pero el hábito que creaste es para siempre.",
+               .en: "Tomorrow is the last day. But the habit you created is forever."],
+    "tip.66": [.es: "Día 66. Lo lograste. No fue fácil, pero lo hiciste. Ahora sigue corriendo, porque esto es solo el comienzo.",
+               .en: "Day 66. You did it. It wasn't easy, but you made it. Now keep running, because this is just the beginning."],
+]
+
+private let _tipDetails: [String: [AppLang: String]] = [
+    // Days 1-10
+    "tip.1.detail": [
+        .es: "No necesitas correr **5 km** ni batir ningún récord. Solo **ponte los tenis**, sal por la puerta y muévete. Aunque sean **500 metros** caminando rápido, hoy cuenta. **El primer paso siempre es el más difícil**, y ya lo diste.",
+        .en: "You don't need to run **5K** or break any record. Just **lace up your shoes**, step outside, and move. Even if it's **500 meters** of brisk walking, today counts. **The first step is always the hardest**, and you already took it."
+    ],
+    "tip.2.detail": [
+        .es: "Esto se llama **ritmo conversacional** y es la base del running. Si puedes hablar con alguien mientras corres, vas a un buen ritmo. Si no puedes terminar una frase sin ahogarte, **bájale**. No hay prisa, tu resistencia se construye **poco a poco**.",
+        .en: "This is called **conversational pace** and it's the foundation of running. If you can talk to someone while running, you're at a good pace. If you can't finish a sentence without gasping, **slow down**. There's no rush — your endurance builds **little by little**."
+    ],
+    "tip.3.detail": [
+        .es: "Es natural ver a otros corredores y sentir que vas lento. Pero **cada cuerpo es diferente** y cada uno empezó en un momento distinto. Lo que importa es que hoy puedes hacer algo que hace una semana no hacías. **Ese es tu progreso real**.",
+        .en: "It's natural to see other runners and feel like you're slow. But **every body is different** and everyone started at a different time. What matters is that today you can do something you couldn't a week ago. **That's your real progress**."
+    ],
+    "tip.4.detail": [
+        .es: "Muchos corredores profesionales empezaron con **intervalos de caminar y trotar**. No es trampa, es estrategia. Prueba correr **2 minutos** y caminar **1**, o lo que te resulte cómodo. Con el tiempo esos intervalos serán más largos **de forma natural**.",
+        .en: "Many professional runners started with **walk-jog intervals**. It's not cheating, it's strategy. Try running **2 minutes** and walking **1**, or whatever feels comfortable. Over time those running intervals will **naturally get longer**."
+    ],
+    "tip.5.detail": [
+        .es: "Tu cerebro necesita asociar **un momento del día** con correr para que se vuelva automático. Puede ser al despertar, a la hora de la comida o al salir del trabajo. Lo importante es que sea **el mismo horario todos los días**. Después de unas semanas, tu cuerpo ya lo pedirá solo.",
+        .en: "Your brain needs to associate **a time of day** with running for it to become automatic. It can be when you wake up, at lunch, or after work. The key is **the same time every day**. After a few weeks, your body will ask for it on its own."
+    ],
+    "tip.6.detail": [
+        .es: "No necesitas las más caras ni las de moda. Necesitas unas que **se ajusten bien a tu pie**, con buen soporte y amortiguación. Ve a una **tienda especializada** si puedes. Un buen par de zapatillas **previene lesiones** y hace que correr sea mucho más agradable.",
+        .en: "You don't need the most expensive or trendiest ones. You need shoes that **fit your foot well**, with good support and cushioning. Visit a **specialty store** if you can. A good pair of shoes **prevents injuries** and makes running much more enjoyable."
+    ],
+    "tip.7.detail": [
+        .es: "Aunque tus piernas sientan algo de dolor, es normal. Tu **sistema cardiovascular** ya está mejorando, tus músculos están creando **nuevas fibras** y tu cerebro está liberando **endorfinas** con más facilidad. La adaptación lleva tiempo, pero ya empezó. **Confía en el proceso**.",
+        .en: "Even if your legs feel some soreness, that's normal. Your **cardiovascular system** is already improving, your muscles are building **new fibers**, and your brain is releasing **endorphins** more easily. Adaptation takes time, but it's already started. **Trust the process**."
+    ],
+    "tip.8.detail": [
+        .es: "La deshidratación reduce tu rendimiento y aumenta el riesgo de **calambres**. No esperes a tener sed para tomar agua. Un vaso de agua **media hora antes** de salir prepara tu cuerpo. Si corres más de **30 minutos**, lleva agua contigo o planea una ruta con fuentes.",
+        .en: "Dehydration reduces your performance and increases the risk of **cramps**. Don't wait until you're thirsty to drink water. A glass of water **half an hour before** heading out prepares your body. If you run for more than **30 minutes**, bring water or plan a route with fountains."
+    ],
+    "tip.9.detail": [
+        .es: "Hay una diferencia entre el **dolor muscular normal** de adaptación y una molestia que indica lesión. El primero es general y mejora al calentar. El segundo es **agudo, puntual y empeora** al correr. Si sientes el segundo, baja el ritmo. **Un día de precaución puede salvarte semanas**.",
+        .en: "There's a difference between **normal muscle soreness** from adaptation and discomfort that signals injury. The first is general and improves as you warm up. The second is **sharp, localized, and worsens** with running. If you feel the latter, slow down. **One day of caution can save you weeks**."
+    ],
+    "tip.10.detail": [
+        .es: "**Diez días** puede no sonar a mucho, pero estadísticamente la mayoría de la gente abandona antes de llegar aquí. **Tú no**. Estás en el grupo de los que persisten, y eso dice mucho de tu carácter. Cada día que sumas hace **más fuerte tu hábito**.",
+        .en: "**Ten days** might not sound like much, but statistically most people quit before reaching this point. **You didn't**. You're in the group that persists, and that says a lot about your character. Every day you add makes **your habit stronger**."
+    ],
+
+    // Days 11-20
+    "tip.11.detail": [
+        .es: "Un calentamiento prepara tus **articulaciones**, eleva tu temperatura corporal y aumenta el **flujo sanguíneo** a los músculos. Puedes caminar rápido, hacer rotaciones de tobillos o rodillas altas. Solo **3 minutos** reducen mucho el riesgo de molestias.",
+        .en: "A warm-up prepares your **joints**, raises your body temperature, and increases **blood flow** to your muscles. You can walk briskly, do ankle rotations, or high knees. Just **3 minutes** greatly reduce the risk of discomfort."
+    ],
+    "tip.12.detail": [
+        .es: "La respiración es algo que muchos corredores principiantes ignoran. No hay una fórmula perfecta, pero **inhalar por la nariz** filtra y calienta el aire, mientras **exhalar por la boca** ayuda a soltar el CO2 rápido. Experimenta y encuentra lo que te funcione mejor.",
+        .en: "Breathing is something many beginner runners overlook. There's no perfect formula, but **inhaling through your nose** filters and warms the air, while **exhaling through your mouth** helps release CO2 quickly. Experiment and find what works best for you."
+    ],
+    "tip.13.detail": [
+        .es: "Cuando te cansas, el cuerpo tiende a tensarse: subes los hombros, aprietas los puños, frunces el ceño. Todo eso **consume energía** que podrías usar para correr. De vez en cuando, **sacude las manos**, baja los hombros y **relaja la mandíbula**.",
+        .en: "When you get tired, your body tends to tense up: you raise your shoulders, clench your fists, furrow your brow. All of that **burns energy** you could use for running. Every now and then, **shake your hands**, lower your shoulders, and **relax your jaw**."
+    ],
+    "tip.14.detail": [
+        .es: "Las zancadas largas ponen más impacto en tus rodillas. **Pasos más cortos y rápidos** (cadencia alta) distribuyen mejor la fuerza y **reducen lesiones**. Intenta que tus pies aterricen **debajo de tu cuerpo**, no por delante. Se siente raro al principio pero tu cuerpo lo agradecerá.",
+        .en: "Long strides put more impact on your knees. **Shorter, quicker steps** (high cadence) distribute force better and **reduce injuries**. Try to land your feet **under your body**, not in front. It feels weird at first but your body will thank you."
+    ],
+    "tip.15.detail": [
+        .es: "Estirar músculos fríos puede causar **micro-desgarros**. Después de correr, tus músculos están **calientes y flexibles**, que es el momento perfecto para estirar. Enfócate en pantorrillas, cuádriceps, isquiotibiales y cadera. Mantén cada estiramiento **20-30 segundos** sin rebotar.",
+        .en: "Stretching cold muscles can cause **micro-tears**. After running, your muscles are **warm and flexible** — the perfect time to stretch. Focus on calves, quads, hamstrings, and hips. Hold each stretch for **20-30 seconds** without bouncing."
+    ],
+    "tip.16.detail": [
+        .es: "Tu cabeza pesa unos **5 kg**. Si la inclinas hacia abajo, todo tu torso se encorva y respiras peor. Mantén la **mirada al horizonte**, el pecho abierto y los hombros atrás. Notarás que puedes **respirar más profundo** y correr con menos esfuerzo.",
+        .en: "Your head weighs about **5 kg**. If you tilt it down, your whole torso hunches and you breathe worse. Keep your **gaze on the horizon**, chest open, and shoulders back. You'll notice you can **breathe deeper** and run with less effort."
+    ],
+    "tip.17.detail": [
+        .es: "El **patrón 3-2** sincroniza tu respiración con tus pasos. Inhala durante **tres pasos**, exhala durante **dos**. Esto te da un ritmo constante y distribuye mejor el esfuerzo. Si 3-2 es mucho, prueba **2-2** o **2-1**.",
+        .en: "The **3-2 pattern** syncs your breathing with your steps. Inhale for **three steps**, exhale for **two**. This gives you a steady rhythm and distributes effort better. If 3-2 is too much, try **2-2** or **2-1**."
+    ],
+    "tip.18.detail": [
+        .es: "Imagina que alguien tira de un **hilo invisible** desde la coronilla de tu cabeza. Eso alinea tu columna, abre tu pecho y permite que tu **diafragma** trabaje bien. **Una postura neutral** es la más eficiente para correr.",
+        .en: "Imagine someone pulling an **invisible string** from the crown of your head. That aligns your spine, opens your chest, and lets your **diaphragm** work properly. **A neutral posture** is the most efficient for running."
+    ],
+    "tip.19.detail": [
+        .es: "Empieza caminando rápido **1-2 minutos**, luego haz **10 rotaciones** de cada tobillo, **10 elevaciones** de rodilla y algunos balanceos de pierna. Esto **activa los músculos** y lubrica las articulaciones. Un buen calentamiento puede ser la diferencia entre una buena carrera y una molestia.",
+        .en: "Start with **1-2 minutes** of brisk walking, then do **10 rotations** of each ankle, **10 knee raises**, and some leg swings. This **activates your muscles** and lubricates your joints. A good warm-up can be the difference between a great run and discomfort."
+    ],
+    "tip.20.detail": [
+        .es: "**Tres semanas** creando un hábito. Los científicos dicen que toma **21 días** formar uno, pero la ciencia real dice que para hábitos complejos como correr se necesitan más cerca de **66 días**. Por eso estás aquí. **Vas por buen camino**.",
+        .en: "**Three weeks** building a habit. Scientists say it takes **21 days** to form one, but real science says complex habits like running need closer to **66 days**. That's why you're here. **You're on the right track**."
+    ],
+
+    // Days 21-30
+    "tip.21.detail": [
+        .es: "Correr con el estómago vacío puede dejarte sin energía. Pero comer demasiado te dará malestar. Un **snack ligero** como un plátano, unas tostadas con miel o frutos secos **1-2 horas antes** es lo ideal. **Encuentra lo que le funciona a tu cuerpo**.",
+        .en: "Running on an empty stomach can leave you out of energy. But eating too much will cause discomfort. A **light snack** like a banana, toast with honey, or nuts **1-2 hours before** is ideal. **Find what works for your body**."
+    ],
+    "tip.22.detail": [
+        .es: "Tus músculos no se fortalecen mientras corres, sino **mientras descansas**. Durante el descanso se reparan las micro-fibras rotas y se reconstruyen **más fuertes**. Un día sin correr **no es perder el tiempo**, es invertir en tu progreso.",
+        .en: "Your muscles don't get stronger while running, but **while resting**. During rest, broken micro-fibers repair and rebuild **stronger**. A day without running **isn't wasting time**, it's investing in your progress."
+    ],
+    "tip.23.detail": [
+        .es: "Tu cuerpo necesita agua para **regular la temperatura**, transportar nutrientes y eliminar desechos. Si solo bebes antes de correr, llegas con un **déficit acumulado**. Lleva una botella contigo durante el día y toma **sorbos regulares**.",
+        .en: "Your body needs water to **regulate temperature**, transport nutrients, and eliminate waste. If you only drink before running, you arrive with an **accumulated deficit**. Carry a bottle with you during the day and take **regular sips**."
+    ],
+    "tip.24.detail": [
+        .es: "No todas las carreras tienen que ser intensas. Los corredores experimentados **alternan días duros con días suaves**. Si tus piernas están pesadas, haz una carrera **corta y lenta**. El objetivo es **mantener el hábito activo** sin castigar tu cuerpo.",
+        .en: "Not every run has to be intense. Experienced runners **alternate hard days with easy days**. If your legs feel heavy, do a **short, slow run**. The goal is **keeping the habit alive** without punishing your body."
+    ],
+    "tip.25.detail": [
+        .es: "A estas alturas tu cuerpo gasta más energía. Las **proteínas** (pollo, huevo, legumbres) reparan los músculos. Los **carbohidratos** (arroz, pasta, fruta) te dan energía. No necesitas una dieta especial, solo come **variado y suficiente**.",
+        .en: "At this point your body spends more energy. **Proteins** (chicken, eggs, legumes) repair muscles. **Carbs** (rice, pasta, fruit) give you energy. You don't need a special diet, just eat **varied and enough**."
+    ],
+    "tip.26.detail": [
+        .es: "El sueño es cuando tu cuerpo produce **hormona del crecimiento**, repara tejidos y consolida la **memoria muscular**. Dormir mal se nota: piernas pesadas, mente lenta, menos motivación. Prioriza **7-8 horas** de sueño como priorizas tu carrera.",
+        .en: "Sleep is when your body produces **growth hormone**, repairs tissue, and consolidates **muscle memory**. Poor sleep shows: heavy legs, slow mind, less motivation. Prioritize **7-8 hours** of sleep like you prioritize your run."
+    ],
+    "tip.27.detail": [
+        .es: "Una comida pesada tarda **2-3 horas** en digerirse. Si corres con el estómago lleno, la sangre se queda en el sistema digestivo. Resultado: **calambres, náuseas** y una carrera miserable. Come ligero o espera al menos **2 horas** después de una comida grande.",
+        .en: "A heavy meal takes **2-3 hours** to digest. If you run with a full stomach, blood stays in your digestive system. Result: **cramps, nausea**, and a miserable run. Eat light or wait at least **2 hours** after a big meal."
+    ],
+    "tip.28.detail": [
+        .es: "**Un mes** es un logro enorme. Tu corazón bombea **más sangre** por latido, tus pulmones absorben **más oxígeno**, tus mitocondrias son más eficientes. Aunque no lo veas en el espejo, por dentro **tu cuerpo es una máquina diferente**.",
+        .en: "**One month** is a huge achievement. Your heart pumps **more blood** per beat, your lungs absorb **more oxygen**, your mitochondria are more efficient. Even if you don't see it in the mirror, inside **your body is a different machine**."
+    ],
+    "tip.29.detail": [
+        .es: "El **descanso activo** mantiene la circulación sin el impacto de correr. Una caminata de **20 minutos**, estiramientos suaves o yoga ligero ayudan a recuperarte **más rápido** que quedarte en el sofá. **Moverte sin esfuerzo** es la mejor receta.",
+        .en: "**Active rest** keeps circulation going without the impact of running. A **20-minute walk**, gentle stretching, or light yoga help you recover **faster** than staying on the couch. **Moving without strain** is the best recipe."
+    ],
+    "tip.30.detail": [
+        .es: "La **cafeína** mejora el rendimiento: aumenta el estado de alerta y reduce la percepción de esfuerzo. Un café solo **30 minutos antes** puede hacer que tu carrera se sienta más fácil. Pero no exageres: demasiada cafeína causa **ansiedad y deshidratación**.",
+        .en: "**Caffeine** improves performance: it increases alertness and reduces perceived effort. A black coffee **30 minutes before** can make your run feel easier. But don't overdo it: too much caffeine causes **anxiety and dehydration**."
+    ],
+
+    // Days 31-40
+    "tip.31.detail": [
+        .es: "Las zapatillas pierden **amortiguación** con el uso, aunque se vean bien por fuera. Después de **500-700 km**, la espuma ya no absorbe el impacto igual. Si notas más dolor en rodillas o espinillas, puede ser señal de que **es hora de cambiarlas**.",
+        .en: "Running shoes lose **cushioning** with use, even if they look fine outside. After **500-700 km**, the foam no longer absorbs impact the same way. If you notice more knee or shin pain, it might be a sign **it's time to replace them**."
+    ],
+    "tip.32.detail": [
+        .es: "El **calor extremo** fuerza a tu cuerpo a enfriar la piel y mover los músculos al mismo tiempo. Corre **temprano** (antes de las 9) o al **atardecer** (después de las 7). Si no puedes evitar el calor, **baja el ritmo y lleva agua**.",
+        .en: "**Extreme heat** forces your body to cool your skin and power your muscles simultaneously. Run **early** (before 9 AM) or at **sunset** (after 7 PM). If you can't avoid the heat, **slow down and carry water**."
+    ],
+    "tip.33.detail": [
+        .es: "Correr fortalece los músculos grandes pero puede dejar débiles los **estabilizadores**. Ejercicios como elevaciones de talón y sentadillas a una pierna toman solo **5 minutos**. Hazlos **2-3 veces por semana** y tus articulaciones te lo agradecerán.",
+        .en: "Running strengthens large muscles but can leave **stabilizers** weak. Exercises like heel raises and single-leg squats take just **5 minutes**. Do them **2-3 times a week** and your joints will thank you."
+    ],
+    "tip.34.detail": [
+        .es: "Al correr generas calor rápidamente. Si te abrigas demasiado, terminarás sudando en exceso. La **regla de los 10 grados** funciona: si afuera hay 15°C, vístete como si hubiera 25°C. En los primeros minutos sentirás frío, pero **pronto estarás perfecto**.",
+        .en: "When you start running, you generate heat quickly. If you overdress, you'll sweat too much. The **10-degree rule** works: if it's 15°C outside, dress as if it's 25°C. You'll feel cold at first, but **soon you'll be just right**."
+    ],
+    "tip.35.detail": [
+        .es: "Muchos corredores descubren que **la lluvia es su clima favorito**. El aire es más fresco, hay menos gente y la sensación de **libertad es única**. Solo asegúrate de usar ropa que no absorba agua y ten cuidado con superficies resbalosas.",
+        .en: "Many runners discover that **rain is their favorite weather**. The air is cooler, fewer people around, and the feeling of **freedom is unique**. Just make sure to wear clothes that don't absorb water and be careful on slippery surfaces."
+    ],
+    "tip.36.detail": [
+        .es: "Las **telas técnicas** (poliéster, nylon) mueven el sudor lejos de tu piel, manteniéndote seco. El **algodón** absorbe la humedad y la retiene, te hace sentir pesado y causa rozaduras. **Vale la pena invertir en ropa técnica**.",
+        .en: "**Technical fabrics** (polyester, nylon) wick sweat away from your skin, keeping you dry. **Cotton** absorbs moisture and holds it, making you feel heavy and causing chafing. **It's worth investing in technical clothing**."
+    ],
+    "tip.37.detail": [
+        .es: "Un tirón muscular es una **señal de alerta**, no un reto a superar. Si sigues corriendo, un desgarro menor puede convertirse en uno mayor. **Para, estira suave, camina a casa**. Más vale **un día perdido que un mes** de recuperación.",
+        .en: "A muscle pull is a **warning signal**, not a challenge to overcome. If you keep running, a minor tear can become a major one. **Stop, stretch gently, walk home**. Better **one lost day than a month** of recovery."
+    ],
+    "tip.38.detail": [
+        .es: "Correr siempre por la misma ruta trabaja los mismos músculos. Cambiar a un parque con subidas, un **sendero de tierra** o correr en dirección contraria **activa músculos diferentes**. Además, las **rutas nuevas** mantienen tu mente estimulada.",
+        .en: "Always running the same route works the same muscles. Switching to a park with hills, a **dirt trail**, or running in reverse **activates different muscles**. Plus, **new routes** keep your mind stimulated."
+    ],
+    "tip.39.detail": [
+        .es: "Los músculos fríos son **menos elásticos** y más propensos a desgarros. En días fríos, dedica **5-7 minutos** al calentamiento en vez de los 3 habituales. Empieza dentro de casa con movimientos articulares, luego **camina rápido antes de trotar**.",
+        .en: "Cold muscles are **less elastic** and more prone to tears. On cold days, spend **5-7 minutes** warming up instead of the usual 3. Start indoors with joint movements, then **walk briskly before jogging**."
+    ],
+    "tip.40.detail": [
+        .es: "**40 días** de carrera continua es algo que **menos del 5%** de la gente logra. Tu capacidad pulmonar ha mejorado, tu frecuencia cardíaca ha bajado, tus piernas son más fuertes. **Ya no estás probando si puedes. Ya lo estás haciendo**.",
+        .en: "**40 consecutive days** of running is something **less than 5%** of people achieve. Your lung capacity has improved, your heart rate has dropped, your legs are stronger. **You're no longer testing if you can. You're already doing it**."
+    ],
+
+    // Days 41-50
+    "tip.41.detail": [
+        .es: "Los **intervalos** son la forma más eficiente de mejorar tu velocidad. Corre rápido un rato corto, descansa trotando, y repite. Tu corazón aprende a bombear **más sangre**, tus músculos a usar **más oxígeno** y tu ritmo mejora sin que te des cuenta.",
+        .en: "**Intervals** are the most efficient way to improve your speed. Run fast for a short burst, recover by jogging, and repeat. Your heart learns to pump **more blood**, your muscles to use **more oxygen**, and your pace improves without you noticing."
+    ],
+    "tip.42.detail": [
+        .es: "La **fatiga mental** llega antes que la física. Cuando tu cerebro dice que ya no puedes, tu cuerpo generalmente tiene un **40% más** de capacidad. Un minuto más entrena tu **voluntad** tanto como tus piernas. **No te rindas al primer instinto de parar**.",
+        .en: "**Mental fatigue** arrives before physical fatigue. When your brain says you're done, your body usually has **40% more** capacity. One more minute trains your **willpower** as much as your legs. **Don't give in to the first instinct to stop**."
+    ],
+    "tip.43.detail": [
+        .es: "La **regla del 10%** es un principio probado. Si esta semana corriste **10 km**, la siguiente no deberías pasar de **11 km**. Aumentos bruscos son la causa número uno de **lesiones por sobreuso**. La paciencia aquí es **velocidad a largo plazo**.",
+        .en: "The **10% rule** is a proven principle. If you ran **10 km** this week, next week don't go over **11 km**. Sudden increases are the number one cause of **overuse injuries**. Patience here is **long-term speed**."
+    ],
+    "tip.44.detail": [
+        .es: "La música con **150-180 BPM** coincide con una cadencia ideal de running. Canciones rápidas te energizan en los intervalos y las lentas te ayudan a recuperar. **Crea una playlist** para correr y notarás cómo tu cuerpo **se sincroniza con el ritmo**.",
+        .en: "Music at **150-180 BPM** matches an ideal running cadence. Fast songs energize you during intervals and slow ones help recovery. **Create a playlist** for running and notice how your body **syncs with the beat**."
+    ],
+    "tip.45.detail": [
+        .es: "En las subidas, tu instinto es mantener el mismo ritmo, pero eso dispara tu frecuencia cardíaca. **Acorta el paso**, inclínate ligeramente hacia adelante y mantén el mismo **nivel de esfuerzo**, no de velocidad. **Llegarás arriba con energía**.",
+        .en: "On hills, your instinct is to keep the same pace, but that spikes your heart rate. **Shorten your stride**, lean slightly forward, and maintain the same **effort level**, not speed. **You'll reach the top with energy**."
+    ],
+    "tip.46.detail": [
+        .es: "La **visualización** activa las mismas redes neuronales que la acción real. Antes de salir, cierra los ojos **30 segundos** e imagínate corriendo fuerte y sintiéndote ligero. Este **ejercicio mental** te prepara para rendir **mejor de lo que crees**.",
+        .en: "**Visualization** activates the same neural networks as the real action. Before heading out, close your eyes for **30 seconds** and imagine yourself running strong and feeling light. This **mental exercise** prepares you to perform **better than you think**."
+    ],
+    "tip.47.detail": [
+        .es: "Cualquiera puede correr cuando se siente motivado. **El verdadero hábito** se construye en los días de lluvia, cansancio o flojera. Cuando sales a pesar de las excusas, le dices a tu cerebro que **esto no es opcional**. Esos son los días que **más cuentan**.",
+        .en: "Anyone can run on days they feel motivated. **The real habit** is built on rainy, tired, or lazy days. When you head out despite the excuses, you're telling your brain **this isn't optional**. Those are the days that **count the most**."
+    ],
+    "tip.48.detail": [
+        .es: "Obsesionarse con el reloj genera **ansiedad** y te hace correr en tensión. **Corre por cómo te sientes**: si hoy te sientes bien, fluye. Si estás cansado, sé gentil. El cuerpo no rinde igual todos los días. **La velocidad viene con la constancia**.",
+        .en: "Obsessing over the clock creates **anxiety** and makes you run tense. **Run by how you feel**: if today feels good, flow. If you're tired, be gentle. Your body doesn't perform the same every day. **Speed comes with consistency**."
+    ],
+    "tip.49.detail": [
+        .es: "**Siete semanas** es más de lo que la mayoría de programas para principiantes duran. Piensa en todos los días que no querías salir y **lo hiciste de todas formas**. Esa disciplina se traslada a todo en tu vida. Correr te hace **más fuerte como persona**.",
+        .en: "**Seven weeks** is longer than most beginner programs last. Think about all the days you didn't want to go out and **did it anyway**. That discipline transfers to everything in your life. Running makes you **stronger as a person**."
+    ],
+    "tip.50.detail": [
+        .es: "Sin música, audiolibros ni podcasts, solo quedan tus pensamientos, tu respiración y tus pisadas. Es una forma de **mindfulness** que muchos corredores avanzados practican. Te conecta con tu cuerpo y puedes descubrir un **ritmo interior** que no sabías que tenías.",
+        .en: "Without music, audiobooks, or podcasts, all that's left is your thoughts, your breathing, and your footsteps. It's a form of **mindfulness** that many advanced runners practice. It connects you with your body and you may discover an **inner rhythm** you didn't know you had."
+    ],
+
+    // Days 51-58
+    "tip.51.detail": [
+        .es: "Parar de golpe hace que la sangre se acumule en las piernas, causando **mareos**. Caminar **5 minutos** permite que tu frecuencia cardíaca baje gradualmente. Piénsalo como aterrizar un avión: **necesitas una pista de desaceleración**.",
+        .en: "Stopping suddenly causes blood to pool in your legs, causing **dizziness**. Walking for **5 minutes** lets your heart rate come down gradually. Think of it like landing a plane: **you need a deceleration runway**."
+    ],
+    "tip.52.detail": [
+        .es: "**Cuádriceps**, isquiotibiales, **gemelos** y cadera son los cuatro grupos que más trabajan al correr. Estirar cada uno **30 segundos** después de la carrera reduce la **rigidez del día siguiente** y mejora tu rango de movimiento con el tiempo.",
+        .en: "**Quads**, hamstrings, **calves**, and hips are the four groups that work hardest when running. Stretching each for **30 seconds** after your run reduces **next-day stiffness** and improves your range of motion over time."
+    ],
+    "tip.53.detail": [
+        .es: "Los números (ritmo, distancia, calorías) son útiles a largo plazo, pero no deberían dictar cada carrera. Tu **percepción del esfuerzo** es un indicador muy confiable. Aprende a **escuchar las señales de tu cuerpo** y ajusta tu rendimiento de forma intuitiva.",
+        .en: "Numbers (pace, distance, calories) are useful long-term, but shouldn't dictate every run. Your **perceived effort** is a very reliable indicator. Learn to **listen to your body's signals** and adjust your performance intuitively."
+    ],
+    "tip.54.detail": [
+        .es: "El **rodillo de espuma** aplica presión sobre los tejidos blandos, liberando nudos y mejorando la circulación. Pásalo por pantorrillas, cuádriceps e isquiotibiales durante **1-2 minutos** por grupo. Puede doler un poco, pero **el alivio vale la pena**.",
+        .en: "A **foam roller** applies pressure on soft tissue, releasing knots and improving circulation. Roll over calves, quads, and hamstrings for **1-2 minutes** per group. It might hurt a bit, but **the relief is worth it**."
+    ],
+    "tip.55.detail": [
+        .es: "La mayoría empieza cosas y no las termina. Tú estás a **11 días** de completar un desafío que cambia la vida. Ya corres sin pensarlo, tu cuerpo lo espera y tu mente lo necesita. Correr **ya es parte de quién eres**.",
+        .en: "Most people start things and don't finish them. You're **11 days** from completing a life-changing challenge. You already run without thinking, your body expects it, and your mind needs it. Running **is already part of who you are**."
+    ],
+    "tip.56.detail": [
+        .es: "Mucha gente termina de correr y se tumba. Pero tu cuerpo necesita una **transición**. Caminar unos minutos y estirar suave ayuda a evacuar el **ácido láctico**, reduce la inflamación y **acelera la recuperación**. Dale a tu cuerpo ese respeto.",
+        .en: "Many people finish running and lie down. But your body needs a **transition**. Walking a few minutes and stretching helps clear **lactic acid**, reduces inflammation, and **speeds up recovery**. Give your body that respect."
+    ],
+    "tip.57.detail": [
+        .es: "Después de correr, tu sistema nervioso está acelerado. **Cinco respiraciones profundas** activan el sistema parasimpático: el modo de **descanso y recuperación**. Inhala **4 segundos**, sostén **4**, exhala **6**. Sentirás la diferencia al instante.",
+        .en: "After running, your nervous system is revved up. **Five deep breaths** activate the parasympathetic system: **rest and recovery** mode. Inhale **4 seconds**, hold **4**, exhale **6**. You'll feel the difference instantly."
+    ],
+    "tip.58.detail": [
+        .es: "A veces olvidamos que simplemente **salir a correr ya es una victoria**. No todos los días serán épicos. Algunos serán lentos, cortos o difíciles. Pero **cada uno de ellos cuenta**. Celebra el acto de moverte, no solo los números.",
+        .en: "Sometimes we forget that simply **going out to run is already a victory**. Not every day will be epic. Some will be slow, short, or hard. But **every single one counts**. Celebrate the act of moving, not just the numbers."
+    ],
+
+    // Days 59-66
+    "tip.59.detail": [
+        .es: "El día 1 probablemente estabas nervioso e inseguro. Ahora corres con **confianza**, tu cuerpo es **más fuerte** y tu mente **más resistente**. Esa transformación no es solo física. **Cambiaste tu relación contigo mismo**.",
+        .en: "On day 1 you were probably nervous and unsure. Now you run with **confidence**, your body is **stronger**, and your mind **more resilient**. That transformation isn't just physical. **You changed your relationship with yourself**."
+    ],
+    "tip.60.detail": [
+        .es: "Cuando compartes tu progreso, no es presumir, es **inspirar**. Alguien en tu vida puede estar pensando en empezar a correr y tu ejemplo puede ser **el empujón que necesita**. Comparte, celebra y deja que otros celebren contigo.",
+        .en: "When you share your progress, it's not bragging — it's **inspiring**. Someone in your life might be thinking about starting to run, and your example could be **the push they need**. Share, celebrate, and let others celebrate with you."
+    ],
+    "tip.61.detail": [
+        .es: "**Cinco días**. Solo cinco. Cada kilómetro que corras ahora tiene un peso especial. No porque sea diferente, sino porque lo haces sabiendo que estás a punto de completar **algo extraordinario**. Saborea cada paso.",
+        .en: "**Five days**. Just five. Every kilometer you run now carries special weight. Not because it's different, but because you're doing it knowing you're about to complete **something extraordinary**. Savor every step."
+    ],
+    "tip.62.detail": [
+        .es: "Los primeros días corrías por el reto. Ahora corres porque **lo necesitas**, porque tu cuerpo lo pide y porque tu día no se siente completo sin esos kilómetros. **El reto termina, pero tu carrera como corredor apenas empieza**.",
+        .en: "The first days you ran for the challenge. Now you run because **you need it**, because your body asks for it, and your day doesn't feel complete without those kilometers. **The challenge ends, but your journey as a runner is just beginning**."
+    ],
+    "tip.63.detail": [
+        .es: "Después de 66 días tienes la base para cualquier cosa: un **5K**, un **10K**, o simplemente seguir corriendo por placer. **Inscribirte en una carrera** te da un objetivo concreto y la emoción de correr con otros. Date ese regalo.",
+        .en: "After 66 days you have the foundation for anything: a **5K**, a **10K**, or simply continuing to run for pleasure. **Signing up for a race** gives you a concrete goal and the thrill of running with others. Give yourself that gift."
+    ],
+    "tip.64.detail": [
+        .es: "**64 días** de trabajo, sudor, días buenos y días malos. Todo eso te pertenece. **Nadie puede quitarte** la disciplina que construiste, la resistencia que ganaste ni la confianza que ahora tienes. Este logro es **tuyo para siempre**.",
+        .en: "**64 days** of work, sweat, good days and bad days. All of that belongs to you. **No one can take away** the discipline you built, the endurance you gained, or the confidence you now have. This achievement is **yours forever**."
+    ],
+    "tip.65.detail": [
+        .es: "Mañana cruzas la meta, pero **el hábito ya se formó**. Lo que hiciste en estos 65 días reconectó tu cerebro: las **rutas neuronales** del hábito de correr ya están grabadas. Mañana no es un final, es la confirmación de que **eres un corredor**.",
+        .en: "Tomorrow you cross the finish line, but **the habit is already formed**. What you did in these 65 days rewired your brain: the **neural pathways** of the running habit are now engraved. Tomorrow isn't an ending, it's confirmation that **you're a runner**."
+    ],
+    "tip.66.detail": [
+        .es: "**66 días**. El número mágico para formar un **hábito de por vida**. Cruzaste la meta de uno de los retos más difíciles que existen. Ahora tienes la prueba de que puedes lograr lo que te propongas. **Sigue corriendo, sigue creciendo, sigue siendo imparable**.",
+        .en: "**66 days**. The magic number to form a **lifelong habit**. You crossed the finish line of one of the hardest challenges there is. Now you have proof you can achieve anything you set your mind to. **Keep running, keep growing, keep being unstoppable**."
+    ],
 ]

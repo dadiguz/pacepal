@@ -144,6 +144,9 @@ final class AppState {
     // Achievement milestones already seen by the user
     private(set) var seenAchievements: Set<Int>
 
+    // Daily tips already seen by the user
+    private(set) var seenTips: Set<Int>
+
     // True once the user logs their first run — gates achievement triggers
     private(set) var challengeStarted: Bool
 
@@ -167,6 +170,8 @@ final class AppState {
         self.widgetPromptDone = UserDefaults.standard.bool(forKey: "widgetPromptDone")
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
         self.seenAchievements = Set(seen)
+        let seenT = UserDefaults.standard.array(forKey: "seenTips") as? [Int] ?? []
+        self.seenTips = Set(seenT)
         self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
         self.medalEarned = UserDefaults.standard.bool(forKey: "medalEarned")
         self.selectedBackground = UserDefaults.standard.string(forKey: "selectedBackground")
@@ -279,6 +284,26 @@ final class AppState {
         updated.insert(day)
         seenAchievements = updated
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
+    }
+
+    /// Returns the tip number (1-66) for the current day if not yet seen, nil otherwise.
+    var pendingTip: Int? {
+        guard challengeStarted else { return nil }
+        let dayNum = min(66, max(1, (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1))
+        guard !seenTips.contains(dayNum) else { return nil }
+        return dayNum
+    }
+
+    func markTipSeen(_ day: Int) {
+        var updated = seenTips
+        updated.insert(day)
+        seenTips = updated
+        UserDefaults.standard.set(Array(seenTips), forKey: "seenTips")
+    }
+
+    func resetTips() {
+        seenTips = []
+        UserDefaults.standard.removeObject(forKey: "seenTips")
     }
 
     #if DEBUG

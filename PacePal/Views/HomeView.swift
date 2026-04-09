@@ -28,6 +28,7 @@ struct HomeView: View {
     @State private var replayAchievement: Achievement? = nil
     @State private var deadAudioStarted = false
     @State private var showMedalTutorial = false
+    @State private var pendingTipDay: Int? = nil
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -212,6 +213,18 @@ struct HomeView: View {
                 .zIndex(20)
             }
 
+            // ── Daily tip modal ─────────────────────────────────────────
+            if let tipDay = pendingTipDay {
+                DailyTipModal(day: tipDay, dna: dna) {
+                    appState.markTipSeen(tipDay)
+                    withAnimation(.spring(duration: 0.35)) { pendingTipDay = nil }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .transition(.opacity)
+                .zIndex(18)
+            }
+
             // ── Medal tutorial (shown after day 66 modal dismiss) ────────
             if showMedalTutorial {
                 MedalTutorialOverlay {
@@ -359,8 +372,21 @@ struct HomeView: View {
 
     private func checkForAchievement() {
         guard pendingAchievement == nil, !showPetStatus else { return }
-        withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
-            pendingAchievement = appState.pendingAchievement
+        if let ach = appState.pendingAchievement {
+            withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
+                pendingAchievement = ach
+            }
+        } else {
+            checkForTip()
+        }
+    }
+
+    private func checkForTip() {
+        guard pendingTipDay == nil, pendingAchievement == nil, !showPetStatus, !showMedalTutorial else { return }
+        if let day = appState.pendingTip {
+            withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
+                pendingTipDay = day
+            }
         }
     }
 
@@ -1121,6 +1147,133 @@ private struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+// MARK: – Daily Tip Modal
+
+struct DailyTipModal: View {
+    let day: Int
+    let dna: PetDNA
+    let onDismiss: () -> Void
+
+    @State private var appeared = false
+
+    // Parses **bold** markers into orange bold text
+    private func richDetail(_ raw: String) -> Text {
+        let orange = Color(hex: "#F9703E")
+        let parts = raw.components(separatedBy: "**")
+        var result = Text("")
+        for (i, part) in parts.enumerated() {
+            if part.isEmpty { continue }
+            if i % 2 == 1 {
+                result = result + Text(part).bold().foregroundColor(orange)
+            } else {
+                result = result + Text(part)
+            }
+        }
+        return result
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                // Solid yellow + pattern overlay
+                Color(hex: "#F9F496")
+
+                Image("pattern")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                    .opacity(0.3)
+
+                VStack(spacing: 0) {
+                    Spacer().frame(height: 80)
+
+                    // Badge
+                    Text(L("tip.badge", day))
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .tracking(2)
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 7)
+                        .background(Color(hex: "#F9703E").opacity(0.12))
+                        .clipShape(Capsule())
+                        .overlay(Capsule().strokeBorder(Color(hex: "#F9703E").opacity(0.3), lineWidth: 1))
+                        .opacity(appeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.3), value: appeared)
+
+                    Spacer().frame(height: 20)
+
+                    // Content box (like energy card: dark bg, white border)
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 14) {
+                            // Title (short tip)
+                            Text(L("tip.\(day)"))
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .foregroundStyle(Color(hex: "#F9703E"))
+                                .multilineTextAlignment(.center)
+
+                            // Detail text with auto-highlighted keywords
+                            richDetail(L("tip.\(day).detail"))
+                                .font(.system(size: 16, weight: .regular, design: .rounded))
+                                .foregroundStyle(Color.white.opacity(0.9))
+                                .multilineTextAlignment(.leading)
+                                .lineSpacing(4)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 20)
+                    }
+                    .frame(maxHeight: geo.size.height * 0.40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "#2B2420"))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .strokeBorder(Color.white.opacity(0.78), lineWidth: 1.5)
+                            )
+                            .shadow(color: Color.black.opacity(0.25), radius: 12, y: 4)
+                    )
+                    .padding(.horizontal, 24)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.4).delay(0.1), value: appeared)
+
+                    Spacer()
+
+                    // Pet with teaching pose (fixed)
+                    PetAnimationView(dna: dna, pose: .teaching, pixelSize: 7, fps: 3)
+                        .scaleEffect(appeared ? 1.0 : 0.8)
+                        .opacity(appeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.4).delay(0.15), value: appeared)
+                        .padding(.bottom, 32)
+
+                    // Dismiss
+                    Button(action: onDismiss) {
+                        Text(L("tip.dismiss"))
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                    }
+                    .foregroundStyle(.white)
+                    .background(Color(hex: "#F9703E"))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color(hex: "#F9703E").opacity(0.4), radius: 12, y: 5)
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 56)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeOut(duration: 0.3).delay(0.25), value: appeared)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation { appeared = true }
+        }
+    }
 }
 
 // MARK: – Medal tutorial overlay

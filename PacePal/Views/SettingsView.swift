@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showResetConfirm = false
     @State private var showBackgroundPicker = false
+    @State private var showTipsSheet = false
     @State private var showPaywall = false
 
     #if DEBUG
@@ -62,6 +63,15 @@ struct SettingsView: View {
                         subtitle: L("settings.background_subtitle")
                     ) {
                         showBackgroundPicker = true
+                    }
+
+                    settingsRow(
+                        icon: "lightbulb.fill",
+                        iconColor: "#F59E0B",
+                        title: L("tip.section_title"),
+                        subtitle: "\(appState.seenTips.count)/66"
+                    ) {
+                        showTipsSheet = true
                     }
 
                     // ── Sounds toggle ────────────────────────────────────
@@ -140,6 +150,12 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showBackgroundPicker) {
             BackgroundPickerSheet()
+                .environment(appState)
+                .presentationDetents([.fraction(0.85)])
+                .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showTipsSheet) {
+            TipsSheet()
                 .environment(appState)
                 .presentationDetents([.fraction(0.85)])
                 .presentationDragIndicator(.visible)
@@ -390,6 +406,20 @@ struct SettingsView: View {
                     .font(.system(size: 10, weight: .black, design: .monospaced))
                     .foregroundStyle(Color(hex: "#FFD700"))
             }
+
+            // Tips controls
+            Button {
+                appState.resetTips()
+            } label: {
+                Text("💡 Reset tips (\(appState.seenTips.count) vistos)")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(hex: "#E12D39"))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+            }
         }
     }
     #endif
@@ -630,6 +660,102 @@ struct BackgroundPickerSheet: View {
         }
         .background(Color(hex: "#F5F8FC").ignoresSafeArea())
     }
+}
+
+// MARK: - Tips Sheet
+
+struct TipsSheet: View {
+    @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedTipDay: Int? = nil
+
+    private var currentDay: Int {
+        (Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0) + 1
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text(L("tip.section_title"))
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .padding(9)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .padding(.bottom, 16)
+
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(1...66, id: \.self) { day in
+                        let unlocked = appState.seenTips.contains(day)
+                        HStack(spacing: 14) {
+                            // Day badge
+                            Text("\(day)")
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                .foregroundStyle(unlocked ? Color(hex: "#F9703E") : Color(hex: "#9AA5B4"))
+                                .frame(width: 34, height: 34)
+                                .background(unlocked ? Color(hex: "#F9703E").opacity(0.12) : Color(hex: "#E5E7EB"))
+                                .clipShape(Circle())
+
+                            if unlocked {
+                                Text(L("tip.\(day)"))
+                                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                                    .foregroundStyle(Color(hex: "#1F2933"))
+                            } else {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 11))
+                                    Text(L("tip.locked", day))
+                                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                                }
+                                .foregroundStyle(Color(hex: "#9AA5B4"))
+                            }
+                            Spacer()
+                            if unlocked {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .onTapGesture {
+                            if unlocked { selectedTipDay = day }
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 32)
+            }
+        }
+        .background(Color(hex: "#F5F8FC").ignoresSafeArea())
+        .fullScreenCover(item: Binding(
+            get: { selectedTipDay.map { TipDayItem(day: $0) } },
+            set: { selectedTipDay = $0?.day }
+        )) { item in
+            DailyTipModal(day: item.day, dna: appState.selectedCharacter ?? PetDNA.presets()[0]) {
+                selectedTipDay = nil
+            }
+            .presentationBackground(.clear)
+        }
+    }
+}
+
+private struct TipDayItem: Identifiable {
+    let day: Int
+    var id: Int { day }
 }
 
 #Preview {

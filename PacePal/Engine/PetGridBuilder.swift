@@ -478,6 +478,30 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
                 pset(&g, x: lX,   y: aY+2, cell: .body); pset(&g, x: lX+1, y: aY+1, cell: .body)
                 pset(&g, x: rX-1, y: aY-2, cell: .body); pset(&g, x: rX,   y: aY-3, cell: .body)
             }
+        case .teaching:
+            // Left arm: holds brown clipboard
+            pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX-1, y: aY+1, cell: .body)
+            // Clipboard (brown board with clip at top)
+            let cbX = lX - 3; let cbY = aY + 1
+            // Board body (brown = accent2)
+            for dy in 0...4 { for dx in 0...2 {
+                pset(&g, x: cbX + dx, y: cbY + dy, cell: .accent2)
+            }}
+            // Paper inside (white = face)
+            for dy in 1...3 { for dx in 0...1 {
+                pset(&g, x: cbX + dx + 1, y: cbY + dy, cell: .face)
+            }}
+            // Metal clip at top center (gray)
+            pset(&g, x: cbX + 1, y: cbY - 1, cell: .gray)
+            pset(&g, x: cbX + 1, y: cbY, cell: .gray)
+            // Right arm: writing with yellow pencil
+            let penY = frame % 2 == 0 ? aY : aY + 1
+            pset(&g, x: rX, y: penY, cell: .body); pset(&g, x: rX + 1, y: penY, cell: .body)
+            // Pencil shaft (yellow = 2 pixels)
+            pset(&g, x: rX + 2, y: penY, cell: .accent1)
+            pset(&g, x: rX + 2, y: penY + 1, cell: .accent1)
+            // Pencil tip (gray point)
+            pset(&g, x: rX + 2, y: penY + 2, cell: .gray)
         case .idle:
             switch dna.armStyle {
             case 0: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
@@ -1069,6 +1093,14 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g,x:eyeLX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI,cell:.eyePupil)
             pset(&g,x:eyeRX-1,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,cell:.eyePupil)
         }
+    case .teaching:
+        // Happy focused eyes with shine (no glasses)
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
     default:
         if pose == .idle && frame == 6 {
             // Blink: ojos cerrados (barra horizontal)
@@ -1251,6 +1283,9 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:fCx-2,y:mY,  cell:.mouth); pset(&g,x:fCx-1,y:mY+1,cell:.mouth)
         pset(&g,x:fCx,  y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY+1,cell:.mouth)
         pset(&g,x:fCx+2,y:mY,  cell:.mouth)
+    case .teaching:
+        // Small focused smile — thinking while writing
+        pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
     case .sign:
         // Big open smile alternating — beaming with happiness
         if frame % 2 == 0 {
