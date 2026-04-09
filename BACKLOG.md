@@ -7,6 +7,7 @@
 | 1 | Fix boton HealthKit (5a) | Critica | Pendiente |
 | 2 | Revisar logica 66 dias (4) | Alta | Pendiente |
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
+| 16 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
 | 4 | Cuestionario inicial pre-compra (6) | Alta | Pendiente |
 | 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 6 | Estado Sleep del monito (3) | Media | Movido a P2 |
@@ -17,7 +18,7 @@
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
 | 12 | Compartir logro (share) | Media | ✅ Completado |
 | 13 | Tips diarios de correr (12) | Media | ✅ Completado |
-| 14 | Parpadeo rojo al colapsar (13) | Baja | Pendiente |
+| 14 | Parpadeo rojo al colapsar (13) | Baja | ✅ Completado |
 | 15 | Editor foto + stickers para compartir (14) | Baja | Movido a P2 |
 
 ---
@@ -206,6 +207,24 @@ Cuando el monito esta colapsando (energia = 0 / pose `.dead`), el fondo parpadea
 - [ ] Overlay rojo semi-transparente con animacion de pulso/parpadeo sobre el fondo actual
 - [ ] Sutil (no agresivo) — opacidad baja con easing suave
 - [ ] Se detiene cuando la energia sube de 0
+
+---
+
+## 16. Apple Watch App
+**Prioridad:** Alta | **Complejidad:** Alta
+
+App companion para Apple Watch que replica funcionalidad clave del iPhone.
+
+- [ ] Target watchOS en el proyecto (WatchKit App + Extension)
+- [ ] Mostrar energia actual del monito
+- [ ] Monito pixel art animado (pose segun energia)
+- [ ] Boton para iniciar/detener tracking de carrera
+- [ ] Tracking de distancia via CoreLocation en watch
+- [ ] Sincronizar datos de carrera con la app de iPhone (WatchConnectivity)
+- [ ] Complicaciones: energia del monito, km del dia
+- [ ] Strings en es/en
+
+> **Depende de:** Tarea 3 (Tracker de carrera in-app)
 
 ---
 

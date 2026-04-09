@@ -1,6 +1,28 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - Red pulse overlay for low energy
+private struct RedPulseOverlay: View {
+    let visible: Bool
+    @State private var pulse = false
+
+    var body: some View {
+        Color.red
+            .opacity(visible ? (pulse ? 0.35 : 0.08) : 0)
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+            .animation(.easeInOut(duration: 0.3), value: visible)
+            .task(id: visible) {
+                pulse = false
+                guard visible else { return }
+                try? await Task.sleep(for: .seconds(0.05))
+                withAnimation(.easeInOut(duration: 1.3).repeatForever(autoreverses: true)) {
+                    pulse = true
+                }
+            }
+    }
+}
+
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
@@ -29,6 +51,7 @@ struct HomeView: View {
     @State private var deadAudioStarted = false
     @State private var showMedalTutorial = false
     @State private var pendingTipDay: Int? = nil
+    @State private var showRedPulse = false
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -235,6 +258,13 @@ struct HomeView: View {
             }
         }
         .background { AppBackground(imageName: appState.selectedBackground) }
+        .overlay {
+            RedPulseOverlay(visible: showRedPulse)
+        }
+        .onChange(of: appState.energyResetDate) { _, _ in
+            let e = appState.energy(at: Date())
+            showRedPulse = e > 0 && e < 0.10
+        }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
         .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
@@ -249,6 +279,7 @@ struct HomeView: View {
             isInitialLoad = true
             currentPose = normalPose
             lastTrackedEnergy = appState.energy(at: Date())
+            showRedPulse = energy > 0 && energy < 0.10
             appState.syncToWidget(km: health.todayKm)
             SoundManager.shared.stopMusic(fadeDuration: 1.2)
             if energy <= 0 {
