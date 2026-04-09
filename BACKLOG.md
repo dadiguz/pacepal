@@ -9,16 +9,16 @@
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
 | 4 | Cuestionario inicial pre-compra (6) | Alta | Pendiente |
 | 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
-| 6 | Estado Sleep del monito (3) | Media | Pendiente |
+| 6 | Estado Sleep del monito (3) | Media | Movido a P2 |
 | 7 | Medalla 66 dias (2) | Media | ✅ Done |
-| 8 | Soporte millas (km/mi) | Media | Pendiente |
+| 8 | Soporte millas (km/mi) | Media | Movido a P2 |
 | 9 | Fondo negro seleccionable | Baja | ✅ Completado |
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
 | 11 | Cambio de idioma en Settings | Media | Pendiente |
 | 12 | Compartir logro (share) | Media | ✅ Completado |
 | 13 | Tips diarios de correr (12) | Media | ✅ Completado |
 | 14 | Parpadeo rojo al colapsar (13) | Baja | Pendiente |
-| 15 | Editor foto + stickers para compartir (14) | Baja | Pendiente |
+| 15 | Editor foto + stickers para compartir (14) | Baja | Movido a P2 |
 
 ---
 
