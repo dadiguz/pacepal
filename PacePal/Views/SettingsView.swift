@@ -13,6 +13,8 @@ struct SettingsView: View {
     @State private var showBackgroundPicker = false
     @State private var showTipsSheet = false
     @State private var showPaywall = false
+    @State private var showLanguagePicker = false
+    @State private var langRefresh = UUID()
 
     #if DEBUG
     @State private var debugNow: Date = Date()
@@ -105,6 +107,16 @@ struct SettingsView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
 
+                    // ── Language selector ────────────────────────────────
+                    settingsRow(
+                        icon: "globe",
+                        iconColor: "#8B5CF6",
+                        title: L("settings.language_title"),
+                        subtitle: L("settings.language_subtitle")
+                    ) {
+                        showLanguagePicker = true
+                    }
+
                     // ── Subscription row ─────────────────────────────────
                     if store.isPremium {
                         settingsRow(
@@ -165,6 +177,12 @@ struct SettingsView: View {
                 .environment(appState)
                 .environment(store)
         }
+        .sheet(isPresented: $showLanguagePicker, onDismiss: { langRefresh = UUID() }) {
+            LanguagePickerSheet()
+                .presentationDetents([.fraction(0.45)])
+                .presentationDragIndicator(.visible)
+        }
+        .id(langRefresh)
         .confirmationDialog(L("settings.reset_title"), isPresented: $showResetConfirm) {
             Button(L("settings.reset_confirm"), role: .destructive) {
                 appState.onCharacterSelected()
@@ -767,6 +785,92 @@ struct TipsSheet: View {
 private struct TipDayItem: Identifiable {
     let day: Int
     var id: Int { day }
+}
+
+// MARK: - Language picker sheet
+
+private struct LanguagePickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var selected: AppLang? = {
+        // nil = automatic (device), otherwise the saved override
+        UserDefaults.standard.string(forKey: "appLanguageOverride")
+            .flatMap { AppLang(rawValue: $0) }
+    }()
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text(L("settings.language_title"))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .padding(8)
+                        .background(Color(hex: "#F5ECE4"))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 24)
+            .padding(.bottom, 20)
+
+            VStack(spacing: 8) {
+                // Auto option
+                languageOption(
+                    label: L("settings.language_auto"),
+                    isSelected: selected == nil
+                ) {
+                    selected = nil
+                    AppLang.setCurrent(nil)
+                    dismiss()
+                }
+
+                // Each language
+                ForEach(AppLang.allCases, id: \.rawValue) { lang in
+                    languageOption(
+                        label: lang.displayName,
+                        isSelected: selected == lang
+                    ) {
+                        selected = lang
+                        AppLang.setCurrent(lang)
+                        dismiss()
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
+        }
+        .background(Color(hex: "#F5F8FC").ignoresSafeArea())
+    }
+
+    private func languageOption(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Text(label)
+                    .font(.system(size: 16, weight: isSelected ? .semibold : .regular, design: .rounded))
+                    .foregroundStyle(Color(hex: "#1F2933"))
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(isSelected ? Color(hex: "#F9703E").opacity(0.5) : Color(hex: "#E2E8F0"), lineWidth: isSelected ? 1.5 : 1)
+            )
+        }
+    }
 }
 
 #Preview {

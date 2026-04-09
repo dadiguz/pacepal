@@ -32,6 +32,7 @@ struct HomeView: View {
 
     @State private var showHistory = false
     @State private var showSettings = false
+    @State private var langRefresh = UUID()
     @State private var now: Date = Date()
 
     @State private var showTutorial = false
@@ -498,7 +499,7 @@ struct HomeView: View {
                     .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
                     .clipShape(Circle())
             }
-            .sheet(isPresented: $showSettings) {
+            .sheet(isPresented: $showSettings, onDismiss: { langRefresh = UUID() }) {
                 SettingsView(onShowTutorial: {
                     showSettings = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -509,6 +510,7 @@ struct HomeView: View {
                 .environment(health)
                 .environment(store)
             }
+            .id(langRefresh)
         }
     }
 

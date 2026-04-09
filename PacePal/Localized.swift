@@ -5,9 +5,31 @@ import Foundation
 enum AppLang: String, CaseIterable {
     case es, en
 
+    /// Display name in its own language (always shown native)
+    var displayName: String {
+        switch self {
+        case .es: return "Español"
+        case .en: return "English"
+        }
+    }
+
+    private static let key = "appLanguageOverride"
+
     static var current: AppLang {
+        if let saved = UserDefaults.standard.string(forKey: key),
+           let lang = AppLang(rawValue: saved) {
+            return lang
+        }
         let code = Locale.current.language.languageCode?.identifier ?? "es"
         return AppLang(rawValue: code) ?? .es
+    }
+
+    static func setCurrent(_ lang: AppLang?) {
+        if let lang {
+            UserDefaults.standard.set(lang.rawValue, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
     }
 }
 
@@ -254,6 +276,9 @@ private let _settings: [String: [AppLang: String]] = [
     "settings.original":            [.es: "Original",          .en: "Original"],
     "settings.black":               [.es: "Negro",             .en: "Black"],
     "settings.pattern":             [.es: "Patrón",            .en: "Pattern"],
+    "settings.language_title":      [.es: "Idioma",            .en: "Language"],
+    "settings.language_subtitle":   [.es: "Cambia el idioma de la app", .en: "Change app language"],
+    "settings.language_auto":       [.es: "Automático (dispositivo)", .en: "Automatic (device)"],
 ]
 
 // MARK: - Tutorial
@@ -280,7 +305,7 @@ private let _notifications: [String: [AppLang: String]] = [
     "notif.collapsing_title":  [.es: "%@ está a punto de colapsar",     .en: "%@ is about to collapse"],
     "notif.collapsing_body":   [.es: "Está en estado crítico. ¡Corre o lo perderás todo!", .en: "It's in critical condition. Run or you'll lose everything!"],
     "notif.critical_title":    [.es: "Tu %@ necesita que corras",       .en: "Your %@ needs you to run"],
-    "notif.critical_body":     [.es: "De inmediato, ¡está a punto de quedarse sin energía!", .en: "Right now — it's about to run out of energy!"],
+    "notif.critical_body":     [.es: "De inmediato, ¡está a punto de quedarse sin energía!", .en: "Right now, it's about to run out of energy!"],
     "notif.fallback":          [.es: "¡Sal a correr!",                  .en: "Go for a run!"],
 ]
 
@@ -455,7 +480,7 @@ private let _medal: [String: [AppLang: String]] = [
 private let _tips: [String: [AppLang: String]] = [
     // Days 1-10: Getting started / beginner advice
     "tip.1":  [.es: "Hoy solo tienes que salir. No importa la distancia, lo que importa es empezar.",
-               .en: "Today you just have to get out. Distance doesn't matter — starting does."],
+               .en: "Today you just have to get out. Distance doesn't matter, starting does."],
     "tip.2":  [.es: "Corre a un ritmo en el que puedas mantener una conversación. Si jadeas, ve más lento.",
                .en: "Run at a pace where you can hold a conversation. If you're gasping, slow down."],
     "tip.3":  [.es: "No te compares con nadie. Tu único rival es el tú de ayer.",
@@ -470,8 +495,8 @@ private let _tips: [String: [AppLang: String]] = [
                .en: "One week running. Your body is already adapting even if you don't notice."],
     "tip.8":  [.es: "Hidrátate antes de salir. Un vaso de agua 30 minutos antes marca la diferencia.",
                .en: "Hydrate before heading out. A glass of water 30 minutes before makes a difference."],
-    "tip.9":  [.es: "Escucha a tu cuerpo. Si algo duele, no lo ignores — ajusta el ritmo.",
-               .en: "Listen to your body. If something hurts, don't ignore it — adjust your pace."],
+    "tip.9":  [.es: "Escucha a tu cuerpo. Si algo duele, no lo ignores, ajusta el ritmo.",
+               .en: "Listen to your body. If something hurts, don't ignore it, adjust your pace."],
     "tip.10": [.es: "10 días seguidos. Estás construyendo algo grande. No pares.",
                .en: "10 days in a row. You're building something big. Don't stop."],
 
@@ -608,7 +633,7 @@ private let _tipDetails: [String: [AppLang: String]] = [
     ],
     "tip.2.detail": [
         .es: "Esto se llama **ritmo conversacional** y es la base del running. Si puedes hablar con alguien mientras corres, vas a un buen ritmo. Si no puedes terminar una frase sin ahogarte, **bájale**. No hay prisa, tu resistencia se construye **poco a poco**.",
-        .en: "This is called **conversational pace** and it's the foundation of running. If you can talk to someone while running, you're at a good pace. If you can't finish a sentence without gasping, **slow down**. There's no rush — your endurance builds **little by little**."
+        .en: "This is called **conversational pace** and it's the foundation of running. If you can talk to someone while running, you're at a good pace. If you can't finish a sentence without gasping, **slow down**. There's no rush, your endurance builds **little by little**."
     ],
     "tip.3.detail": [
         .es: "Es natural ver a otros corredores y sentir que vas lento. Pero **cada cuerpo es diferente** y cada uno empezó en un momento distinto. Lo que importa es que hoy puedes hacer algo que hace una semana no hacías. **Ese es tu progreso real**.",
@@ -662,7 +687,7 @@ private let _tipDetails: [String: [AppLang: String]] = [
     ],
     "tip.15.detail": [
         .es: "Estirar músculos fríos puede causar **micro-desgarros**. Después de correr, tus músculos están **calientes y flexibles**, que es el momento perfecto para estirar. Enfócate en pantorrillas, cuádriceps, isquiotibiales y cadera. Mantén cada estiramiento **20-30 segundos** sin rebotar.",
-        .en: "Stretching cold muscles can cause **micro-tears**. After running, your muscles are **warm and flexible** — the perfect time to stretch. Focus on calves, quads, hamstrings, and hips. Hold each stretch for **20-30 seconds** without bouncing."
+        .en: "Stretching cold muscles can cause **micro-tears**. After running, your muscles are **warm and flexible**, the perfect time to stretch. Focus on calves, quads, hamstrings, and hips. Hold each stretch for **20-30 seconds** without bouncing."
     ],
     "tip.16.detail": [
         .es: "Tu cabeza pesa unos **5 kg**. Si la inclinas hacia abajo, todo tu torso se encorva y respiras peor. Mantén la **mirada al horizonte**, el pecho abierto y los hombros atrás. Notarás que puedes **respirar más profundo** y correr con menos esfuerzo.",
@@ -852,7 +877,7 @@ private let _tipDetails: [String: [AppLang: String]] = [
     ],
     "tip.60.detail": [
         .es: "Cuando compartes tu progreso, no es presumir, es **inspirar**. Alguien en tu vida puede estar pensando en empezar a correr y tu ejemplo puede ser **el empujón que necesita**. Comparte, celebra y deja que otros celebren contigo.",
-        .en: "When you share your progress, it's not bragging — it's **inspiring**. Someone in your life might be thinking about starting to run, and your example could be **the push they need**. Share, celebrate, and let others celebrate with you."
+        .en: "When you share your progress, it's not bragging, it's **inspiring**. Someone in your life might be thinking about starting to run, and your example could be **the push they need**. Share, celebrate, and let others celebrate with you."
     ],
     "tip.61.detail": [
         .es: "**Cinco días**. Solo cinco. Cada kilómetro que corras ahora tiene un peso especial. No porque sea diferente, sino porque lo haces sabiendo que estás a punto de completar **algo extraordinario**. Saborea cada paso.",

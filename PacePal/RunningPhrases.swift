@@ -5,15 +5,14 @@ struct RunningPhrase {
     let en: String  // TODO: fill when localizing to English
 
     var localized: String {
-        let lang = Locale.current.language.languageCode?.identifier ?? "es"
-        return lang == "en" && !en.isEmpty ? en : es
+        return AppLang.current == .en && !en.isEmpty ? en : es
     }
 }
 
 extension RunningPhrase {
     // swiftlint:disable line_length
     static let all: [RunningPhrase] = [
-        .init(es: "Sal a correr. Tus excusas ya están en forma, tú no.", en: "Go for a run. Your excuses are in great shape — you're not."),
+        .init(es: "Sal a correr. Tus excusas ya están en forma, tú no.", en: "Go for a run. Your excuses are in great shape, you're not."),
         .init(es: "La cama no te va a extrañar tanto como crees.", en: "Your bed won't miss you as much as you think."),
         .init(es: "Tus tenis están polvorientos. Eso dice todo.", en: "Your sneakers are dusty. That says it all."),
         .init(es: "Correr duele. Quedarse quieto para siempre también.", en: "Running hurts. Staying still forever hurts more."),
@@ -31,10 +30,10 @@ extension RunningPhrase {
         .init(es: "Tu cuerpo puede más de lo que tu cabeza admite.", en: "Your body can do more than your brain admits."),
         .init(es: "El peor run es el que no hiciste.", en: "The worst run is the one you didn't do."),
         .init(es: "Sal afuera. Netflix sigue ahí cuando regreses.", en: "Go outside. Netflix will still be there when you get back."),
-        .init(es: "Correr 1km quema vergüenza y calorías, en ese orden.", en: "Running 1km burns shame and calories — in that order."),
+        .init(es: "Correr 1km quema vergüenza y calorías, en ese orden.", en: "Running 1km burns shame and calories, in that order."),
         .init(es: "Tus músculos no crecen en el sillón. Dato curioso.", en: "Your muscles don't grow on the couch. Fun fact."),
         .init(es: "El tiempo pasa igual corras o no. Mejor corriendo.", en: "Time passes whether you run or not. Better running."),
-        .init(es: "No necesitas motivación, necesitas tenis y la puerta.", en: "You don't need motivation — you need sneakers and the door."),
+        .init(es: "No necesitas motivación, necesitas tenis y la puerta.", en: "You don't need motivation, you need sneakers and the door."),
         .init(es: "Hoy es el 'mañana' que postergaste ayer.", en: "Today is the 'tomorrow' you put off yesterday."),
         .init(es: "El sudor es solo grasa llorando. Dale más razones.", en: "Sweat is just fat crying. Give it more reasons."),
         .init(es: "Sal a correr antes de que tu cerebro invente más excusas.", en: "Go run before your brain invents more excuses."),
@@ -58,7 +57,7 @@ extension RunningPhrase {
         .init(es: "Tus rodillas ahorita: quejándose. En 10 años: agradecidas.", en: "Your knees now: complaining. In 10 years: grateful."),
         .init(es: "Sal a correr. La ansiedad prefiere cuerpos quietos.", en: "Go for a run. Anxiety prefers still bodies."),
         .init(es: "Corre antes de que el día te gane la partida.", en: "Run before the day beats you to it."),
-        .init(es: "No necesitas correr rápido, necesitas correr.", en: "You don't need to run fast — you need to run."),
+        .init(es: "No necesitas correr rápido, necesitas correr.", en: "You don't need to run fast, you need to run."),
         .init(es: "Tu pacepal tiene más energía cuando tú corres. Nota mental.", en: "Your pacepal has more energy when you run. Mental note."),
         .init(es: "El mundo no se acaba, pero tu día sí. Sal.", en: "The world isn't ending, but your day is. Go."),
         .init(es: "Cada kilómetro le dice a tu cuerpo: todavía puedo.", en: "Every kilometer tells your body: I've still got it."),
@@ -81,7 +80,7 @@ extension RunningPhrase {
         .init(es: "Afuera hace frío. Adentro hace cómodo. Sal de todas formas.", en: "It's cold outside. It's cozy inside. Go anyway."),
         .init(es: "Tu pacepal se alegra cada vez que corres. No es coincidencia.", en: "Your pacepal lights up every time you run. Not a coincidence."),
         .init(es: "Correr es lo más barato que puedes hacer por tu salud.", en: "Running is the cheapest thing you can do for your health."),
-        .init(es: "No se trata de velocidad, se trata de aparecer.", en: "It's not about speed — it's about showing up."),
+        .init(es: "No se trata de velocidad, se trata de aparecer.", en: "It's not about speed, it's about showing up."),
         .init(es: "El asfalto está esperando tus pasos. O tus excusas. Tú decides.", en: "The pavement is waiting for your steps. Or your excuses. You pick."),
         .init(es: "Cada run malo construye el run bueno que sigue.", en: "Every bad run builds the good run that follows."),
         .init(es: "Tus pies saben el camino. Tu cabeza solo pone obstáculos.", en: "Your feet know the way. Your head just puts up roadblocks."),
@@ -141,7 +140,7 @@ extension RunningPhrase {
         .init(es: "La queja no quema calorías. El run sí.", en: "Complaining doesn't burn calories. Running does."),
         .init(es: "No se trata de ser rápido. Se trata de no parar.", en: "It's not about being fast. It's about not stopping."),
         .init(es: "El dolor de correr dura horas. El orgullo, días.", en: "The pain of running lasts hours. The pride lasts days."),
-        .init(es: "Sal. La ciudad te tiene preparada una ruta sin cobrar.", en: "Go. The city has a route ready for you — free of charge."),
+        .init(es: "Sal. La ciudad te tiene preparada una ruta sin cobrar.", en: "Go. The city has a route ready for you, free of charge."),
         .init(es: "Tu cuerpo es el único vehículo que no puedes cambiar. Mantenlo.", en: "Your body is the only vehicle you can't trade in. Maintain it."),
         .init(es: "Corre antes de que el desayuno tome partido por el sillón.", en: "Run before breakfast sides with the couch."),
         .init(es: "Los 66 días te necesitan a ti, no al gimnasio.", en: "The 66 days need you, not a gym."),
@@ -164,7 +163,7 @@ extension RunningPhrase {
         .init(es: "Corre. Después puedes comer lo que quieras. Más o menos.", en: "Run. Then you can eat whatever you want. More or less."),
         .init(es: "El asfalto no juzga tu ritmo. Solo tus pies.", en: "The pavement doesn't judge your pace. Only your feet."),
         .init(es: "Hoy es uno de los 66. No lo desperdicies.", en: "Today is one of the 66. Don't waste it."),
-        .init(es: "Tu energía no se agota corriendo, se multiplica.", en: "Your energy doesn't drain from running — it multiplies."),
+        .init(es: "Tu energía no se agota corriendo, se multiplica.", en: "Your energy doesn't drain from running, it multiplies."),
         .init(es: "Corre aunque tu cuerpo diga que no. Especialmente entonces.", en: "Run even when your body says no. Especially then."),
         .init(es: "El tiempo pasa igual. Mejor que te encuentre en movimiento.", en: "Time passes either way. Better it finds you moving."),
         .init(es: "No hay run perfecto. Hay run de hoy. Ese alcanza.", en: "There's no perfect run. There's today's run. That's enough."),
@@ -197,7 +196,7 @@ extension RunningPhrase {
         .init(es: "El run de 10 minutos también es un run. No te hagas.", en: "A 10-minute run is still a run. Don't kid yourself."),
         .init(es: "Hoy tienes dos opciones. La que te hace bien gana.", en: "Today you have two options. The one that's good for you wins."),
         .init(es: "Sal. Las excusas se oxidan más rápido que los tenis.", en: "Go. Excuses rust faster than sneakers."),
-        .init(es: "Correr no requiere talento, requiere zapatos y salida.", en: "Running doesn't require talent — just shoes and a door."),
+        .init(es: "Correr no requiere talento, requiere zapatos y salida.", en: "Running doesn't require talent, just shoes and a door."),
         .init(es: "El kilómetro que más importa es el próximo.", en: "The kilometer that matters most is the next one."),
         .init(es: "Corre aunque el cielo esté nublado. Tus pulmones no le importa.", en: "Run even if it's cloudy. Your lungs don't care."),
         .init(es: "Hoy no corres contra nadie. Solo contra tu excusa de ayer.", en: "Today you're not racing anyone. Just yesterday's excuse."),
@@ -266,7 +265,7 @@ extension RunningPhrase {
         .init(es: "Hoy defines si eres de los que lo intentan o de los que lo hacen.", en: "Today you decide: are you someone who tries or someone who does?"),
         .init(es: "Tu pacepal te espera con más energía cada vez que corres.", en: "Your pacepal waits for you with more energy every time you run."),
         .init(es: "Sal. La ciudad tiene esquinas que todavía no conoces.", en: "Go. The city has corners you haven't discovered yet."),
-        .init(es: "Correr no te hace más rápido, te hace más constante. Mejor aún.", en: "Running doesn't make you faster — it makes you more consistent. Even better."),
+        .init(es: "Correr no te hace más rápido, te hace más constante. Mejor aún.", en: "Running doesn't make you faster, it makes you more consistent. Even better."),
         .init(es: "El run de hoy no compite con el de ayer. Solo suma.", en: "Today's run doesn't compete with yesterday's. It just adds up."),
         .init(es: "Tus excusas tienen caducidad. Las de hoy ya vencieron.", en: "Your excuses have an expiration date. Today's already expired."),
         .init(es: "Tu pacepal vive de kilómetros. No lo dejes en ayunas.", en: "Your pacepal lives on kilometers. Don't starve it."),
@@ -290,16 +289,16 @@ extension RunningPhrase {
         .init(es: "Hoy no hay excusa que no hayas usado antes. Sal.", en: "There's no excuse today you haven't used before. Go."),
         .init(es: "Tu corazón tiene una velocidad favorita: la que logras corriendo.", en: "Your heart has a favorite speed: the one you hit while running."),
         .init(es: "Tu pacepal y tú son el mejor equipo que nadie ve.", en: "You and your pacepal are the best team nobody sees."),
-        .init(es: "Sal. Lo que pesa no es el cuerpo, son las decisiones pendientes.", en: "Go. What weighs you down isn't your body — it's the decisions you keep putting off."),
+        .init(es: "Sal. Lo que pesa no es el cuerpo, son las decisiones pendientes.", en: "Go. What weighs you down isn't your body, it's the decisions you keep putting off."),
         .init(es: "Correr afuera es la única pantalla que te hace bien.", en: "Running outside is the only screen that's good for you."),
         .init(es: "Hoy la meta no es lejos. Está justo del otro lado de la puerta.", en: "Today the finish line isn't far. It's right on the other side of the door."),
         .init(es: "El km que más cuesta es el que más vale.", en: "The km that costs the most is worth the most."),
         .init(es: "Tu pacepal tiene fe en ti aunque tú no la tengas hoy.", en: "Your pacepal believes in you even when you don't."),
         .init(es: "Sal. Tu cuerpo sabe más que tu cerebro cuando se trata de moverse.", en: "Go. Your body knows more than your brain when it comes to moving."),
-        .init(es: "Corre. Los 66 días no son un reto, son una decisión.", en: "Run. The 66 days aren't a challenge — they're a decision."),
+        .init(es: "Corre. Los 66 días no son un reto, son una decisión.", en: "Run. The 66 days aren't a challenge, they're a decision."),
         .init(es: "No hay run pequeño. Hay run hecho y run que no.", en: "There's no small run. There's a run done and a run not done."),
         .init(es: "Tu energía se genera corriendo, no esperando tenerla.", en: "Your energy is generated by running, not by waiting for it."),
-        .init(es: "Tu pacepal brilla más cuando tú corres. No es magia, es esfuerzo.", en: "Your pacepal shines brighter when you run. It's not magic — it's effort."),
+        .init(es: "Tu pacepal brilla más cuando tú corres. No es magia, es esfuerzo.", en: "Your pacepal shines brighter when you run. It's not magic, it's effort."),
         .init(es: "Sal. La ciudad amanece diferente desde los tenis.", en: "Go. The city looks different at dawn from your sneakers."),
         .init(es: "El run que no quieres hacer es exactamente el que necesitas.", en: "The run you don't want to do is exactly the one you need."),
         .init(es: "Hoy decides si el hábito te gana a ti o tú al hábito.", en: "Today you decide: does the habit beat you, or do you beat the habit?"),
@@ -307,7 +306,7 @@ extension RunningPhrase {
         .init(es: "Tu pacepal no sabe rendirse. Aprende de él.", en: "Your pacepal doesn't know how to quit. Learn from it."),
         .init(es: "Sal. Las mejores ideas llegan corriendo, no sentado.", en: "Go. The best ideas come while running, not sitting."),
         .init(es: "Un run hoy es una racha mañana. No la dejes morir.", en: "A run today is a streak tomorrow. Don't let it die."),
-        .init(es: "Correr solo o acompañado igual suma. Sal.", en: "Running solo or with someone — it all counts. Go."),
+        .init(es: "Correr solo o acompañado igual suma. Sal.", en: "Running solo or with someone, it all counts. Go."),
         .init(es: "Tu cuerpo tiene combustible. Las excusas consumen más.", en: "Your body has fuel. Excuses burn through more of it."),
         .init(es: "Tu pacepal solo pide que no te rindas hoy.", en: "Your pacepal only asks that you don't give up today."),
         .init(es: "Sal. El mundo exterior tiene más para ofrecerte que el techo.", en: "Go. The outside world has more to offer than your ceiling."),

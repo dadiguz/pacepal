@@ -15,7 +15,7 @@
 | 8 | Soporte millas (km/mi) | Media | Movido a P2 |
 | 9 | Fondo negro seleccionable | Baja | ✅ Completado |
 | 10 | Paletas de color custom para monitos | Baja | Pendiente |
-| 11 | Cambio de idioma en Settings | Media | Pendiente |
+| 11 | Cambio de idioma en Settings | Media | ✅ Completado |
 | 12 | Compartir logro (share) | Media | ✅ Completado |
 | 13 | Tips diarios de correr (12) | Media | ✅ Completado |
 | 14 | Parpadeo rojo al colapsar (13) | Baja | ✅ Completado |
@@ -165,12 +165,13 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 
 ---
 
-## 10. Cambio de Idioma en Settings
-**Prioridad:** Media | **Complejidad:** Baja
+## 10. Cambio de Idioma en Settings ✅
+**Prioridad:** Media | **Complejidad:** Baja | **Estado:** Completado
 
-- [ ] Agregar selector de idioma en SettingsView (Espanol / English)
-- [ ] Persistir preferencia en UserDefaults y que `AppLang.current` la respete sobre el idioma del dispositivo
-- [ ] Refrescar toda la UI al cambiar idioma
+- [x] Selector de idioma en SettingsView (Automático / Español / English)
+- [x] Persistido en UserDefaults (`appLanguageOverride`), `AppLang.current` respeta override sobre dispositivo
+- [x] UI se refresca al cerrar el picker (via `.id(langRefresh)` en HomeView y SettingsView)
+- [x] Strings en es/en (`settings.language_title`, `settings.language_subtitle`, `settings.language_auto`)
 
 ---
 
