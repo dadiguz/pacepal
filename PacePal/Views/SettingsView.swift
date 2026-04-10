@@ -803,8 +803,6 @@ private struct DebugSheet: View {
                         btn("+10") { appState.shiftChallengeDay(by: 10) }
                         btn("+30") { appState.shiftChallengeDay(by: 30) }
                     }
-                    btn("📅 +1 día (sin correr)") { appState.advanceCalendarDay() }
-
                     // MARK: Medalla
                     section("MEDALLA\(appState.medalEarned ? " — ACTIVA 🏅" : "")")
                     HStack(spacing: 6) {

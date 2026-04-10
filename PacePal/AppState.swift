@@ -351,13 +351,6 @@ final class AppState {
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
     }
 
-    /// Advances the calendar day only — completedDays stays the same.
-    /// Use this to simulate "a new day started" without adding a fake run.
-    func advanceCalendarDay() {
-        challengeStartDate = Calendar.current.date(byAdding: .day, value: -1, to: challengeStartDate) ?? challengeStartDate
-        UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
-    }
-
     func revokeMedal() {
         medalEarned = false
         UserDefaults.standard.set(false, forKey: "medalEarned")

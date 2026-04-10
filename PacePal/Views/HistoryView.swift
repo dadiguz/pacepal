@@ -27,14 +27,17 @@ struct HistoryView: View {
 
     private var startDate: Date { appState.challengeStartDate }
 
-    /// 0-based index of today (clamped to 0...totalDays-1)
+    /// 0-based index of today in calendar days since challenge start.
     private var todayIndex: Int {
         let days = Calendar.current.dateComponents([.day], from: startDate, to: Calendar.current.startOfDay(for: Date())).day ?? 0
-        return min(max(days, 0), totalDays - 1)
+        return max(days, 0)
     }
 
     private var completedCount: Int { (0...todayIndex).filter { state(for: $0) == .completed }.count }
     private var missedCount: Int    { (0..<todayIndex).filter { state(for: $0) == .missed   }.count }
+
+    /// Total cells in the grid: 66 runs + one placeholder per missed day.
+    private var totalCells: Int { totalDays + missedCount }
     private var streakCount: Int {
         var streak = 0
         var i = todayIndex
@@ -70,7 +73,7 @@ struct HistoryView: View {
     private var runNumbers: [Int: Int] {
         var result: [Int: Int] = [:]
         var count = 0
-        for i in 0..<totalDays {
+        for i in 0..<totalCells {
             if state(for: i) == .completed {
                 count += 1
                 result[i] = count
@@ -93,11 +96,8 @@ struct HistoryView: View {
         }
         let km = dailyKm[dayIndex] ?? 0
         #if DEBUG
-        if km < runThreshold {
-            let completedStart = max(0, todayIndex - appState.completedDays)
-            if dayIndex >= completedStart {
-                return .completed
-            }
+        if km < runThreshold && dayIndex < appState.completedDays {
+            return .completed
         }
         #endif
         return km >= runThreshold ? .completed : .missed
@@ -134,7 +134,7 @@ struct HistoryView: View {
         .task { await loadHistory() }
         .sheet(item: $selectedDayIndex) { sel in
             DayDetailView(
-                dayIndex: sel.index,
+                runNumber: runNumbers[sel.index] ?? (completedCount + 1),
                 date: date(for: sel.index),
                 state: state(for: sel.index),
                 km: sel.index == todayIndex ? health.todayKm : (dailyKm[sel.index] ?? 0)
@@ -153,7 +153,7 @@ struct HistoryView: View {
                     Text(L("history.title"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "#1F2933"))
-                    Text(L("history.day_progress", min(todayIndex + 1, totalDays), totalDays))
+                    Text(L("history.day_progress", completedCount, totalDays))
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(hex: "#9AA5B4"))
                 }
@@ -206,7 +206,7 @@ struct HistoryView: View {
                     Color.clear.aspectRatio(1, contentMode: .fit)
                 }
 
-                ForEach(0..<totalDays, id: \.self) { i in
+                ForEach(0..<totalCells, id: \.self) { i in
                     let nums = runNumbers
                     DayCell(
                         dayIndex: i,
@@ -217,7 +217,11 @@ struct HistoryView: View {
                     )
                     .aspectRatio(1, contentMode: .fit)
                     .id(i == todayIndex ? "today" : "day-\(i)")
-                    .onTapGesture { selectedDayIndex = SelectedDay(index: i) }
+                    .onTapGesture {
+                        let s = state(for: i)
+                        guard s == .completed || s == .today else { return }
+                        selectedDayIndex = SelectedDay(index: i)
+                    }
                 }
             }
         }
@@ -386,7 +390,7 @@ private struct SelectedDay: Identifiable {
 // MARK: – DayDetailView
 
 private struct DayDetailView: View {
-    let dayIndex: Int
+    let runNumber: Int
     let date: Date
     let state: DayState
     let km: Double
@@ -398,7 +402,7 @@ private struct DayDetailView: View {
         return fmt.string(from: date).capitalized
     }
 
-    private var dayLabel: String { L("common.day_n", dayIndex + 1) }
+    private var dayLabel: String { L("common.day_n", runNumber) }
 
     var body: some View {
         ZStack {
