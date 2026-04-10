@@ -204,31 +204,41 @@ struct HealthPermissionView: View {
         switch health.authState {
 
         case .idle, .requesting:
-            Button {
-                health.requestFromPermissionScreen()
-            } label: {
-                HStack(spacing: 8) {
-                    if health.authState == .requesting {
-                        ProgressView()
-                            .tint(.white)
-                            .scaleEffect(0.85)
+            VStack(spacing: 12) {
+                Button {
+                    health.requestFromPermissionScreen()
+                } label: {
+                    HStack(spacing: 8) {
+                        if health.authState == .requesting {
+                            ProgressView()
+                                .tint(.white)
+                                .scaleEffect(0.85)
+                        }
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 15))
+                        Text(health.authState == .requesting ? L("health.requesting") : L("health.activate_button"))
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
                     }
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 15))
-                    Text(health.authState == .requesting ? L("health.requesting") : L("health.activate_button"))
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 17)
+                    .background(health.authState == .requesting
+                        ? Color(hex: "#F9703E").opacity(0.6)
+                        : Color(hex: "#F9703E"))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: Color(hex: "#F9703E").opacity(0.3), radius: 10, y: 5)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 17)
-                .background(health.authState == .requesting
-                    ? Color(hex: "#F9703E").opacity(0.6)
-                    : Color(hex: "#F9703E"))
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .shadow(color: Color(hex: "#F9703E").opacity(0.3), radius: 10, y: 5)
+                .disabled(health.authState == .requesting)
+                .animation(.easeInOut(duration: 0.2), value: health.authState == .requesting)
+
+                Button(L("health.skip")) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        appState.completeHealthPermission()
+                    }
+                }
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(Color(hex: "#9AA5B4"))
             }
-            .disabled(health.authState == .requesting)
-            .animation(.easeInOut(duration: 0.2), value: health.authState == .requesting)
 
         case .denied:
             VStack(spacing: 12) {

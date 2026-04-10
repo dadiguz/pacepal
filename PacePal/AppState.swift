@@ -146,6 +146,7 @@ final class AppState {
     private(set) var onboardingCompleted: Bool
     private(set) var paywallDismissed: Bool
     private(set) var healthPermissionDone: Bool
+    private(set) var locationPermissionDone: Bool
     private(set) var notificationPermissionDone: Bool
     private(set) var widgetPromptDone: Bool
 
@@ -184,6 +185,9 @@ final class AppState {
         self.onboardingCompleted = UserDefaults.standard.bool(forKey: "onboardingCompleted")
         self.paywallDismissed = UserDefaults.standard.bool(forKey: "paywallDismissed")
         self.healthPermissionDone = UserDefaults.standard.bool(forKey: "healthPermissionDone")
+        // Existing users (already through onboarding) skip location permission screen
+        let existingUser = UserDefaults.standard.bool(forKey: "notificationPermissionDone")
+        self.locationPermissionDone = existingUser || UserDefaults.standard.bool(forKey: "locationPermissionDone")
         self.notificationPermissionDone = UserDefaults.standard.bool(forKey: "notificationPermissionDone")
         self.widgetPromptDone = UserDefaults.standard.bool(forKey: "widgetPromptDone")
         let seen = UserDefaults.standard.array(forKey: "seenAchievements") as? [Int] ?? []
@@ -213,6 +217,11 @@ final class AppState {
     func completeHealthPermission() {
         healthPermissionDone = true
         UserDefaults.standard.set(true, forKey: "healthPermissionDone")
+    }
+
+    func completeLocationPermission() {
+        locationPermissionDone = true
+        UserDefaults.standard.set(true, forKey: "locationPermissionDone")
     }
 
     func completeNotificationPermission() {

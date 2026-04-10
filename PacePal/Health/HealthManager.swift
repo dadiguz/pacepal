@@ -120,6 +120,9 @@ final class HealthManager {
 
     func addTestKm() { testKmOffset += 1.0 }
 
+    /// Credits km from an in-app tracking session directly into today's total.
+    func addManualKm(_ km: Double) { realKm += km }
+
     func resetKm() { testKmOffset = 0; realKm = 0 }
 
     // Returns total km from running workouts in the given interval

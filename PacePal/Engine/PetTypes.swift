@@ -25,7 +25,7 @@ enum PetCell: Equatable {
 // MARK: - Pose
 enum PetPose: String, CaseIterable, Identifiable {
     case idle, happy, sad, angry, running, jump, dead, hurt, hype, dizzy, cheer, spin, bounce, dance, wave, flex, star, finish
-    case victory, clap, skip, stretch, stomp, leap, salute, shimmy, kick, pump, twirl, sign, teaching
+    case victory, clap, skip, stretch, stomp, leap, salute, shimmy, kick, pump, twirl, sign, teaching, tired, drinking, navigate
     var id: String { rawValue }
 
     var label: String {
@@ -61,6 +61,9 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .twirl:   return "Twirl"
         case .sign:     return "Sign"
         case .teaching: return "Teaching"
+        case .tired:    return "Tired"
+        case .drinking: return "Drinking"
+        case .navigate: return "Navigate"
         }
     }
 
@@ -97,6 +100,9 @@ enum PetPose: String, CaseIterable, Identifiable {
         case .twirl:   return "🌀"
         case .sign:     return "🔔"
         case .teaching: return "📝"
+        case .tired:    return "😮‍💨"
+        case .drinking: return "💧"
+        case .navigate: return "🗺️"
         }
     }
 }

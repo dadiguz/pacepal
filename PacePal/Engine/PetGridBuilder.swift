@@ -502,6 +502,28 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
             pset(&g, x: rX + 2, y: penY + 1, cell: .accent1)
             // Pencil tip (gray point)
             pset(&g, x: rX + 2, y: penY + 2, cell: .gray)
+        case .tired:
+            // Arms drooping down toward knees — slow bob each frame
+            let tireBob = frame % 2 == 0
+            pset(&g, x: lX,   y: tireBob ? aY+1 : aY+2, cell: .body)
+            pset(&g, x: lX+1, y: tireBob ? aY+2 : aY+3, cell: .body)
+            pset(&g, x: rX,   y: tireBob ? aY+1 : aY+2, cell: .body)
+            pset(&g, x: rX-1, y: tireBob ? aY+2 : aY+3, cell: .body)
+        case .drinking:
+            // Left arm: relaxed at side
+            pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
+            // Right arm: bent up toward mouth — bobs between frames
+            let drinkUp = frame % 2 == 0
+            pset(&g, x: rX,   y: drinkUp ? aY-2 : aY-1, cell: .body)
+            pset(&g, x: rX+1, y: drinkUp ? aY-3 : aY-2, cell: .body)
+        case .navigate:
+            // Arms extended downward to hold the map at chest-level
+            pset(&g, x: lX,   y: aY+1, cell: .body)
+            pset(&g, x: lX+1, y: aY+2, cell: .body)
+            pset(&g, x: lX+1, y: aY+3, cell: .body)
+            pset(&g, x: rX,   y: aY+1, cell: .body)
+            pset(&g, x: rX-1, y: aY+2, cell: .body)
+            pset(&g, x: rX-1, y: aY+3, cell: .body)
         case .idle:
             switch dna.armStyle {
             case 0: pset(&g, x: lX, y: aY, cell: .body); pset(&g, x: lX, y: aY+1, cell: .body)
@@ -606,6 +628,10 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:15,y:19,cell:.body); pset(&g,x:17,y:19,cell:.body)
         pset(&g,x:15,y:20,cell:.body); pset(&g,x:17,y:20,cell:.body); pset(&g,x:16,y:21,cell:.body)
     case .dead: break
+    case .tired, .drinking, .navigate:
+        // Planted stance, feet slightly wide
+        pset(&g,x:8, y:19,cell:.body);pset(&g,x:10,y:19,cell:.body);pset(&g,x:8, y:20,cell:.body);pset(&g,x:10,y:20,cell:.body);pset(&g,x:9, y:21,cell:.body)
+        pset(&g,x:14,y:19,cell:.body);pset(&g,x:16,y:19,cell:.body);pset(&g,x:14,y:20,cell:.body);pset(&g,x:16,y:20,cell:.body);pset(&g,x:15,y:21,cell:.body)
     case .hurt:
         let sh = (frame == 1 || frame == 2) ? 1 : 0
         pset(&g,x:8-sh,y:19,cell:.body);pset(&g,x:10-sh,y:19,cell:.body);pset(&g,x:8-sh,y:20,cell:.body);pset(&g,x:10-sh,y:20,cell:.body);pset(&g,x:9-sh,y:21,cell:.body)
@@ -1101,6 +1127,22 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
         pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
         pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
+    case .tired:
+        // Heavy half-closed eyes — only bottom row, no shine
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+    case .drinking:
+        // Eyes closed with satisfaction — flat line
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+    case .navigate:
+        // Normal curious eyes looking forward (default 2×2 + shine)
+        pset(&g,x:eyeLX-1,y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeLX,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeLX-1,y:eyeYI-1,cell:.eyeShine)
+        pset(&g,x:eyeRX,  y:eyeYI,  cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI,  cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI+1,cell:.eyePupil); pset(&g,x:eyeRX+1,y:eyeYI+1,cell:.eyePupil)
+        pset(&g,x:eyeRX,  y:eyeYI-1,cell:.eyeShine)
     default:
         if pose == .idle && frame == 6 {
             // Blink: ojos cerrados (barra horizontal)
@@ -1286,6 +1328,17 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
     case .teaching:
         // Small focused smile — thinking while writing
         pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
+    case .tired:
+        // Open panting mouth — alternating between small and wider O
+        pset(&g,x:fCx-1,y:mY,  cell:.mouth); pset(&g,x:fCx+1,y:mY,  cell:.mouth)
+        pset(&g,x:fCx,  y:mY+1,cell:.mouth)
+        if frame % 2 == 1 { pset(&g,x:fCx,y:mY+2,cell:.mouth) }
+    case .drinking:
+        // Pursed lips — small sealed mouth
+        pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
+    case .navigate:
+        // Small curious neutral
+        pset(&g,x:fCx-1,y:mY,cell:.mouth); pset(&g,x:fCx,y:mY+1,cell:.mouth); pset(&g,x:fCx+1,y:mY,cell:.mouth)
     case .sign:
         // Big open smile alternating — beaming with happiness
         if frame % 2 == 0 {
@@ -1367,6 +1420,98 @@ func buildCharacterGrid(dna: PetDNA, pose: PetPose = .idle, frame: Int = 0) -> P
         let tearY = eyeYI + 1 + (frame % 2) * 2
         pset(&g,x:tearX,y:tearY,  cell:.tear)
         pset(&g,x:tearX,y:tearY+1,cell:.tear)
+    }
+
+    // ── Drinking water splash ─────────────────────────────────────────────────────
+    if pose == .drinking {
+        // Water poured over the head — streams down from above, splashing each frame
+        let headTopY = Int(earTopY) - 1
+        let splashCx = Int(faceCx)
+        // Four alternating splash patterns cycling through frames
+        switch frame % 4 {
+        case 0:
+            // Big pour — wide stream above head
+            pset(&g,x:splashCx,   y:headTopY-3, cell:.tear)
+            pset(&g,x:splashCx-1, y:headTopY-2, cell:.tear)
+            pset(&g,x:splashCx,   y:headTopY-2, cell:.tear)
+            pset(&g,x:splashCx+1, y:headTopY-2, cell:.tear)
+            pset(&g,x:splashCx-1, y:headTopY-1, cell:.tear)
+            pset(&g,x:splashCx+1, y:headTopY-1, cell:.tear)
+        case 1:
+            // Drops rolling down sides of head
+            pset(&g,x:splashCx-2, y:headTopY,   cell:.tear)
+            pset(&g,x:splashCx+2, y:headTopY,   cell:.tear)
+            pset(&g,x:splashCx-2, y:headTopY+1, cell:.tear)
+            pset(&g,x:splashCx+2, y:headTopY+1, cell:.tear)
+            pset(&g,x:splashCx,   y:headTopY-2, cell:.tear)
+        case 2:
+            // Droplets scattered around head
+            pset(&g,x:splashCx-3, y:headTopY+1, cell:.tear)
+            pset(&g,x:splashCx+3, y:headTopY+1, cell:.tear)
+            pset(&g,x:splashCx-1, y:headTopY-2, cell:.tear)
+            pset(&g,x:splashCx+1, y:headTopY-2, cell:.tear)
+            pset(&g,x:splashCx,   y:headTopY-3, cell:.tear)
+        default:
+            // Drips lower — running down face
+            pset(&g,x:splashCx-2, y:eyeYI-1,    cell:.tear)
+            pset(&g,x:splashCx+2, y:eyeYI-1,    cell:.tear)
+            pset(&g,x:splashCx-2, y:eyeYI,      cell:.tear)
+            pset(&g,x:splashCx+2, y:eyeYI,      cell:.tear)
+            pset(&g,x:splashCx,   y:headTopY-1, cell:.tear)
+        }
+    }
+
+    // ── Navigate map ─────────────────────────────────────────────────────────────
+    if pose == .navigate {
+        let mLeft  = lX + 2
+        let mRight = rX - 2
+        let mTop   = aY + 4
+        let mBot   = min(aY + 9, GRID_SIZE - 2)
+        if mLeft < mRight && mTop < mBot {
+            // Border
+            for x in mLeft...mRight { pset(&g,x:x,y:mTop,cell:.outline); pset(&g,x:x,y:mBot,cell:.outline) }
+            for y in mTop...mBot    { pset(&g,x:mLeft,y:y,cell:.outline); pset(&g,x:mRight,y:y,cell:.outline) }
+            // Interior paper fill
+            if mLeft+1 <= mRight-1 && mTop+1 <= mBot-1 {
+                for y in mTop+1...mBot-1 { for x in mLeft+1...mRight-1 { if pget(g,x:x,y:y) == .empty { pset(&g,x:x,y:y,cell:.face) } } }
+            }
+            // Zigzag route: start bottom-left → diagonal → top-right
+            let mid = (mLeft + mRight) / 2
+            let midY = (mTop + mBot) / 2
+            // First leg: bottom-left upward
+            pset(&g,x:mLeft+1, y:mBot-1,   cell:.speedLine)
+            pset(&g,x:mLeft+2, y:mBot-2,   cell:.speedLine)
+            pset(&g,x:mLeft+2, y:midY,     cell:.speedLine)
+            // Turn right
+            pset(&g,x:mid-1,   y:midY,     cell:.speedLine)
+            pset(&g,x:mid,     y:midY-1,   cell:.speedLine)
+            // Second leg: up to destination
+            pset(&g,x:mid,     y:mTop+2,   cell:.speedLine)
+            pset(&g,x:mid+1,   y:mTop+1,   cell:.speedLine)
+            // Destination pin — 2×2 blinking accent1
+            if frame % 2 == 0 {
+                pset(&g,x:mid+1, y:mTop+1, cell:.accent1)
+                pset(&g,x:mid+2, y:mTop+1, cell:.accent1)
+                pset(&g,x:mid+1, y:mTop+2, cell:.accent1)
+            }
+            // Current position dot — always visible accent2
+            pset(&g,x:mLeft+1, y:mBot-1,  cell:.accent2)
+            pset(&g,x:mLeft+2, y:mBot-2,  cell:.accent2)
+        }
+    }
+
+    // ── Tired sweat drops ────────────────────────────────────────────────────────
+    if pose == .tired {
+        switch frame {
+        case 0:
+            pset(&g,x:eyeLX-2,y:eyeYI-1,cell:.tear); pset(&g,x:eyeLX-2,y:eyeYI-2,cell:.tear)
+        case 1:
+            pset(&g,x:eyeLX-3,y:eyeYI-2,cell:.tear)
+        case 2:
+            pset(&g,x:eyeRX+2,y:eyeYI-1,cell:.tear); pset(&g,x:eyeRX+2,y:eyeYI-2,cell:.tear)
+        default:
+            pset(&g,x:eyeRX+3,y:eyeYI-2,cell:.tear)
+        }
     }
 
     // ── Angry sign + vein ────────────────────────────────────────────────────────

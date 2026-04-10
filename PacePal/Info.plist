@@ -29,6 +29,8 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PacePal usa tu ubicación para medir la distancia que corres en tiempo real.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Pacepal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
 	<key>NSHealthUpdateUsageDescription</key>

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CoreLocation
 
 // MARK: - Red pulse overlay for low energy
 private struct RedPulseOverlay: View {
@@ -53,6 +54,9 @@ struct HomeView: View {
     @State private var showMedalTutorial = false
     @State private var pendingTipDay: Int? = nil
     @State private var showRedPulse = false
+    @State private var showTracker = false
+    @State private var showLocationPerm = false
+    @State private var showLocationDeniedAlert = false
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -133,6 +137,28 @@ struct HomeView: View {
                     .padding(.top, 8)
                     .animation(.spring(duration: 0.45), value: phraseIndex)
 
+                // ── Pet status pill (below phrase) ────────────────────────
+                Button { showPetStatus = true } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(energyColor)
+                        Text(moodText)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933") : Color(hex: "#4A3F35"))
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 8, weight: .semibold))
+                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933").opacity(0.4) : Color(hex: "#4A3F35").opacity(0.4))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(hasPhotoBackground ? Color.white : energyColor.opacity(0.13))
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(energyColor, lineWidth: 1))
+                }
+                .padding(.top, 8)
+                .animation(.easeInOut(duration: 0.3), value: moodText)
+
                 Spacer(minLength: 4)
 
                 // ── Pet ──────────────────────────────────────────────────
@@ -147,27 +173,50 @@ struct HomeView: View {
                             value: ["km": geo.frame(in: .global)])
                     })
 
-                // ── Pet status pill ───────────────────────────────────────
-                Button { showPetStatus = true } label: {
-                    HStack(spacing: 7) {
-                        Image(systemName: "bolt.fill")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(energyColor)
-                        Text(moodText)
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933") : Color(hex: "#4A3F35"))
-                        Image(systemName: "chevron.up")
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(hasPhotoBackground ? Color(hex: "#1F2933").opacity(0.4) : Color(hex: "#4A3F35").opacity(0.4))
+                // ── Track Run button ─────────────────────────────────────
+                Button { handleRunTap() } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "figure.run")
+                            .font(.system(size: 16, weight: .bold))
+                        Text(L("tracker.track_run"))
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
-                    .background(hasPhotoBackground ? Color.white : energyColor.opacity(0.13))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "#F9703E"))
                     .clipShape(Capsule())
-                    .overlay(Capsule().strokeBorder(energyColor, lineWidth: 1.5))
+                    .shadow(color: Color(hex: "#F9703E").opacity(0.35), radius: 8, y: 4)
                 }
-                .padding(.top, 10)
-                .animation(.easeInOut(duration: 0.3), value: moodText)
+                .padding(.top, 12)
+                .fullScreenCover(isPresented: $showLocationPerm) {
+                    LocationPermissionView(
+                        onGranted: {
+                            showLocationPerm = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                showTracker = true
+                            }
+                        },
+                        onCancel: { showLocationPerm = false }
+                    )
+                    .environment(appState)
+                    .environment(health)
+                }
+                .fullScreenCover(isPresented: $showTracker) {
+                    RunTrackerView()
+                        .environment(appState)
+                        .environment(health)
+                }
+                .alert(L("tracker.location_title"), isPresented: $showLocationDeniedAlert) {
+                    Button(L("tracker.location_open_settings")) {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    Button(L("tracker.location_cancel"), role: .cancel) {}
+                } message: {
+                    Text(L("tracker.location_body"))
+                }
 
                 Spacer(minLength: 24)
             }
@@ -401,6 +450,20 @@ struct HomeView: View {
             } else {
                 SoundManager.shared.play(.achievement, enabled: appState.soundsEnabled)
             }
+        }
+    }
+
+    // MARK: – Run tap handler
+
+    private func handleRunTap() {
+        let status = CLLocationManager().authorizationStatus
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
+            showTracker = true
+        case .denied, .restricted:
+            showLocationDeniedAlert = true
+        default:
+            showLocationPerm = true
         }
     }
 

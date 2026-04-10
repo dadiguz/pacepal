@@ -57,7 +57,7 @@ private let _allStrings: [String: [AppLang: String]] = {
         _common, _challengeLevel, _questionnaire,
         _onboarding, _paywall, _healthPerm, _notifPerm, _widgetPrompt,
         _charSelect, _home, _history, _settings, _tutorial, _notifications,
-        _achievements, _archetypes, _medal, _tips, _tipDetails,
+        _achievements, _archetypes, _medal, _tips, _tipDetails, _tracker, _locationPerm,
     ] {
         d.merge(section) { _, new in new }
     }
@@ -186,6 +186,41 @@ private let _healthPerm: [String: [AppLang: String]] = [
     "health.activate_button":   [.es: "Continuar",            .en: "Continue"],
     "health.open_settings":     [.es: "Abrir Ajustes",       .en: "Open Settings"],
     "health.retry":             [.es: "Intentar de nuevo",    .en: "Try again"],
+    "health.skip":              [.es: "Omitir por ahora",     .en: "Skip for now"],
+]
+
+// MARK: - Location Permission
+
+private let _locationPerm: [String: [AppLang: String]] = [
+    "location_perm.title_part1":      [.es: "Mide cada\n",             .en: "Measure every\n"],
+    "location_perm.title_highlight":  [.es: "paso que corres.",        .en: "step you run."],
+    "location_perm.subtitle":         [.es: "Usamos GPS para registrar tu distancia en tiempo real, aunque no tengas Apple Watch o HealthKit.",
+                                       .en: "We use GPS to track your distance in real time, even without Apple Watch or HealthKit."],
+    "location_perm.pill_gps":         [.es: "GPS en tiempo real",      .en: "Real-time GPS"],
+    "location_perm.pill_readonly":    [.es: "Solo lectura",            .en: "Read only"],
+    "location_perm.activate_button":  [.es: "Activar ubicación",       .en: "Enable location"],
+    "location_perm.skip":             [.es: "Omitir por ahora",        .en: "Skip for now"],
+]
+
+// MARK: - Run Tracker
+
+private let _tracker: [String: [AppLang: String]] = [
+    "tracker.track_run":               [.es: "¡Corre!",                 .en: "Run!"],
+    "tracker.km":                      [.es: "km",                      .en: "km"],
+    "tracker.hold_to_start":           [.es: "Mantén presionado para iniciar", .en: "Hold to start"],
+    "tracker.done":                    [.es: "Listo",                   .en: "Done"],
+    "tracker.finish":                  [.es: "Detener",                 .en: "Stop"],
+    "tracker.finish_confirm_title":    [.es: "¿Terminar carrera?",      .en: "Finish run?"],
+    "tracker.finish_confirm_body":     [.es: "Se guardará la distancia recorrida.", .en: "The distance will be saved."],
+    "tracker.finish_confirm_yes":      [.es: "Terminar",                .en: "Finish"],
+    "tracker.finish_confirm_cancel":   [.es: "Cancelar",               .en: "Cancel"],
+    "tracker.discard_confirm_title":   [.es: "¿Descartar carrera?",    .en: "Discard run?"],
+    "tracker.discard_confirm_body":    [.es: "La distancia no se guardará.", .en: "The distance won't be saved."],
+    "tracker.discard_confirm_yes":     [.es: "Descartar",              .en: "Discard"],
+    "tracker.location_title":          [.es: "Ubicación necesaria",    .en: "Location needed"],
+    "tracker.location_body":           [.es: "Activa la ubicación para medir tu distancia.", .en: "Enable location to measure your distance."],
+    "tracker.location_open_settings":  [.es: "Abrir Ajustes",          .en: "Open Settings"],
+    "tracker.location_cancel":         [.es: "Cancelar",               .en: "Cancel"],
 ]
 
 // MARK: - Notification Permission

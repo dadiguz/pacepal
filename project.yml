@@ -21,8 +21,13 @@ targets:
         excludes:
           - "**/*.md"
           - "**/*.entitlements"
+      - path: songs
+        type: folder
+      - path: sounds
+        type: folder
     dependencies:
       - sdk: HealthKit.framework
+      - sdk: CoreLocation.framework
     entitlements:
       path: PacePal/PacePal.entitlements
       properties:
