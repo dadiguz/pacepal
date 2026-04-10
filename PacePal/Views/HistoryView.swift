@@ -66,6 +66,19 @@ struct HistoryView: View {
     }
 
     // Weekday offset so day 0 aligns to its actual weekday (0=Sun)
+    /// Sequential run number for each completed dayIndex (1-based).
+    private var runNumbers: [Int: Int] {
+        var result: [Int: Int] = [:]
+        var count = 0
+        for i in 0..<totalDays {
+            if state(for: i) == .completed {
+                count += 1
+                result[i] = count
+            }
+        }
+        return result
+    }
+
     private var startWeekday: Int {
         let wd = Calendar.current.component(.weekday, from: startDate)
         return wd - 1   // Calendar.weekday is 1-indexed
@@ -194,11 +207,13 @@ struct HistoryView: View {
                 }
 
                 ForEach(0..<totalDays, id: \.self) { i in
+                    let nums = runNumbers
                     DayCell(
                         dayIndex: i,
                         state: state(for: i),
                         km: dailyKm[i] ?? 0,
-                        todayKm: i == todayIndex ? health.todayKm : nil
+                        todayKm: i == todayIndex ? health.todayKm : nil,
+                        runNumber: nums[i]
                     )
                     .aspectRatio(1, contentMode: .fit)
                     .id(i == todayIndex ? "today" : "day-\(i)")
@@ -286,6 +301,7 @@ private struct DayCell: View {
     let state: DayState
     let km: Double
     let todayKm: Double?   // non-nil only for today
+    let runNumber: Int?    // sequential run count, nil if not a completed run
 
     private var effectiveKm: Double { todayKm ?? km }
 
@@ -297,18 +313,15 @@ private struct DayCell: View {
                 case .completed:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#F9703E"))
-                    VStack(spacing: 0) {
-                        dayNumber(size: size, color: .white.opacity(0.45))
-                        checkmark(size: size)
+                    if let n = runNumber {
+                        runLabel(n, size: size, color: .white.opacity(0.45))
                     }
+                    checkmark(size: size)
 
                 case .missed:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#F2C4BA"))
-                    VStack(spacing: 0) {
-                        dayNumber(size: size, color: Color(hex: "#E07060").opacity(0.5))
-                        xmark(size: size)
-                    }
+                    xmark(size: size)
 
                 case .today:
                     RoundedRectangle(cornerRadius: size * 0.22)
@@ -326,19 +339,20 @@ private struct DayCell: View {
                         }
                         .clipShape(RoundedRectangle(cornerRadius: size * 0.22))
                     }
-                    dayNumber(size: size, color: Color(hex: "#F9703E").opacity(0.6))
+                    if let n = runNumber {
+                        runLabel(n, size: size, color: Color(hex: "#F9703E").opacity(0.6))
+                    }
 
                 case .future:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#E8EEF6"))
-                    dayNumber(size: size, color: Color(hex: "#9AA5B4").opacity(0.5))
                 }
             }
         }
     }
 
-    private func dayNumber(size: CGFloat, color: Color) -> some View {
-        Text(String(format: "%02d", dayIndex + 1))
+    private func runLabel(_ n: Int, size: CGFloat, color: Color) -> some View {
+        Text(String(format: "%02d", n))
             .font(.system(size: size * 0.24, weight: .bold, design: .monospaced))
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
