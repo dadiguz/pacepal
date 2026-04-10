@@ -297,12 +297,18 @@ private struct DayCell: View {
                 case .completed:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#F9703E"))
-                    checkmark(size: size)
+                    VStack(spacing: 0) {
+                        dayNumber(size: size, color: .white.opacity(0.45))
+                        checkmark(size: size)
+                    }
 
                 case .missed:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#F2C4BA"))
-                    xmark(size: size)
+                    VStack(spacing: 0) {
+                        dayNumber(size: size, color: Color(hex: "#E07060").opacity(0.5))
+                        xmark(size: size)
+                    }
 
                 case .today:
                     RoundedRectangle(cornerRadius: size * 0.22)
@@ -312,7 +318,6 @@ private struct DayCell: View {
                                 .strokeBorder(Color(hex: "#F9703E"), lineWidth: 1.5)
                         )
                     if effectiveKm > 0 {
-                        // Partial fill
                         ZStack(alignment: .bottom) {
                             Color.clear
                             Rectangle()
@@ -321,25 +326,39 @@ private struct DayCell: View {
                         }
                         .clipShape(RoundedRectangle(cornerRadius: size * 0.22))
                     }
+                    dayNumber(size: size, color: Color(hex: "#F9703E").opacity(0.6))
 
                 case .future:
                     RoundedRectangle(cornerRadius: size * 0.22)
                         .fill(Color(hex: "#E8EEF6"))
+                    dayNumber(size: size, color: Color(hex: "#9AA5B4").opacity(0.5))
                 }
             }
         }
     }
 
+    private func dayNumber(size: CGFloat, color: Color) -> some View {
+        Text(String(format: "%02d", dayIndex + 1))
+            .font(.system(size: size * 0.24, weight: .bold, design: .monospaced))
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(size * 0.1)
+    }
+
     private func checkmark(size: CGFloat) -> some View {
         Image(systemName: "checkmark")
-            .font(.system(size: size * 0.38, weight: .bold))
+            .font(.system(size: size * 0.34, weight: .bold))
             .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .padding(size * 0.1)
     }
 
     private func xmark(size: CGFloat) -> some View {
         Image(systemName: "xmark")
-            .font(.system(size: size * 0.34, weight: .semibold))
+            .font(.system(size: size * 0.3, weight: .semibold))
             .foregroundStyle(Color(hex: "#E07060"))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .padding(size * 0.1)
     }
 }
 
