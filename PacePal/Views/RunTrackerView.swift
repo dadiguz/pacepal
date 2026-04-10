@@ -713,6 +713,8 @@ private struct PetCarryingPinStage: View {
 // MARK: - PetIndoorStage (Motion/Indoor permission)
 
 private struct PetIndoorStage: View {
+    let dna: PetDNA
+
     var body: some View {
         ZStack(alignment: .center) {
             Circle()
@@ -720,7 +722,67 @@ private struct PetIndoorStage: View {
                 .frame(width: 180, height: 180)
                 .blur(radius: 30)
 
-            PixelTreadmillView()
+            VStack(spacing: -12) {
+                ZStack(alignment: .topTrailing) {
+                    PetAnimationView(dna: dna, pose: .running, pixelSize: 7)
+                        .frame(width: 90, height: 145)
+                        .offset(y: 23)
+
+                    SweatDropsView()
+                        .offset(x: 10, y: 61)
+                }
+
+                PixelTreadmillView()
+            }
+        }
+    }
+}
+
+// MARK: - SweatDropsView
+
+private struct SweatDropsView: View {
+    var body: some View {
+        ZStack {
+            SweatDrop(delay: 0.0, x: 0)
+            SweatDrop(delay: 0.35, x: 10)
+            SweatDrop(delay: 0.7, x: -8)
+        }
+        .frame(width: 40, height: 40)
+    }
+}
+
+private struct SweatDrop: View {
+    let delay: Double
+    let x: CGFloat
+    @State private var animating = false
+
+    var body: some View {
+        Canvas { ctx, _ in
+            let p: CGFloat = 5
+            let blue  = Color(hex: "#5BA8E8")
+            let light = Color(hex: "#A8D8FA")
+
+            func px(_ c: Int, _ r: Int, _ col: Color) {
+                ctx.fill(Path(CGRect(x: CGFloat(c)*p, y: CGFloat(r)*p, width: p, height: p)),
+                         with: .color(col))
+            }
+            // Pixel drop shape (2×4):
+            //  . X
+            //  X X
+            //  X x  (x = highlight)
+            //  . X
+            px(1, 0, blue)
+            px(0, 1, blue); px(1, 1, blue)
+            px(0, 2, blue); px(1, 2, light)
+            px(1, 3, blue)
+        }
+        .frame(width: 10, height: 20)
+        .offset(x: x, y: animating ? 18 : 0)
+        .opacity(animating ? 0 : 0.9)
+        .onAppear {
+            withAnimation(.easeIn(duration: 0.6).delay(delay).repeatForever(autoreverses: false)) {
+                animating = true
+            }
         }
     }
 }
@@ -1005,7 +1067,7 @@ private struct TrackerMotionPermView: View {
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.35), value: appeared)
 
-                PetIndoorStage()
+                PetIndoorStage(dna: dna)
                     .frame(height: 180)
                     .padding(.top, 32)
                     .padding(.bottom, 24)
