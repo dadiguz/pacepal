@@ -713,10 +713,6 @@ private struct PetCarryingPinStage: View {
 // MARK: - PetIndoorStage (Motion/Indoor permission)
 
 private struct PetIndoorStage: View {
-    let dna: PetDNA
-    @State private var bobUp = false
-    @State private var glowOn = false
-
     var body: some View {
         ZStack(alignment: .center) {
             Circle()
@@ -724,9 +720,70 @@ private struct PetIndoorStage: View {
                 .frame(width: 180, height: 180)
                 .blur(radius: 30)
 
-            PetAnimationView(dna: dna, pose: .sign, pixelSize: 9)
-                .frame(width: 130, height: 130)
+            PixelTreadmillView()
         }
+    }
+}
+
+// MARK: - PixelTreadmillView
+
+private struct PixelTreadmillView: View {
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.08)) { tl in
+            Canvas { ctx, _ in
+                let p: CGFloat = 8
+                let t = tl.date.timeIntervalSinceReferenceDate
+
+                let orange = Color(hex: "#F9703E")
+                let gray   = Color(hex: "#4A4A4A")
+                let drum   = Color(hex: "#3A3A3A")
+                let belt   = Color(hex: "#525252")
+                let shine  = Color(hex: "#787878")
+                let foot   = Color(hex: "#2A2A2A")
+
+                func px(_ c: Int, _ r: Int, _ color: Color) {
+                    ctx.fill(
+                        Path(CGRect(x: CGFloat(c) * p, y: CGFloat(r) * p, width: p, height: p)),
+                        with: .color(color)
+                    )
+                }
+
+                // Handlebars (orange accent)
+                px(3, 0, orange); px(4, 0, orange)
+                px(3, 1, orange); px(4, 1, orange)
+
+                // Diagonal frame
+                px(2, 2, gray); px(3, 2, gray)
+                px(1, 3, gray); px(2, 3, gray)
+                px(0, 4, gray); px(1, 4, gray)
+
+                // Back drum
+                px(0, 5, drum); px(0, 6, drum); px(0, 7, drum)
+
+                // Belt top highlight
+                for c in 1...16 { px(c, 5, shine) }
+
+                // Belt surface — animated stripes scroll left
+                for c in 1...16 {
+                    let phase = (Double(c) + t * 5.0).truncatingRemainder(dividingBy: 4.0)
+                    let isStripe = phase < 1.0
+                    px(c, 6, isStripe ? shine : belt)
+                    px(c, 7, isStripe ? shine : belt)
+                }
+
+                // Front drum
+                px(17, 5, drum); px(17, 6, drum); px(17, 7, drum)
+
+                // Left leg + foot
+                px(2, 8, foot); px(2, 9, foot)
+                px(1, 10, foot); px(2, 10, foot); px(3, 10, foot)
+
+                // Right leg + foot
+                px(15, 8, foot); px(15, 9, foot)
+                px(14, 10, foot); px(15, 10, foot); px(16, 10, foot)
+            }
+        }
+        .frame(width: 8 * 20, height: 8 * 11)
     }
 }
 
@@ -948,7 +1005,7 @@ private struct TrackerMotionPermView: View {
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.35), value: appeared)
 
-                PetIndoorStage(dna: dna)
+                PetIndoorStage()
                     .frame(height: 180)
                     .padding(.top, 32)
                     .padding(.bottom, 24)
