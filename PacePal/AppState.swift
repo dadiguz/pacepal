@@ -314,12 +314,12 @@ final class AppState {
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
     }
 
-    /// Returns the tip number (1-66) for the current completed-day count if not yet seen, nil otherwise.
+    /// Returns the tip number (1-66) for the current calendar day if not yet seen, nil otherwise.
+    /// Tips advance with the calendar — shown on app open, regardless of whether the user has run.
     var pendingTip: Int? {
-        guard challengeStarted else { return nil }
-        let tipDay = min(66, max(1, completedDays))
-        guard !seenTips.contains(tipDay) else { return nil }
-        return tipDay
+        let calDay = min(66, max(1, (Calendar.current.dateComponents([.day], from: challengeStartDate, to: Date()).day ?? 0) + 1))
+        guard !seenTips.contains(calDay) else { return nil }
+        return calDay
     }
 
     func markTipSeen(_ day: Int) {
@@ -337,6 +337,9 @@ final class AppState {
     #if DEBUG
     /// Shifts the challenge start date backwards and auto-marks passed milestones as seen.
     func shiftChallengeDay(by days: Int) {
+        // Move start date back so calendar day, tips, and HistoryView all advance correctly
+        challengeStartDate = Calendar.current.date(byAdding: .day, value: -days, to: challengeStartDate) ?? challengeStartDate
+        UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
         completedDays = min(66, completedDays + days)
         UserDefaults.standard.set(completedDays, forKey: "completedDays")
         // Mark all reached milestones except the most recent one as seen,
@@ -346,6 +349,13 @@ final class AppState {
         for a in reached.dropLast() { updated.insert(a.day) }
         seenAchievements = updated
         UserDefaults.standard.set(Array(seenAchievements), forKey: "seenAchievements")
+    }
+
+    /// Advances the calendar day only — completedDays stays the same.
+    /// Use this to simulate "a new day started" without adding a fake run.
+    func advanceCalendarDay() {
+        challengeStartDate = Calendar.current.date(byAdding: .day, value: -1, to: challengeStartDate) ?? challengeStartDate
+        UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
     }
 
     func revokeMedal() {

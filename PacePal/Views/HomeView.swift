@@ -297,7 +297,7 @@ struct HomeView: View {
             let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                checkForAchievement()
+                checkForTip()
             }
             if !UserDefaults.standard.bool(forKey: "hasSeenTutorial") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -348,6 +348,9 @@ struct HomeView: View {
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
             appState.syncToWidget(km: health.todayKm)
         }
+        .onChange(of: appState.completedDays) { _, _ in
+            checkForAchievement()
+        }
         .onReceive(
             Timer.publish(every: 60, on: .main, in: .common).autoconnect()
         ) { date in
@@ -356,12 +359,13 @@ struct HomeView: View {
                 health.fetchToday()
                 if !isAnimating { currentPose = normalPose }
             }
-            checkForAchievement()
+            checkForTip()
         }
         .onReceive(
             NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
         ) { _ in
             if energy > 0 { health.fetchToday() }
+            checkForTip()
         }
         .onChange(of: normalPose) { oldPose, newPose in
             // Always stop looping SFX immediately when entering dead state (before isAnimating guard)
@@ -402,19 +406,19 @@ struct HomeView: View {
 
     // MARK: – Achievement check
 
+    // Called after a run completes — only checks for milestone achievements.
     private func checkForAchievement() {
         guard pendingAchievement == nil, !showPetStatus else { return }
         if let ach = appState.pendingAchievement {
             withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
                 pendingAchievement = ach
             }
-        } else {
-            checkForTip()
         }
     }
 
+    // Called on app open / foreground — only checks for daily tips.
     private func checkForTip() {
-        guard pendingTipDay == nil, pendingAchievement == nil, !showPetStatus, !showMedalTutorial else { return }
+        guard pendingTipDay == nil, pendingAchievement == nil, !showPetStatus, !showMedalTutorial, !showTutorial else { return }
         if let day = appState.pendingTip {
             withAnimation(.spring(duration: 0.45, bounce: 0.15)) {
                 pendingTipDay = day
@@ -431,6 +435,7 @@ struct HomeView: View {
     private func finishTutorial() {
         withAnimation { showTutorial = false }
         UserDefaults.standard.set(true, forKey: "hasSeenTutorial")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { checkForTip() }
     }
 
     // MARK: – KM animation state machine
@@ -466,6 +471,11 @@ struct HomeView: View {
         isAnimating = false
         currentPose = normalPose
         appState.confirmChallengeStart()
+        await health.fetchRunStats(since: appState.challengeStartDate)
+        // fetchRunStats only sees real HealthKit workouts. If test km pushed today
+        // over the threshold without a real workout, add 1 for today.
+        let todayBonus = (health.todayKm >= 0.5 && health.realKm < 0.5) ? 1 : 0
+        appState.updateCompletedDays(health.totalRuns + todayBonus)
         checkForAchievement()
     }
 
@@ -529,7 +539,7 @@ struct HomeView: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Color(hex: "#FFD700"))
                     }
-                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, appState.completedDays + 1))))
+                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, health.todayKm >= 0.5 ? appState.completedDays : appState.completedDays + 1))))
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white.opacity(0.55))
                 }

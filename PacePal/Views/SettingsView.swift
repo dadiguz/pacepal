@@ -18,6 +18,7 @@ struct SettingsView: View {
     @State private var showLevelPicker = false
 
     #if DEBUG
+    @State private var showDebug = false
     @State private var debugNow: Date = Date()
     @State private var drainTimer: Timer? = nil
     #endif
@@ -163,9 +164,14 @@ struct SettingsView: View {
                 .padding(.horizontal, 24)
 
                 #if DEBUG
-                testingSection
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
+                settingsRow(
+                    icon: "ladybug.fill",
+                    iconColor: "#1F2933",
+                    title: "Debug",
+                    subtitle: "Testing tools"
+                ) { showDebug = true }
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
                 #endif
 
                 Spacer()
@@ -194,6 +200,15 @@ struct SettingsView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
+        #if DEBUG
+        .sheet(isPresented: $showDebug) {
+            DebugSheet()
+                .environment(appState)
+                .environment(health)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        }
+        #endif
         .sheet(isPresented: $showLanguagePicker, onDismiss: { langRefresh = UUID() }) {
             LanguagePickerSheet()
                 .presentationDetents([.fraction(0.45)])
@@ -215,270 +230,6 @@ struct SettingsView: View {
             Text(L("settings.reset_message"))
         }
     }
-
-    #if DEBUG
-    private var testingSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("TESTING")
-                .font(.system(size: 10, weight: .bold, design: .rounded))
-                .tracking(1.4)
-                .foregroundStyle(Color(hex: "#9AA5B4"))
-
-            Button {
-                appState.syncToWidget(km: health.todayKm)
-            } label: {
-                Text("📲 Sync widget ahora")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color(hex: "#EFF8FF"))
-                    .foregroundStyle(Color(hex: "#1C5FA8"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#BFDBFE"), lineWidth: 1))
-            }
-
-            Button {
-                SoundManager.shared.playRandomHappy(enabled: true)
-            } label: {
-                Text("🔊 Test sonido (happy)")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .foregroundStyle(Color(hex: "#4A3F35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-            }
-
-            Button {
-                SoundManager.shared.playMusic(name: "pacepal", enabled: true)
-            } label: {
-                Text("🎵 Test música (pacepal)")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .foregroundStyle(Color(hex: "#4A3F35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-            }
-
-            HStack(spacing: 6) {
-                ForEach([
-                    ("100%", 1.00),
-                    ("96%",  0.96),
-                    ("92%",  0.92),
-                    ("70%",  0.70),
-                    ("25%",  0.25),
-                    ("0%",   0.00),
-                ], id: \.0) { label, value in
-                    Button {
-                        appState.setEnergy(value)
-                        debugNow = Date()
-                    } label: {
-                        Text(label)
-                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(Color.white)
-                            .foregroundStyle(Color(hex: "#4A3F35"))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                    }
-                }
-            }
-
-            // Drain: decreases energy 1% every second for testing notifications
-            Button {
-                if drainTimer != nil {
-                    drainTimer?.invalidate()
-                    drainTimer = nil
-                } else {
-                    drainTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                        let current = appState.energy(at: Date())
-                        appState.setEnergy(max(0, current - 0.01))
-                        debugNow = Date()
-                    }
-                }
-            } label: {
-                Text(drainTimer != nil ? "⏹ Detener drain" : "📉 -1% / seg (drain)")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(drainTimer != nil ? Color(hex: "#FFF0EE") : Color.white)
-                    .foregroundStyle(drainTimer != nil ? Color(hex: "#E53E3E") : Color(hex: "#4A3F35"))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(
-                        drainTimer != nil ? Color(hex: "#E53E3E").opacity(0.4) : Color(hex: "#E2E8F0"),
-                        lineWidth: 1))
-            }
-
-            HStack(spacing: 6) {
-                Button {
-                    health.addTestKm()
-                } label: {
-                    Text("➕ 1 km")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Button {
-                    appState.addEnergy(km: 1.0)
-                    debugNow = Date()
-                } label: {
-                    Text("⚡ +10% energía")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-            }
-
-            // Day controls
-            HStack(spacing: 6) {
-                Button {
-                    appState.resetChallengeToToday()
-                    debugNow = Date()
-                } label: {
-                    Text("0 días")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#E12D39"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Button {
-                    appState.shiftChallengeDay(by: 1)
-                    debugNow = Date()
-                } label: {
-                    Text("+1 día")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Button {
-                    appState.shiftChallengeDay(by: 3)
-                    debugNow = Date()
-                } label: {
-                    Text("+3 días")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Button {
-                    appState.shiftChallengeDay(by: 10)
-                    debugNow = Date()
-                } label: {
-                    Text("+10 días")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Text("DÍA \(appState.completedDays)")
-                    .font(.system(size: 11, weight: .black, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#9AA5B4"))
-            }
-
-            // Medal controls
-            HStack(spacing: 6) {
-                Button {
-                    appState.grantMedal()
-                } label: {
-                    Text("🏅 Dar medalla")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#4A3F35"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(appState.medalEarned ? Color(hex: "#FFF9E6") : Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(
-                            appState.medalEarned ? Color(hex: "#FFD700") : Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-
-                Button {
-                    appState.revokeMedal()
-                } label: {
-                    Text("❌ Quitar medalla")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color(hex: "#E12D39"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-                }
-            }
-
-            if appState.medalEarned {
-                Text("MEDALLA ACTIVA")
-                    .font(.system(size: 10, weight: .black, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#FFD700"))
-            }
-
-            // Tips controls
-            Button {
-                appState.resetTips()
-            } label: {
-                Text("💡 Reset tips (\(appState.seenTips.count) vistos)")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#E12D39"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-            }
-
-            // Questionnaire reset
-            Button {
-                UserDefaults.standard.set(false, forKey: "questionnaireCompleted")
-                withAnimation(.spring(duration: 0.4)) {
-                    appState.selectedCharacter = nil
-                }
-                dismiss()
-            } label: {
-                Text("📋 Reset cuestionario")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#E12D39"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-            }
-
-            Text("DÍAS COMPLETADOS: \(appState.completedDays)")
-                .font(.system(size: 10, weight: .black, design: .monospaced))
-                .foregroundStyle(Color(hex: "#9AA5B4"))
-        }
-    }
-    #endif
 
     private func settingsRow(
         icon: String,
@@ -979,6 +730,118 @@ struct LevelPickerSheet: View {
         .background(Color(hex: "#F5F8FC").ignoresSafeArea())
     }
 }
+
+// MARK: - Debug Sheet
+
+#if DEBUG
+private struct DebugSheet: View {
+    @Environment(AppState.self) private var appState
+    @Environment(HealthManager.self) private var health
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var drainTimer: Timer? = nil
+
+    private func btn(_ label: String, color: String = "#4A3F35", bg: String = "#FFFFFF", action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(label)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color(hex: color))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(Color(hex: bg))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
+        }
+    }
+
+    private func section(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 10, weight: .black, design: .monospaced))
+            .tracking(1.2)
+            .foregroundStyle(Color(hex: "#9AA5B4"))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 6)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+
+                    // MARK: Energía
+                    section("ENERGÍA")
+                    HStack(spacing: 6) {
+                        ForEach([("100%", 1.00), ("70%", 0.70), ("25%", 0.25), ("9%", 0.09), ("0%", 0.00)], id: \.0) { lbl, val in
+                            btn(lbl) { appState.setEnergy(val) }
+                        }
+                    }
+                    btn(drainTimer != nil ? "⏹ Detener drain" : "📉 -1% / seg",
+                        color: drainTimer != nil ? "#E53E3E" : "#4A3F35",
+                        bg:    drainTimer != nil ? "#FFF0EE" : "#FFFFFF") {
+                        if drainTimer != nil {
+                            drainTimer?.invalidate(); drainTimer = nil
+                        } else {
+                            drainTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                                appState.setEnergy(max(0, appState.energy(at: Date()) - 0.01))
+                            }
+                        }
+                    }
+
+                    // MARK: Km
+                    section("KM")
+                    HStack(spacing: 6) {
+                        btn("➕ 1 km (health)") { health.addTestKm() }
+                        btn("⚡ +1 km (energía)") { appState.addEnergy(km: 1.0) }
+                    }
+
+                    // MARK: Días
+                    section("DÍAS COMPLETADOS: \(appState.completedDays)")
+                    HStack(spacing: 6) {
+                        btn("0", color: "#E12D39") { appState.resetChallengeToToday() }
+                        btn("+1") { appState.shiftChallengeDay(by: 1) }
+                        btn("+3") { appState.shiftChallengeDay(by: 3) }
+                        btn("+10") { appState.shiftChallengeDay(by: 10) }
+                        btn("+30") { appState.shiftChallengeDay(by: 30) }
+                    }
+                    btn("📅 +1 día (sin correr)") { appState.advanceCalendarDay() }
+
+                    // MARK: Medalla
+                    section("MEDALLA\(appState.medalEarned ? " — ACTIVA 🏅" : "")")
+                    HStack(spacing: 6) {
+                        btn("🏅 Dar medalla", bg: appState.medalEarned ? "#FFF9E6" : "#FFFFFF") { appState.grantMedal() }
+                        btn("❌ Quitar", color: "#E12D39") { appState.revokeMedal() }
+                    }
+
+                    // MARK: Resets
+                    section("RESETS")
+                    btn("💡 Reset tips (\(appState.seenTips.count) vistos)", color: "#E12D39") { appState.resetTips() }
+                    btn("📋 Reset cuestionario", color: "#E12D39") {
+                        UserDefaults.standard.set(false, forKey: "questionnaireCompleted")
+                        withAnimation(.spring(duration: 0.4)) { appState.selectedCharacter = nil }
+                        dismiss()
+                    }
+
+                    // MARK: Misc
+                    section("MISC")
+                    btn("📲 Sync widget") { appState.syncToWidget(km: health.todayKm) }
+                    btn("🔊 Test sonido (happy)") { SoundManager.shared.playRandomHappy(enabled: true) }
+                    btn("🎵 Test música") { SoundManager.shared.playMusic(name: "pacepal", enabled: true) }
+                }
+                .padding(20)
+            }
+            .background(Color(hex: "#F5F8FC").ignoresSafeArea())
+            .navigationTitle("Debug")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cerrar") { dismiss() }
+                        .font(.system(size: 15, weight: .semibold))
+                }
+            }
+        }
+    }
+}
+#endif
 
 #Preview {
     SettingsView()

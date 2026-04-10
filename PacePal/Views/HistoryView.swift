@@ -79,6 +79,14 @@ struct HistoryView: View {
             return health.todayKm >= runThreshold ? .completed : .today
         }
         let km = dailyKm[dayIndex] ?? 0
+        #if DEBUG
+        if km < runThreshold {
+            let completedStart = max(0, todayIndex - appState.completedDays)
+            if dayIndex >= completedStart {
+                return .completed
+            }
+        }
+        #endif
         return km >= runThreshold ? .completed : .missed
     }
 
