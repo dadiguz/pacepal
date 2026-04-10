@@ -6,14 +6,52 @@ struct PaywallView: View {
 
     @State private var appeared = false
     @State private var glowPulse = false
-    @State private var featurePage = 0
+    @State private var floatTick = false
     @State private var purchased = false
+    @State private var activePill: Int? = nil
 
-    private let features: [(icon: String, color: String, titleKey: String, descKey: String)] = [
-        ("figure.run",  "#F9703E", "paywall.feature_challenge_title", "paywall.feature_challenge_desc"),
-        ("heart.fill",  "#E12D39", "paywall.feature_health_title",    "paywall.feature_health_desc"),
-        ("flame.fill",  "#DE911D", "paywall.feature_streaks_title",   "paywall.feature_streaks_desc"),
+    private struct PillData {
+        let icon: String; let color: String
+        let titleES: String; let titleEN: String
+        let descES: String;  let descEN: String
+        let x: CGFloat; let y: CGFloat
+        let floatAmp: CGFloat; let delay: Double
+    }
+
+    private let pills: [PillData] = [
+        PillData(icon: "figure.run",           color: "#F9703E",
+                 titleES: "66 días",      titleEN: "66 days",
+                 descES:  "Completa el reto de 66 días para convertir correr en un hábito real.",
+                 descEN:  "Complete the 66-day challenge and turn running into a real habit.",
+                 x: -112, y: -80, floatAmp: 4, delay: 0.0),
+        PillData(icon: "heart.fill",           color: "#E12D39",
+                 titleES: "Apple Health", titleEN: "Apple Health",
+                 descES:  "Tus kilómetros se sincronizan automáticamente. Sin hacer nada.",
+                 descEN:  "Your kilometers sync automatically from Apple Health.",
+                 x:  108, y: -65, floatAmp: 5, delay: 0.4),
+        PillData(icon: "rectangle.stack.fill", color: "#0967D2",
+                 titleES: "Widget",       titleEN: "Widget",
+                 descES:  "Agrega el widget y ve el estado de tu compañero sin abrir la app.",
+                 descEN:  "Add the widget and see your pet's status without opening the app.",
+                 x: -118, y:  10, floatAmp: 3, delay: 0.7),
+        PillData(icon: "bell.fill",            color: "#DE911D",
+                 titleES: "Avisos",       titleEN: "Alerts",
+                 descES:  "Recibe una notificación cuando tu compañero empieza a perder energía.",
+                 descEN:  "Get notified when your companion starts losing energy.",
+                 x:  110, y:  15, floatAmp: 6, delay: 0.2),
+        PillData(icon: "flame.fill",           color: "#CF1124",
+                 titleES: "Rachas",       titleEN: "Streaks",
+                 descES:  "Consulta tu historial y mantén tu racha activa día a día.",
+                 descEN:  "Track your history and keep your streak going every day.",
+                 x:  -88, y:  82, floatAmp: 4, delay: 0.9),
+        PillData(icon: "photo.fill",           color: "#27AB83",
+                 titleES: "Fondos",       titleEN: "Backgrounds",
+                 descES:  "Desbloquea nuevos fondos al alcanzar logros de racha en el reto.",
+                 descEN:  "Unlock new backgrounds as you reach streak milestones.",
+                 x:   84, y:  80, floatAmp: 5, delay: 0.5),
     ]
+
+    private var isES: Bool { AppLang.current != .en }
 
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     private var petName: String? {
@@ -36,9 +74,35 @@ struct PaywallView: View {
                         .opacity(appeared ? 1 : 0)
                         .animation(.easeIn(duration: 0.35), value: appeared)
 
-                    // Pet
+                    // Pet + floating pills
                     petStage
-                        .padding(.top, 52)
+                        .padding(.top, 24)
+
+                    // Pill description card
+                    if let i = activePill {
+                        let p = pills[i]
+                        HStack(spacing: 10) {
+                            Image(systemName: p.icon)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 28, height: 28)
+                                .background(Color(hex: p.color))
+                                .clipShape(Circle())
+                            Text(isES ? p.descES : p.descEN)
+                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color(hex: "#3E4C59"))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(hex: p.color).opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color(hex: p.color).opacity(0.2), lineWidth: 1))
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+                        .transition(.scale(scale: 0.95, anchor: .top).combined(with: .opacity))
+                    }
 
                     // Headline
                     headlineText
@@ -47,13 +111,6 @@ struct PaywallView: View {
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
                         .animation(.spring(duration: 0.45).delay(0.2), value: appeared)
-
-                    // Feature carousel
-                    featureList
-                        .padding(.top, 28)
-                        .opacity(appeared ? 1 : 0)
-                        .offset(y: appeared ? 0 : 8)
-                        .animation(.spring(duration: 0.45).delay(0.28), value: appeared)
 
                     // Price card
                     priceCard
@@ -98,9 +155,33 @@ struct PaywallView: View {
                         }
                     }
                     .padding(.top, 16)
-                    .padding(.bottom, 48)
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.3).delay(0.5), value: appeared)
+
+                    // Subscription description (required by Apple)
+                    Text(isES
+                         ? "Pacepal Premium desbloquea el acceso completo a la app para completar el reto de 66 días: sincronización con Apple Health, widget, notificaciones y fondos. Suscripción anual · 7 días gratis, después \(store.displayPrice)/año · Cancela en Ajustes de Apple."
+                         : "Pacepal Premium unlocks full access to complete the 66-day challenge: Apple Health sync, widget, notifications, and backgrounds. Annual subscription · 7-day free trial, then \(store.displayPrice)/year · Cancel anytime in Apple Settings.")
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(Color(hex: "#9AA5B4"))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .padding(.top, 12)
+                        .opacity(appeared ? 1 : 0)
+                        .animation(.easeIn(duration: 0.3).delay(0.52), value: appeared)
+
+                    // Legal links (required by Apple)
+                    HStack(spacing: 16) {
+                        Link(isES ? "Privacidad" : "Privacy", destination: URL(string: "https://www.pacepal.mx/privacy")!)
+                        Text("·").foregroundStyle(Color(hex: "#CBD2D9"))
+                        Link(isES ? "Términos de uso" : "Terms of Use", destination: URL(string: "https://www.pacepal.mx/terms")!)
+                    }
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                    .padding(.top, 10)
+                    .padding(.bottom, 48)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeIn(duration: 0.3).delay(0.54), value: appeared)
                 }
             }
         }
@@ -113,6 +194,7 @@ struct PaywallView: View {
         }
         .onAppear {
             appeared = true
+            floatTick = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
                     glowPulse = true
@@ -145,8 +227,51 @@ struct PaywallView: View {
                 .scaleEffect(appeared ? 1 : 0.8)
                 .opacity(appeared ? 1 : 0)
                 .animation(.spring(duration: 0.55, bounce: 0.3).delay(0.1), value: appeared)
+
+            // Floating feature pills (encima del mono)
+            ForEach(Array(pills.enumerated()), id: \.offset) { i, p in
+                featurePill(p, isActive: activePill == i)
+                    .onTapGesture {
+                        withAnimation(.spring(duration: 0.3)) {
+                            activePill = activePill == i ? nil : i
+                        }
+                    }
+                    .offset(x: p.x, y: p.y + (floatTick ? p.floatAmp : -p.floatAmp))
+                    .animation(
+                        .easeInOut(duration: 2.2 + Double(i) * 0.25)
+                        .repeatForever(autoreverses: true)
+                        .delay(p.delay),
+                        value: floatTick
+                    )
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeIn(duration: 0.35).delay(0.15 + Double(i) * 0.08), value: appeared)
+            }
         }
-        .frame(height: 160)
+        .frame(height: 260)
+    }
+
+    private func featurePill(_ p: PillData, isActive: Bool) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: p.icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 22, height: 22)
+                .background(Color(hex: p.color))
+                .clipShape(Circle())
+            Text(isES ? p.titleES : p.titleEN)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color(hex: "#1F2933"))
+                .lineLimit(1)
+                .fixedSize()
+        }
+        .fixedSize()
+        .padding(.horizontal, 9)
+        .padding(.vertical, 6)
+        .background(isActive ? Color(hex: p.color).opacity(0.15) : .white.opacity(0.72))
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.07), radius: 6, y: 2)
+        .overlay(Capsule().strokeBorder(isActive ? Color(hex: p.color).opacity(0.5) : .clear, lineWidth: 1.5))
     }
 
     // MARK: - Headline
@@ -192,66 +317,6 @@ struct PaywallView: View {
                     .foregroundStyle(Color(hex: "#9AA5B4"))
             }
         }
-    }
-
-    // MARK: - Feature carousel
-
-    private var featureList: some View {
-        VStack(spacing: 10) {
-            TabView(selection: $featurePage) {
-                ForEach(features.indices, id: \.self) { i in
-                    featureCard(features[i])
-                        .tag(i)
-                        .padding(.horizontal, 24)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 88)
-
-            HStack(spacing: 6) {
-                ForEach(features.indices, id: \.self) { i in
-                    Capsule()
-                        .fill(i == featurePage ? Color(hex: "#F9703E") : Color(hex: "#CBD2D9"))
-                        .frame(width: i == featurePage ? 16 : 5, height: 5)
-                        .animation(.spring(duration: 0.3), value: featurePage)
-                }
-            }
-        }
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
-                withAnimation(.spring(duration: 0.4)) {
-                    featurePage = (featurePage + 1) % features.count
-                }
-            }
-        }
-    }
-
-    private func featureCard(_ f: (icon: String, color: String, titleKey: String, descKey: String)) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: f.icon)
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 52, height: 52)
-                .background(Color(hex: f.color))
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L(f.titleKey))
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#1F2933"))
-                Text(L(f.descKey))
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(Color(hex: "#9AA5B4"))
-            }
-            Spacer()
-        }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 16)
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color(hex: "#E2E8F0"), lineWidth: 1))
-        .shadow(color: .black.opacity(0.03), radius: 8, y: 3)
     }
 
     // MARK: - Price card
