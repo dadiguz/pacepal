@@ -48,23 +48,33 @@ struct RunTrackerView: View {
 
     var body: some View {
         ZStack {
-            // Same background across ALL phases — no dark overlay
+            // ✅ CLAUDE BUILD V4
             Color(hex: "#F9F496").ignoresSafeArea()
             AppBackground(imageName: "pattern")
                 .ignoresSafeArea()
                 .opacity(0.30)
 
+            // All phases rendered simultaneously; opacity drives visibility.
+            // Each view gets the full screen frame → no layout collapse.
             Group {
-                switch phase {
-                case .idle:           idleView
-                case .countdown(let n): countdownView(n)
-                case .running:        runningView
-                case .paused:         pausedView
-                case .finished:       finishedView
-                }
+                idleContentView
+                    .opacity(phase == .idle ? 1 : 0)
+
+                countdownOverlay
+                    .opacity({ if case .countdown = phase { return 1 } else { return 0 } }())
+
+                runningView
+                    .opacity(phase == .running ? 1 : 0)
+
+                pausedView
+                    .opacity(phase == .paused ? 1 : 0)
+
+                finishedView
+                    .opacity(phase == .finished ? 1 : 0)
             }
-            .id(phase)
-            .transition(.opacity.animation(.easeInOut(duration: 0.5)))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .animation(.easeInOut(duration: 0.35), value: phase)
+
         }
         .sheet(isPresented: $showShareSheet) {
             RunShareSheet(items: shareItems.isEmpty ? [shareText] : shareItems)
@@ -96,78 +106,90 @@ struct RunTrackerView: View {
     // MARK: - Shared Nike-style header (Pace | Day | Time)
 
     private var nrcHeader: some View {
-        HStack(alignment: .top, spacing: 0) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(tracker.formattedPace ?? "--:--")
-                    .font(.system(size: 26, weight: .black))
-                    .monospacedDigit()
-                    .foregroundStyle(.black)
-                Text("Pace")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.4))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        // GeometryReader guarantees each column gets exactly 1/3 of the width
+        GeometryReader { geo in
+            let col = geo.size.width / 3
+            HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(tracker.formattedPace ?? "--:--")
+                        .font(.system(size: 22, weight: .black))
+                        .monospacedDigit()
+                        .foregroundStyle(.black)
+                    Text("PACE")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.black.opacity(0.4))
+                        .tracking(0.5)
+                }
+                .frame(width: col, alignment: .leading)
 
-            VStack(alignment: .center, spacing: 3) {
-                Text("\(currentDay)/66")
-                    .font(.system(size: 26, weight: .black))
-                    .monospacedDigit()
-                    .foregroundStyle(.black)
-                Text("Day")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.4))
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
+                VStack(alignment: .center, spacing: 3) {
+                    Text("\(currentDay)/66")
+                        .font(.system(size: 22, weight: .black))
+                        .monospacedDigit()
+                        .foregroundStyle(.black)
+                    Text("DAY")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.black.opacity(0.4))
+                        .tracking(0.5)
+                }
+                .frame(width: col, alignment: .center)
 
-            VStack(alignment: .trailing, spacing: 3) {
-                Text(tracker.formattedTime)
-                    .font(.system(size: 26, weight: .black))
-                    .monospacedDigit()
-                    .foregroundStyle(.black)
-                Text("Time")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.black.opacity(0.4))
+                VStack(alignment: .trailing, spacing: 3) {
+                    Text(tracker.formattedTime)
+                        .font(.system(size: 22, weight: .black))
+                        .monospacedDigit()
+                        .foregroundStyle(.black)
+                    Text("TIME")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.black.opacity(0.4))
+                        .tracking(0.5)
+                }
+                .frame(width: col, alignment: .trailing)
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(.horizontal, 32)
-        .padding(.top, 60)
+        .frame(height: 52)
+        .padding(.horizontal, 24)
+        .padding(.top, 56)
     }
 
     // MARK: - Shared KM block
 
     private var kmDisplay: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Text(String(format: "%.2f", tracker.distanceKm))
-                .font(.system(size: 112, weight: .black))
+                .font(.system(size: 128, weight: .black))
                 .foregroundStyle(.black)
                 .monospacedDigit()
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
                 .contentTransition(.numericText())
                 .animation(.spring(duration: 0.3), value: tracker.distanceKm)
             Text("kilometers")
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Color.black.opacity(0.4))
+                .textCase(.uppercase)
+                .tracking(1)
         }
     }
 
     // MARK: - Idle: hold-circle to start
 
-    private var idleView: some View {
+    private var idleContentView: some View {
         VStack(spacing: 0) {
+            // X button — same layer as the pet so it's guaranteed visible
             HStack {
                 Button { dismiss() } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 15, weight: .black))
+                        .font(.system(size: 16, weight: .black))
                         .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
-                        .background(.black)
+                        .frame(width: 48, height: 48)
+                        .background(Color.black)
                         .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
                 }
                 Spacer()
             }
             .padding(.horizontal, 24)
-            .padding(.top, 52)
+            .padding(.top, 16)
 
             Spacer()
 
@@ -203,10 +225,9 @@ struct RunTrackerView: View {
 
     // MARK: - Countdown
 
-    private func countdownView(_ n: Int) -> some View {
+    private var countdownOverlay: some View {
         ZStack {
-            VStack {
-                Spacer()
+            if case .countdown(let n) = phase {
                 Text("\(n)")
                     .font(.system(size: 140, weight: .black))
                     .foregroundStyle(.black)
@@ -215,7 +236,6 @@ struct RunTrackerView: View {
                         insertion: .scale(scale: 1.4).combined(with: .opacity),
                         removal:   .scale(scale: 0.6).combined(with: .opacity)
                     ))
-                Spacer()
             }
         }
     }
@@ -342,64 +362,21 @@ struct RunTrackerView: View {
     // MARK: - Share (screenshot card + optional route)
 
     private func prepareShare() {
-        Task { @MainActor in
-            var routeImg: UIImage? = nil
-            if tracker.routeCoordinates.count > 3 {
-                routeImg = await makeRouteSnapshot(tracker.routeCoordinates)
-            }
-            let card = RunShareCard(
-                km: tracker.distanceKm,
-                time: tracker.formattedTime,
-                pace: tracker.formattedPace,
-                day: currentDay,
-                dna: displayDNA,
-                routeImage: routeImg
-            )
-            let renderer = ImageRenderer(content: card)
-            renderer.scale = 3
-            if let img = renderer.uiImage {
-                shareText = ""          // unused when sharing image
-                shareItems = [img]
-                showShareSheet = true
-            }
-        }
-    }
-
-    private func makeRouteSnapshot(_ coords: [CLLocationCoordinate2D]) async -> UIImage? {
-        let lats = coords.map { $0.latitude }
-        let lons = coords.map { $0.longitude }
-        guard let minLat = lats.min(), let maxLat = lats.max(),
-              let minLon = lons.min(), let maxLon = lons.max() else { return nil }
-
-        let latPad = max((maxLat - minLat) * 0.25, 0.002)
-        let lonPad = max((maxLon - minLon) * 0.25, 0.002)
-        let region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2,
-                                           longitude: (minLon + maxLon) / 2),
-            span: MKCoordinateSpan(latitudeDelta: (maxLat - minLat) + latPad * 2,
-                                   longitudeDelta: (maxLon - minLon) + lonPad * 2)
+        let card = RunShareCard(
+            km: tracker.distanceKm,
+            time: tracker.formattedTime,
+            pace: tracker.formattedPace,
+            day: currentDay,
+            dna: displayDNA
         )
-        let opts = MKMapSnapshotter.Options()
-        opts.region = region
-        opts.size   = CGSize(width: 390, height: 220)
-        opts.scale  = 3
-
-        return await withCheckedContinuation { cont in
-            MKMapSnapshotter(options: opts).start { snap, _ in
-                guard let snap else { cont.resume(returning: nil); return }
-                UIGraphicsBeginImageContextWithOptions(opts.size, true, opts.scale)
-                defer { UIGraphicsEndImageContext() }
-                snap.image.draw(at: .zero)
-                if let ctx = UIGraphicsGetCurrentContext() {
-                    ctx.setStrokeColor(UIColor(red: 0.98, green: 0.44, blue: 0.24, alpha: 1).cgColor)
-                    ctx.setLineWidth(4); ctx.setLineCap(.round); ctx.setLineJoin(.round)
-                    let pts = coords.map { snap.point(for: $0) }
-                    ctx.move(to: pts[0]); pts.dropFirst().forEach { ctx.addLine(to: $0) }
-                    ctx.strokePath()
-                }
-                cont.resume(returning: UIGraphicsGetImageFromCurrentImageContext())
-            }
+        let renderer = ImageRenderer(content: card)
+        renderer.scale = 3
+        if let img = renderer.uiImage {
+            shareItems = [img]
+        } else {
+            shareItems = ["\(String(format: "%.2f", tracker.distanceKm)) km — Day \(currentDay)/66 #PacePal"]
         }
+        showShareSheet = true
     }
 
     // MARK: - Hold-to-start logic
@@ -432,11 +409,11 @@ struct RunTrackerView: View {
 
     private func beginCountdown() {
         startHoldProgress = 0
-        phase = .countdown(3)
+        withAnimation { phase = .countdown(3) }
         Task {
             for n in stride(from: 3, through: 1, by: -1) {
                 UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-                await MainActor.run { phase = .countdown(n) }
+                await MainActor.run { withAnimation(.spring(duration: 0.3)) { phase = .countdown(n) } }
                 try? await Task.sleep(for: .seconds(1))
             }
             await MainActor.run { beginRun() }
@@ -567,95 +544,78 @@ struct RunShareCard: View {
     let pace: String?
     let day: Int
     let dna: PetDNA
-    let routeImage: UIImage?
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Route map or gradient placeholder
-            if let img = routeImage {
-                Image(uiImage: img)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 210)
-                    .clipped()
-            } else {
-                LinearGradient(
-                    colors: [Color(hex: "#F9703E").opacity(0.7), Color(hex: "#F9F496")],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                )
-                .frame(height: 210)
-                .overlay {
-                    Image(systemName: "figure.run")
-                        .font(.system(size: 70, weight: .black))
-                        .foregroundStyle(.white.opacity(0.35))
-                }
-            }
+        ZStack {
+            Color(hex: "#F9F496")
 
-            // Stats block
             VStack(spacing: 0) {
-                // KM
-                VStack(spacing: 4) {
-                    Text(String(format: "%.2f", km))
-                        .font(.system(size: 80, weight: .black))
-                        .foregroundStyle(.black)
-                        .monospacedDigit()
-                    Text("kilometers")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Color.black.opacity(0.4))
-                }
-                .padding(.top, 24)
-
-                // Secondary stats
-                HStack(spacing: 32) {
-                    VStack(spacing: 3) {
-                        Text(time)
-                            .font(.system(size: 22, weight: .black))
-                            .monospacedDigit()
+                // Header row — fixed 390pt width so GeometryReader isn't needed
+                HStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(pace ?? "--:--")
+                            .font(.system(size: 20, weight: .black)).monospacedDigit()
                             .foregroundStyle(.black)
-                        Text("Time")
-                            .font(.system(size: 11, weight: .medium))
+                        Text("PACE")
+                            .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.black.opacity(0.4))
                     }
-                    if let p = pace {
-                        VStack(spacing: 3) {
-                            Text(p)
-                                .font(.system(size: 22, weight: .black))
-                                .monospacedDigit()
-                                .foregroundStyle(.black)
-                            Text("Pace /km")
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(Color.black.opacity(0.4))
-                        }
-                    }
-                    VStack(spacing: 3) {
+                    .frame(width: 110, alignment: .leading)
+
+                    VStack(alignment: .center, spacing: 2) {
                         Text("\(day)/66")
-                            .font(.system(size: 22, weight: .black))
-                            .monospacedDigit()
+                            .font(.system(size: 20, weight: .black)).monospacedDigit()
                             .foregroundStyle(.black)
-                        Text("Day")
-                            .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(Color.black.opacity(0.4))
+                        Text("DAY")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.black.opacity(0.4))
                     }
+                    .frame(width: 110, alignment: .center)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(time)
+                            .font(.system(size: 20, weight: .black)).monospacedDigit()
+                            .foregroundStyle(.black)
+                        Text("TIME")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.black.opacity(0.4))
+                    }
+                    .frame(width: 110, alignment: .trailing)
                 }
-                .padding(.top, 20)
+                .padding(.horizontal, 20)
+                .padding(.top, 32)
+
+                // Big KM
+                Text(String(format: "%.2f", km))
+                    .font(.system(size: 100, weight: .black))
+                    .monospacedDigit()
+                    .foregroundStyle(.black)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 20)
+
+                Text("KILOMETERS")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(0.4))
+                    .tracking(1.5)
+                    .padding(.top, 4)
 
                 // Pet + branding
-                HStack {
+                HStack(alignment: .bottom) {
                     PetAnimationView(dna: dna, pose: .jump, pixelSize: 5)
-                        .frame(width: 90, height: 90)
+                        .frame(width: 80, height: 80)
                     Spacer()
                     Text("PacePal")
-                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .font(.system(size: 18, weight: .black, design: .rounded))
                         .foregroundStyle(Color(hex: "#F9703E"))
                 }
                 .padding(.horizontal, 28)
-                .padding(.top, 16)
-                .padding(.bottom, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 28)
             }
-            .background(Color(hex: "#F9F496"))
         }
         .frame(width: 390)
-        .background(Color(hex: "#F9F496"))
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .clipShape(RoundedRectangle(cornerRadius: 28))
     }
 }

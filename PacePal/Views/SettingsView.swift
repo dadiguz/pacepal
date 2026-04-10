@@ -163,16 +163,6 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 24)
 
-                #if DEBUG
-                settingsRow(
-                    icon: "ladybug.fill",
-                    iconColor: "#1F2933",
-                    title: "Debug",
-                    subtitle: "Testing tools"
-                ) { showDebug = true }
-                .padding(.horizontal, 24)
-                .padding(.top, 10)
-                #endif
 
                 Spacer()
             }
