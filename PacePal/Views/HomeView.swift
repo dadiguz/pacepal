@@ -722,7 +722,7 @@ struct HomeView: View {
             .shadow(color: hasPhotoBackground ? .black.opacity(0.80) : .clear, radius: 12, x: 0, y: 2)
             .shadow(color: hasPhotoBackground ? .black.opacity(0.50) : .clear, radius: 4, x: 0, y: 1)
             .multilineTextAlignment(.center)
-            .lineLimit(2)
+            .lineLimit(3)
             .onTapGesture {
                 UIPasteboard.general.string = RunningPhrase.all[phraseIndex].localized
             }

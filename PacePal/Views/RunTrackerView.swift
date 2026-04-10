@@ -6,6 +6,8 @@ import MapKit
 
 private enum TrackerPhase: Equatable, Hashable {
     case idle
+    case locationPermission
+    case motionPermission
     case countdown(Int)
     case running
     case paused
@@ -22,11 +24,9 @@ struct RunTrackerView: View {
     @State private var tracker = RunTracker()
     @State private var phase: TrackerPhase = .idle
     @State private var showLocationAlert = false
-    @State private var showShareSheet = false
-    @State private var shareText = ""
-    @State private var shareItems: [Any] = []
     @State private var pendingKm: Double = 0        // applied on dismiss so HomeView animates
     @State private var showHoldToast = false
+    @State private var toastMessage: String = ""
 
     // Hold-to-start
     @State private var startHoldProgress: Double = 0
@@ -36,12 +36,16 @@ struct RunTrackerView: View {
     @State private var stopHoldProgress: Double = 0
     @State private var stopHoldTimer: Timer? = nil
 
+    // Permission screen entrance animations
+    @State private var locationPermAppeared = false
+    @State private var motionPermAppeared = false
+
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
     private var currentDay: Int { min(66, appState.completedDays + 1) }
 
     private var currentPose: PetPose {
         switch phase {
-        case .idle, .countdown: return .idle
+        case .idle, .countdown, .locationPermission, .motionPermission: return .idle
         case .running:          return tracker.isMoving ? .running : .tired
         case .paused:           return .drinking
         case .finished:         return .jump
@@ -60,6 +64,14 @@ struct RunTrackerView: View {
             Group {
                 idleContentView
                     .opacity(phase == .idle ? 1 : 0)
+
+                locationPermissionView
+                    .opacity(phase == .locationPermission ? 1 : 0)
+                    .allowsHitTesting(phase == .locationPermission)
+
+                motionPermissionView
+                    .opacity(phase == .motionPermission ? 1 : 0)
+                    .allowsHitTesting(phase == .motionPermission)
 
                 countdownOverlay
                     .opacity({ if case .countdown = phase { return 1 } else { return 0 } }())
@@ -92,12 +104,9 @@ struct RunTrackerView: View {
             }
             .frame(width: UIScreen.main.bounds.width)
             .padding(.top, 60)
-            .opacity(phase == .idle ? 1 : 0)
-            .allowsHitTesting(phase == .idle)
-            .animation(.easeInOut(duration: 0.2), value: phase == .idle)
-        }
-        .sheet(isPresented: $showShareSheet) {
-            RunShareSheet(items: shareItems.isEmpty ? [shareText] : shareItems)
+            .opacity([.idle, .locationPermission].contains(phase) ? 1 : 0)
+            .allowsHitTesting([.idle, .locationPermission].contains(phase))
+            .animation(.easeInOut(duration: 0.2), value: phase)
         }
         .alert(L("tracker.location_title"), isPresented: $showLocationAlert) {
             Button(L("tracker.location_open_settings")) {
@@ -111,7 +120,12 @@ struct RunTrackerView: View {
         }
         .onChange(of: tracker.locationAuthStatus) { _, status in
             if status == .denied || status == .restricted {
+                if phase == .locationPermission { withAnimation { phase = .idle } }
                 showLocationAlert = true
+            } else if (status == .authorizedWhenInUse || status == .authorizedAlways)
+                        && phase == .locationPermission {
+                withAnimation { phase = .idle }
+                beginCountdown()
             }
         }
         .overlay(alignment: .top) {
@@ -119,7 +133,7 @@ struct RunTrackerView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "hand.tap.fill")
                         .font(.system(size: 14, weight: .semibold))
-                    Text(L("tracker.hold_toast"))
+                    Text(toastMessage.isEmpty ? L("tracker.hold_toast") : toastMessage)
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                 }
                 .foregroundStyle(.white)
@@ -132,6 +146,22 @@ struct RunTrackerView: View {
             }
         }
         .animation(.spring(duration: 0.3), value: showHoldToast)
+        .onChange(of: tracker.autoPauseTriggered) { _, triggered in
+            if triggered {
+                pauseRun()
+                tracker.autoPauseTriggered = false
+                showAutoPauseToast()
+            }
+        }
+        .onChange(of: phase) { _, newPhase in
+            if newPhase == .locationPermission {
+                locationPermAppeared = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { locationPermAppeared = true }
+            } else if newPhase == .motionPermission {
+                motionPermAppeared = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { motionPermAppeared = true }
+            }
+        }
         .onAppear {
             // Fresh state every time the view is presented
             tracker.reset()
@@ -227,8 +257,6 @@ struct RunTrackerView: View {
             .frame(width: 200, height: 200)
             .animation(.easeInOut(duration: 0.2), value: startHoldProgress > 0)
 
-            Spacer()
-
             Circle()
                 .fill(Color(hex: "#F9703E"))
                 .frame(width: 120, height: 120)
@@ -247,8 +275,81 @@ struct RunTrackerView: View {
                         .onChanged { _ in startHoldBegan() }
                         .onEnded   { _ in startHoldCancelled() }
                 )
-                .padding(.bottom, 76)
+                .padding(.top, 40)
+
+            // Settings row
+            HStack(spacing: 12) {
+                // Indoor / Outdoor toggle
+                Button {
+                    if tracker.isIndoor {
+                        tracker.isIndoor = false
+                    } else if tracker.needsMotionPermission {
+                        withAnimation { phase = .motionPermission }
+                    } else {
+                        tracker.isIndoor = true
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: tracker.isIndoor ? "figure.run.treadmill" : "location.fill")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text(tracker.isIndoor ? L("tracker.indoor") : L("tracker.outdoor"))
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(tracker.isIndoor ? .white : Color.black.opacity(0.6))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(tracker.isIndoor ? Color.black : Color.black.opacity(0.07))
+                    .clipShape(Capsule())
+                }
+
+                // Auto-pause toggle
+                Button {
+                    tracker.isAutoPause.toggle()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "pause.fill")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text(L("tracker.auto_pause"))
+                            .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundStyle(tracker.isAutoPause ? .white : Color.black.opacity(0.6))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(tracker.isAutoPause ? Color.black : Color.black.opacity(0.07))
+                    .clipShape(Capsule())
+                }
+            }
+            .padding(.top, 36)
+
+            Spacer()
         }
+    }
+
+    // MARK: - Location Permission
+
+    private var locationPermissionView: some View {
+        TrackerLocPermView(
+            dna: displayDNA,
+            appeared: locationPermAppeared,
+            onAllow: { tracker.requestLocationPermission() },
+            onCancel: { withAnimation { phase = .idle } }
+        )
+    }
+
+    // MARK: - Motion Permission
+
+    private var motionPermissionView: some View {
+        TrackerMotionPermView(
+            dna: displayDNA,
+            appeared: motionPermAppeared,
+            onAllow: {
+                tracker.requestMotionPermission { granted in
+                    if granted { tracker.isIndoor = true }
+                    withAnimation { phase = .idle }
+                }
+            },
+            onCancel: { withAnimation { phase = .idle } }
+        )
     }
 
     // MARK: - Countdown
@@ -395,19 +496,27 @@ struct RunTrackerView: View {
         let renderer = ImageRenderer(content: card)
         renderer.proposedSize = .init(width: 390, height: 500)
         renderer.scale = 3
-        if let img = renderer.uiImage,
-           let data = img.pngData() {
+
+        let items: [Any]
+        if let img = renderer.uiImage, let data = img.pngData() {
             let url = FileManager.default.temporaryDirectory
                 .appendingPathComponent("pacepal_run.png")
             if (try? data.write(to: url)) != nil {
-                shareItems = [url]
+                items = [url]
             } else {
-                shareItems = [img]
+                items = [img]
             }
         } else {
-            shareItems = ["\(String(format: "%.2f", tracker.distanceKm)) km — Day \(currentDay)/66 #PacePal"]
+            items = ["\(String(format: "%.2f", tracker.distanceKm)) km — Day \(currentDay)/66 #PacePal"]
         }
-        showShareSheet = true
+
+        // Present via UIKit directly — avoids SwiftUI nested-sheet issues
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let root = scene.windows.first?.rootViewController else { return }
+        var top = root
+        while let next = top.presentedViewController { top = next }
+        let vc = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        top.present(vc, animated: true)
     }
 
     // MARK: - Hold-to-start logic
@@ -441,15 +550,38 @@ struct RunTrackerView: View {
     }
 
     private func triggerHoldToast() {
+        showToast(L("tracker.hold_toast"))
+    }
+
+    private func showAutoPauseToast() {
+        showToast(L("tracker.auto_paused_toast"))
+    }
+
+    private func showToast(_ message: String) {
+        toastMessage = message
         showHoldToast = true
         Task {
             try? await Task.sleep(for: .seconds(2))
-            await MainActor.run { showHoldToast = false }
+            await MainActor.run { showHoldToast = false; toastMessage = "" }
         }
     }
 
     private func beginCountdown() {
         startHoldProgress = 0
+        // Outdoor + location permission not yet granted
+        if !tracker.isIndoor && tracker.locationAuthStatus == .notDetermined {
+            withAnimation { phase = .locationPermission }
+            return
+        }
+        // Indoor + motion permission not yet granted
+        if tracker.isIndoor && tracker.needsMotionPermission {
+            withAnimation { phase = .motionPermission }
+            return
+        }
+        beginCountdownDirectly()
+    }
+
+    private func beginCountdownDirectly() {
         withAnimation { phase = .countdown(3) }
         Task {
             for n in stride(from: 3, through: 1, by: -1) {
@@ -531,6 +663,135 @@ struct RunTrackerView: View {
     }
 }
 
+// MARK: - PetCarryingPinStage (GPS permission)
+
+private struct PetCarryingPinStage: View {
+    let dna: PetDNA
+    @State private var bobUp = false
+    @State private var glowOn = false
+
+    var body: some View {
+        ZStack(alignment: .center) {
+            // Soft background glow
+            Circle()
+                .fill(Color(hex: "#F9703E").opacity(0.08))
+                .frame(width: 180, height: 180)
+                .blur(radius: 30)
+
+            VStack(spacing: -12) {
+                // Location pin the pet is "holding up"
+                ZStack {
+                    // Shadow/glow behind pin
+                    Image(systemName: "mappin.fill")
+                        .font(.system(size: 48, weight: .black))
+                        .foregroundStyle(Color(hex: "#F9703E").opacity(glowOn ? 0.3 : 0.15))
+                        .blur(radius: 8)
+                        .scaleEffect(glowOn ? 1.2 : 1.0)
+                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: glowOn)
+
+                    // Pin itself
+                    Image(systemName: "mappin.fill")
+                        .font(.system(size: 48, weight: .black))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.5), radius: 6, y: 3)
+                }
+                .offset(y: bobUp ? -6 : 0)
+                .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: bobUp)
+
+                // Pet holding it up with .sign pose
+                PetAnimationView(dna: dna, pose: .sign, pixelSize: 9)
+                    .frame(width: 130, height: 130)
+            }
+        }
+        .onAppear {
+            bobUp  = true
+            glowOn = true
+        }
+    }
+}
+
+// MARK: - PetIndoorStage (Motion/Indoor permission)
+
+private struct PetIndoorStage: View {
+    let dna: PetDNA
+    @State private var bobUp = false
+    @State private var glowOn = false
+
+    var body: some View {
+        ZStack(alignment: .center) {
+            Circle()
+                .fill(Color(hex: "#F9703E").opacity(0.08))
+                .frame(width: 180, height: 180)
+                .blur(radius: 30)
+
+            PetAnimationView(dna: dna, pose: .sign, pixelSize: 9)
+                .frame(width: 130, height: 130)
+        }
+    }
+}
+
+// MARK: - PetOnTreadmillStage (Motion permission)
+
+private struct PetOnTreadmillStage: View {
+    let dna: PetDNA
+    @State private var beltOffset: CGFloat = -100
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            // Background glow
+            Circle()
+                .fill(Color(hex: "#F9703E").opacity(0.07))
+                .frame(width: 180, height: 180)
+                .blur(radius: 28)
+
+            VStack(spacing: 0) {
+                // Pet running on top
+                PetAnimationView(dna: dna, pose: .running, pixelSize: 9)
+                    .frame(width: 130, height: 130)
+                    .offset(y: 10) // slightly overlap the belt
+
+                // Treadmill machine
+                ZStack {
+                    // Belt track
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(hex: "#2C2C2E"))
+                        .frame(width: 190, height: 24)
+
+                    // Moving shimmer stripe
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, .white.opacity(0.28), .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: 80, height: 24)
+                        .offset(x: beltOffset)
+                        .onAppear {
+                            withAnimation(.linear(duration: 0.75).repeatForever(autoreverses: false)) {
+                                beltOffset = 190
+                            }
+                        }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                // Support legs
+                HStack {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(hex: "#1C1C1E"))
+                        .frame(width: 10, height: 22)
+                    Spacer()
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(hex: "#1C1C1E"))
+                        .frame(width: 10, height: 22)
+                }
+                .frame(width: 170)
+            }
+        }
+    }
+}
+
 // MARK: - HoldCircle
 
 private struct HoldCircle: View {
@@ -565,14 +826,206 @@ private struct HoldCircle: View {
     }
 }
 
-// MARK: - Share sheet
 
-private struct RunShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+// MARK: - TrackerLocPermView (GPS location permission)
+
+private struct TrackerLocPermView: View {
+    let dna: PetDNA
+    let appeared: Bool
+    let onAllow: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        ZStack {
+            AppBackground()
+
+            VStack(spacing: 0) {
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 44)
+                    .padding(.top, 52)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeIn(duration: 0.35), value: appeared)
+
+                PetCarryingPinStage(dna: dna)
+                    .frame(height: 180)
+                    .padding(.top, 32)
+                    .padding(.bottom, 24)
+
+                VStack(spacing: 20) {
+                    (
+                        Text(L("tracker.location_permission_title_part1"))
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#1F2933"))
+                        + Text(L("tracker.location_permission_title_highlight"))
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#F9703E"))
+                    )
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                    Text(L("tracker.location_permission_body"))
+                        .font(.system(size: 17, design: .rounded))
+                        .foregroundStyle(Color(hex: "#52606D"))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 32)
+
+                    HStack(spacing: 10) {
+                        pill(icon: "location.fill", label: "GPS")
+                        pill(icon: "figure.run",    label: L("tracker.outdoor"))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 4)
+                }
+                .padding(.top, 24)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 10)
+                .animation(.spring(duration: 0.45).delay(0.2), value: appeared)
+
+                Spacer()
+
+                VStack(spacing: 12) {
+                    Button { onAllow() } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "location.fill").font(.system(size: 15))
+                            Text(L("tracker.location_permission_allow"))
+                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 17)
+                        .background(Color(hex: "#F9703E"))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.3), radius: 10, y: 5)
+                    }
+                    Button { onCancel() } label: {
+                        Text(L("tracker.location_permission_cancel"))
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#52606D"))
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 48)
+            }
+        }
     }
-    func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
+
+    private func pill(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(label)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+        }
+        .foregroundStyle(Color(hex: "#F9703E"))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(Color(hex: "#FFF1EC"))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - TrackerMotionPermView (Motion/Indoor permission)
+
+private struct TrackerMotionPermView: View {
+    let dna: PetDNA
+    let appeared: Bool
+    let onAllow: () -> Void
+    let onCancel: () -> Void
+
+    var body: some View {
+        ZStack {
+            AppBackground()
+
+            VStack(spacing: 0) {
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 44)
+                    .padding(.top, 52)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeIn(duration: 0.35), value: appeared)
+
+                PetIndoorStage(dna: dna)
+                    .frame(height: 180)
+                    .padding(.top, 32)
+                    .padding(.bottom, 24)
+
+                VStack(spacing: 20) {
+                    (
+                        Text(L("tracker.motion_permission_title_part1"))
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#1F2933"))
+                        + Text(L("tracker.motion_permission_title_highlight"))
+                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(Color(hex: "#F9703E"))
+                    )
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                    Text(L("tracker.motion_permission_body"))
+                        .font(.system(size: 17, design: .rounded))
+                        .foregroundStyle(Color(hex: "#52606D"))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 32)
+
+                    HStack(spacing: 10) {
+                        pill(icon: "figure.run.treadmill", label: L("tracker.indoor"))
+                        pill(icon: "location.slash.fill",  label: "Sin GPS")
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 4)
+                }
+                .frame(width: UIScreen.main.bounds.width)
+                .padding(.top, 24)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 10)
+                .animation(.spring(duration: 0.45).delay(0.2), value: appeared)
+
+                Spacer()
+
+                VStack(spacing: 12) {
+                    Button { onAllow() } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "figure.run.treadmill").font(.system(size: 15))
+                            Text(L("tracker.motion_permission_allow"))
+                                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 17)
+                        .background(Color(hex: "#F9703E"))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.3), radius: 10, y: 5)
+                    }
+                    Button { onCancel() } label: {
+                        Text(L("tracker.motion_permission_cancel"))
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#52606D"))
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width - 48)
+                .padding(.bottom, 48)
+            }
+        }
+    }
+
+    private func pill(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(label)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+        }
+        .foregroundStyle(Color(hex: "#F9703E"))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(Color(hex: "#FFF1EC"))
+        .clipShape(Capsule())
+    }
 }
 
 // MARK: - Share card (rendered by ImageRenderer)

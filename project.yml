@@ -28,6 +28,7 @@ targets:
     dependencies:
       - sdk: HealthKit.framework
       - sdk: CoreLocation.framework
+      - sdk: CoreMotion.framework
     entitlements:
       path: PacePal/PacePal.entitlements
       properties:

@@ -15,6 +15,7 @@
 		2DABBE3DFD0832F5A5ABF17C /* RunningPhrases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */; };
 		2FC6A836FF4C6242DD322ED7 /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B18ECDE05BD7F57EC68A1BD /* SoundManager.swift */; };
 		391DB47B58EA508DF702D0E6 /* TutorialOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */; };
+		39EB2C9DAEE8006737980274 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D324CF6D2B055F9182C9C25 /* CoreMotion.framework */; };
 		3CF3A2D4D8D88B3AFFC0769B /* PetGridBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */; };
 		514ABD39DBE49666E1BC28F2 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77760BE94CF98F76C8D6C4A2 /* Localized.swift */; };
 		5485A5AB673208F162919A94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF72C8057EA6268B152E458B /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningPhrases.swift; sourceTree = "<group>"; };
 		77760BE94CF98F76C8D6C4A2 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
 		7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSelectView.swift; sourceTree = "<group>"; };
+		7D324CF6D2B055F9182C9C25 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		87722B94D0D1737F52EC447F /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		8B18ECDE05BD7F57EC68A1BD /* SoundManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
 		942F8FE68C39D21F132217C2 /* TutorialOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialOverlayView.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 			files = (
 				1EAD1E1908DA981BFDBDF376 /* HealthKit.framework in Frameworks */,
 				FDD4105AE853DA1FA962DB9B /* CoreLocation.framework in Frameworks */,
+				39EB2C9DAEE8006737980274 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				F21EE2A12883EC3E974CC0F6 /* CoreLocation.framework */,
+				7D324CF6D2B055F9182C9C25 /* CoreMotion.framework */,
 				C1918003EAED4B99DE32E955 /* HealthKit.framework */,
 			);
 			name = Frameworks;

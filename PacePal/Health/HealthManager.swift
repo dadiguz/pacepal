@@ -6,7 +6,8 @@ final class HealthManager {
     private(set) var realKm: Double = 0.0
     private(set) var sessionKm: Double = 0.0   // accumulated in-app km (persisted per day)
     var testKmOffset: Double = 0.0
-    var todayKm: Double { realKm + sessionKm + testKmOffset }
+    /// Uses max() so a simultaneous Watch recording doesn't double-count an in-app session.
+    var todayKm: Double { max(realKm, sessionKm) + testKmOffset }
     var isAuthorized = false
 
     init() {

@@ -14,6 +14,8 @@ struct LocationPermissionView: View {
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     @State private var appeared = false
     @State private var locationManager = LocationPermissionManager()
+    @State private var pinBob = false
+    @State private var pinGlow = false
 
     var body: some View {
         ZStack {
@@ -63,23 +65,46 @@ struct LocationPermissionView: View {
     // MARK: - Pet stage
 
     private var petStage: some View {
-        ZStack {
+        ZStack(alignment: .center) {
+            // Background glow
             Circle()
-                .fill(Color(hex: "#627D98").opacity(0.07))
-                .frame(width: 200, height: 200)
-                .blur(radius: 28)
+                .fill(Color(hex: "#F9703E").opacity(0.08))
+                .frame(width: 180, height: 180)
+                .blur(radius: 30)
 
-            Image(systemName: "map.fill")
-                .font(.system(size: 90, weight: .black))
-                .foregroundStyle(Color(hex: "#627D98").opacity(0.08))
-                .offset(y: -6)
+            VStack(spacing: -14) {
+                // Location pin the pet holds up
+                ZStack {
+                    // Glow behind pin
+                    Image(systemName: "mappin.fill")
+                        .font(.system(size: 52, weight: .black))
+                        .foregroundStyle(Color(hex: "#F9703E").opacity(pinGlow ? 0.35 : 0.12))
+                        .blur(radius: 10)
+                        .scaleEffect(pinGlow ? 1.2 : 1.0)
+                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: pinGlow)
 
-            PetAnimationView(dna: displayDNA, pose: .navigate, pixelSize: 9)
-                .scaleEffect(appeared ? 1 : 0.8)
-                .opacity(appeared ? 1 : 0)
-                .animation(.spring(duration: 0.55, bounce: 0.3).delay(0.1), value: appeared)
+                    // Pin itself
+                    Image(systemName: "mappin.fill")
+                        .font(.system(size: 52, weight: .black))
+                        .foregroundStyle(Color(hex: "#F9703E"))
+                        .shadow(color: Color(hex: "#F9703E").opacity(0.5), radius: 8, y: 4)
+                }
+                .offset(y: pinBob ? -7 : 0)
+                .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pinBob)
+
+                // Pet in sign pose (holding something up)
+                PetAnimationView(dna: displayDNA, pose: .sign, pixelSize: 9)
+                    .frame(width: 130, height: 130)
+                    .scaleEffect(appeared ? 1 : 0.8)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.spring(duration: 0.55, bounce: 0.3).delay(0.1), value: appeared)
+            }
         }
         .frame(height: 180)
+        .onAppear {
+            pinBob  = true
+            pinGlow = true
+        }
     }
 
     // MARK: - Pitch content

@@ -1,4 +1,5 @@
 import CoreLocation
+import CoreMotion
 import Observation
 
 enum RunState { case idle, running, paused, finished }
@@ -6,8 +7,11 @@ enum RunState { case idle, running, paused, finished }
 @Observable
 final class RunTracker: NSObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
+    private let pedometer = CMPedometer()
     private var lastLocation: CLLocation?
     private var timer: Timer?
+    private var notMovingSeconds: Int = 0
+    private var hasMovedSinceStart: Bool = false
 
     var state: RunState = .idle
     var distanceKm: Double = 0
@@ -15,6 +19,11 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     var isMoving: Bool = false
     var locationAuthStatus: CLAuthorizationStatus = .notDetermined
     var routeCoordinates: [CLLocationCoordinate2D] = []
+
+    // Settings
+    var isIndoor: Bool = false
+    var isAutoPause: Bool = false
+    var autoPauseTriggered: Bool = false
 
     override init() {
         super.init()
@@ -27,6 +36,7 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     // MARK: - Controls
 
     func requestPermissionAndStart() {
+        if isIndoor { start(); return }
         let status = locationManager.authorizationStatus
         if status == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
@@ -35,17 +45,44 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         }
     }
 
+    var needsMotionPermission: Bool {
+        CMMotionActivityManager.authorizationStatus() == .notDetermined
+    }
+
+    func requestLocationPermission() {
+        guard locationManager.authorizationStatus == .notDetermined else { return }
+        locationManager.requestWhenInUseAuthorization()
+    }
+
+    /// Triggers the CoreMotion system permission dialog by starting a brief activity query.
+    func requestMotionPermission(completion: @escaping (Bool) -> Void) {
+        let manager = CMMotionActivityManager()
+        manager.startActivityUpdates(to: .main) { _ in }
+        // The dialog is asynchronous — poll after a short delay for the result
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            manager.stopActivityUpdates()
+            completion(CMMotionActivityManager.authorizationStatus() == .authorized)
+        }
+    }
+
     func start() {
         guard state == .idle || state == .paused else { return }
-        locationManager.startUpdatingLocation()
+        hasMovedSinceStart = false
+        notMovingSeconds = 0
+        if isIndoor {
+            startPedometer()
+        } else {
+            locationManager.startUpdatingLocation()
+        }
         state = .running
         startTimer()
     }
 
     func pause() {
         guard state == .running else { return }
-        locationManager.stopUpdatingLocation()
+        if isIndoor { pedometer.stopUpdates() } else { locationManager.stopUpdatingLocation() }
         lastLocation = nil
+        notMovingSeconds = 0
         state = .paused
         stopTimer()
         isMoving = false
@@ -53,17 +90,23 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
 
     func resume() {
         guard state == .paused else { return }
-        locationManager.startUpdatingLocation()
+        autoPauseTriggered = false
+        if isIndoor {
+            startPedometer()
+        } else {
+            locationManager.startUpdatingLocation()
+        }
         state = .running
         startTimer()
     }
 
     func finish() {
-        locationManager.stopUpdatingLocation()
+        if isIndoor { pedometer.stopUpdates() } else { locationManager.stopUpdatingLocation() }
         stopTimer()
         state = .finished
         isMoving = false
         lastLocation = nil
+        notMovingSeconds = 0
     }
 
     func reset() {
@@ -72,14 +115,44 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         isMoving = false
         lastLocation = nil
         routeCoordinates = []
+        notMovingSeconds = 0
+        autoPauseTriggered = false
         state = .idle
+    }
+
+    // MARK: - Indoor (pedometer)
+
+    private func startPedometer() {
+        guard CMPedometer.isDistanceAvailable() else { return }
+        let baseline = distanceKm   // preserve km from previous segments (e.g. after resume)
+        pedometer.startUpdates(from: Date()) { [weak self] data, error in
+            guard let self, let data, error == nil, state == .running else { return }
+            let meters = data.distance?.doubleValue ?? 0
+            DispatchQueue.main.async {
+                self.distanceKm = baseline + meters / 1000.0
+                self.isMoving = (data.currentPace?.doubleValue ?? 999) < 20
+                if self.isMoving { self.hasMovedSinceStart = true }
+            }
+        }
     }
 
     // MARK: - Timer
 
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.elapsedSeconds += 1
+            guard let self else { return }
+            elapsedSeconds += 1
+            if isAutoPause && state == .running && hasMovedSinceStart {
+                if !isMoving {
+                    notMovingSeconds += 1
+                    if notMovingSeconds >= 3 {
+                        autoPauseTriggered = true
+                        notMovingSeconds = 0
+                    }
+                } else {
+                    notMovingSeconds = 0
+                }
+            }
         }
     }
 
@@ -114,6 +187,7 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         guard location.horizontalAccuracy > 0 && location.horizontalAccuracy < 50 else { return }
 
         isMoving = location.speed > 0.5
+        if isMoving { hasMovedSinceStart = true }
 
         if let last = lastLocation {
             let delta = location.distance(from: last) / 1000.0

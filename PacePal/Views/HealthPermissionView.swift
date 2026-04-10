@@ -89,14 +89,14 @@ struct HealthPermissionView: View {
     private var pitchContent: some View {
         VStack(spacing: 20) {
             // Title
-            (
+            VStack(spacing: 0) {
                 Text(L("health.title_part1"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#1F2933"))
-                + Text(L("health.title_highlight"))
+                Text(L("health.title_highlight"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
-            )
+            }
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
 
