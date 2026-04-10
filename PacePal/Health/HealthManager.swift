@@ -4,9 +4,14 @@ import Observation
 @Observable
 final class HealthManager {
     private(set) var realKm: Double = 0.0
+    private(set) var sessionKm: Double = 0.0   // accumulated in-app km (persisted per day)
     var testKmOffset: Double = 0.0
-    var todayKm: Double { realKm + testKmOffset }
+    var todayKm: Double { realKm + sessionKm + testKmOffset }
     var isAuthorized = false
+
+    init() {
+        sessionKm = UserDefaults.standard.double(forKey: HealthManager.sessionKmKey())
+    }
 
     // Run stats populated by fetchRunStats(since:)
     private(set) var totalRuns: Int = 0
@@ -120,10 +125,19 @@ final class HealthManager {
 
     func addTestKm() { testKmOffset += 1.0 }
 
-    /// Credits km from an in-app tracking session directly into today's total.
-    func addManualKm(_ km: Double) { realKm += km }
+    /// Credits km from an in-app tracking session. Persisted per day in UserDefaults
+    /// so repeated calls accumulate instead of being overwritten by HealthKit fetches.
+    func addManualKm(_ km: Double) {
+        sessionKm += km
+        UserDefaults.standard.set(sessionKm, forKey: HealthManager.sessionKmKey())
+    }
 
     func resetKm() { testKmOffset = 0; realKm = 0 }
+
+    private static func sessionKmKey() -> String {
+        let day = Calendar.current.startOfDay(for: Date())
+        return "pacepal.sessionKm.\(Int(day.timeIntervalSince1970))"
+    }
 
     // Returns total km from running workouts in the given interval
     private func fetchRunningKm(from start: Date, to end: Date) async -> Double {

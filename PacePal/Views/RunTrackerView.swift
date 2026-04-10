@@ -25,6 +25,8 @@ struct RunTrackerView: View {
     @State private var showShareSheet = false
     @State private var shareText = ""
     @State private var shareItems: [Any] = []
+    @State private var pendingKm: Double = 0        // applied on dismiss so HomeView animates
+    @State private var showHoldToast = false
 
     // Hold-to-start
     @State private var startHoldProgress: Double = 0
@@ -112,12 +114,40 @@ struct RunTrackerView: View {
                 showLocationAlert = true
             }
         }
+        .overlay(alignment: .top) {
+            if showHoldToast {
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text(L("tracker.hold_toast"))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(Color.black.opacity(0.75))
+                .clipShape(Capsule())
+                    .padding(.top, 60)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(duration: 0.3), value: showHoldToast)
         .onAppear {
             // Fresh state every time the view is presented
             tracker.reset()
             phase = .idle
             startHoldProgress = 0
             stopHoldProgress = 0
+            pendingKm = 0
+        }
+        .onDisappear {
+            // Apply km credit here so HomeView's animation triggers on arrival
+            if pendingKm > 0 {
+                health.addManualKm(pendingKm)
+                appState.addEnergy(km: pendingKm, at: Date())
+                appState.syncToWidget(km: health.todayKm)
+                pendingKm = 0
+            }
         }
     }
 
@@ -130,7 +160,7 @@ struct RunTrackerView: View {
         return HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(tracker.formattedPace ?? "--:--")
-                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
                 Text("PACE")
                     .font(.system(size: 10, weight: .semibold))
@@ -140,7 +170,7 @@ struct RunTrackerView: View {
 
             VStack(alignment: .center, spacing: 3) {
                 Text("\(currentDay)/66")
-                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
                 Text("DAY")
                     .font(.system(size: 10, weight: .semibold))
@@ -150,7 +180,7 @@ struct RunTrackerView: View {
 
             VStack(alignment: .trailing, spacing: 3) {
                 Text(tracker.formattedTime)
-                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
                 Text("TIME")
                     .font(.system(size: 10, weight: .semibold))
@@ -199,23 +229,25 @@ struct RunTrackerView: View {
 
             Spacer()
 
-            Text(L("tracker.hold_to_start"))
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(Color.black.opacity(0.5))
-                .padding(.bottom, 28)
-
-            HoldCircle(
-                progress: startHoldProgress,
-                icon: "figure.run",
-                color: Color(hex: "#F9703E"),
-                size: 120
-            )
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in startHoldBegan() }
-                    .onEnded   { _ in startHoldCancelled() }
-            )
-            .padding(.bottom, 60)
+            Circle()
+                .fill(Color(hex: "#F9703E"))
+                .frame(width: 120, height: 120)
+                .overlay(
+                    Text(L("tracker.start_button"))
+                        .font(.system(size: 21, weight: .black))
+                        .italic()
+                        .tracking(0.5)
+                        .foregroundStyle(.white)
+                )
+                .scaleEffect(startHoldProgress > 0 ? 1.12 : 1.0)
+                .animation(.spring(duration: 0.2), value: startHoldProgress > 0)
+                .shadow(color: Color(hex: "#F9703E").opacity(0.4), radius: 20, y: 8)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { _ in startHoldBegan() }
+                        .onEnded   { _ in startHoldCancelled() }
+                )
+                .padding(.bottom, 76)
         }
     }
 
@@ -276,6 +308,8 @@ struct RunTrackerView: View {
                     color: Color(hex: "#E12D39"),
                     size: 72
                 )
+                .scaleEffect(stopHoldProgress > 0 ? 1.12 : 1.0)
+                .animation(.spring(duration: 0.2), value: stopHoldProgress > 0)
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { _ in stopHoldBegan() }
@@ -349,6 +383,7 @@ struct RunTrackerView: View {
 
     // MARK: - Share (screenshot card + optional route)
 
+    @MainActor
     private func prepareShare() {
         let card = RunShareCard(
             km: tracker.distanceKm,
@@ -358,9 +393,17 @@ struct RunTrackerView: View {
             dna: displayDNA
         )
         let renderer = ImageRenderer(content: card)
+        renderer.proposedSize = .init(width: 390, height: 500)
         renderer.scale = 3
-        if let img = renderer.uiImage {
-            shareItems = [img]
+        if let img = renderer.uiImage,
+           let data = img.pngData() {
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent("pacepal_run.png")
+            if (try? data.write(to: url)) != nil {
+                shareItems = [url]
+            } else {
+                shareItems = [img]
+            }
         } else {
             shareItems = ["\(String(format: "%.2f", tracker.distanceKm)) km — Day \(currentDay)/66 #PacePal"]
         }
@@ -374,7 +417,7 @@ struct RunTrackerView: View {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
         let interval = 0.05
-        let total = 2.0
+        let total = 1.0
         startHoldTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { t in
             startHoldProgress += interval / total
             if Int(startHoldProgress * total) != Int((startHoldProgress - interval / total) * total) {
@@ -390,9 +433,19 @@ struct RunTrackerView: View {
     }
 
     private func startHoldCancelled() {
+        let wasHolding = startHoldProgress > 0 && startHoldProgress < 1.0
         startHoldTimer?.invalidate()
         startHoldTimer = nil
         withAnimation(.spring(duration: 0.3)) { startHoldProgress = 0 }
+        if wasHolding { triggerHoldToast() }
+    }
+
+    private func triggerHoldToast() {
+        showHoldToast = true
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            await MainActor.run { showHoldToast = false }
+        }
     }
 
     private func beginCountdown() {
@@ -442,7 +495,7 @@ struct RunTrackerView: View {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
 
         let interval = 0.05
-        let total = 2.0
+        let total = 1.0
         stopHoldTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { t in
             stopHoldProgress += interval / total
             if Int(stopHoldProgress * total) != Int((stopHoldProgress - interval / total) * total) {
@@ -458,9 +511,11 @@ struct RunTrackerView: View {
     }
 
     private func stopHoldCancelled() {
+        let wasHolding = stopHoldProgress > 0 && stopHoldProgress < 1.0
         stopHoldTimer?.invalidate()
         stopHoldTimer = nil
         withAnimation(.spring(duration: 0.3)) { stopHoldProgress = 0 }
+        if wasHolding { triggerHoldToast() }
     }
 
     // MARK: - Finish
@@ -469,11 +524,7 @@ struct RunTrackerView: View {
         stopHoldProgress = 0
         tracker.finish()
         let km = tracker.distanceKm
-        if km > 0 {
-            health.addManualKm(km)
-            appState.addEnergy(km: km, at: Date())
-            appState.syncToWidget(km: health.todayKm)
-        }
+        if km > 0 { pendingKm = km }   // applied on dismiss so HomeView's km animation fires
         withAnimation { phase = .finished }
         SoundManager.shared.play(.jump, enabled: appState.soundsEnabled)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
@@ -604,7 +655,7 @@ struct RunShareCard: View {
                 .padding(.bottom, 28)
             }
         }
-        .frame(width: 390)
+        .frame(width: 390, height: 500)
         .clipShape(RoundedRectangle(cornerRadius: 28))
     }
 }
