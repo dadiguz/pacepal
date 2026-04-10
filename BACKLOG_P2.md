@@ -7,7 +7,8 @@
 | 1 | Editor foto + stickers para compartir | Media | Pendiente |
 | 2 | Soporte millas (km/mi) | Media | Pendiente |
 | 3 | Estado Sleep del monito | Media | Pendiente |
-| 4 | Mini-juego easter egg (estilo dino Chrome) | Baja | Pendiente |
+| 4 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
+| 5 | Mini-juego easter egg (estilo dino Chrome) | Baja | Pendiente |
 
 ---
 
@@ -61,3 +62,21 @@ Juego oculto tipo endless runner con el monito del usuario, similar al dinosauri
 - [ ] Pixel art consistente con el estilo visual de la app
 - [ ] High score guardado en UserDefaults
 - [ ] Strings en es/en
+
+---
+
+## 4. Apple Watch App
+**Prioridad:** Alta | **Complejidad:** Alta
+
+App companion para Apple Watch que replica funcionalidad clave del iPhone.
+
+- [ ] Target watchOS en el proyecto (WatchKit App + Extension)
+- [ ] Mostrar energia actual del monito
+- [ ] Monito pixel art animado (pose segun energia)
+- [ ] Boton para iniciar/detener tracking de carrera
+- [ ] Tracking de distancia via CoreLocation en watch
+- [ ] Sincronizar datos de carrera con la app de iPhone (WatchConnectivity)
+- [ ] Complicaciones: energia del monito, km del dia
+- [ ] Strings en es/en
+
+> **Depende de:** Tracker de carrera in-app (BACKLOG #5b)

@@ -7,8 +7,9 @@
 | 1 | Fix boton HealthKit (5a) | Critica | Pendiente |
 | 2 | Revisar logica 66 dias (4) | Alta | Pendiente |
 | 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
-| 16 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
 | 4 | Cuestionario inicial pre-compra (6) | Alta | Pendiente |
+| 17 | Mapa de progreso 66 dias (sustituye heatmap) | Media | Pendiente |
+| 16 | Apple Watch app (energia, monito, tracking) | Alta | Movido a P2 |
 | 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 6 | Estado Sleep del monito (3) | Media | Movido a P2 |
 | 7 | Medalla 66 dias (2) | Media | ✅ Done |
@@ -211,21 +212,29 @@ Cuando el monito esta colapsando (energia = 0 / pose `.dead`), el fondo parpadea
 
 ---
 
-## 16. Apple Watch App
-**Prioridad:** Alta | **Complejidad:** Alta
+## 17. Mapa de Progreso 66 Días (sustituye heatmap)
+**Prioridad:** Media | **Complejidad:** Media
 
-App companion para Apple Watch que replica funcionalidad clave del iPhone.
+Reemplazar la cuadrícula de 66 días (heatmap) por un mapa visual estilo pixel art donde el monito avanza a lo largo de una ruta conforme el usuario completa días.
 
-- [ ] Target watchOS en el proyecto (WatchKit App + Extension)
-- [ ] Mostrar energia actual del monito
-- [ ] Monito pixel art animado (pose segun energia)
-- [ ] Boton para iniciar/detener tracking de carrera
-- [ ] Tracking de distancia via CoreLocation en watch
-- [ ] Sincronizar datos de carrera con la app de iPhone (WatchConnectivity)
-- [ ] Complicaciones: energia del monito, km del dia
+- [ ] Diseñar ruta en pixel art (camino serpenteante con checkpoints cada ~10 días: bosque, montaña, ciudad, meta)
+- [ ] El monito aparece en la posición correspondiente a sus días completados (no calendario)
+- [ ] Días completados: tramo del camino iluminado/coloreado
+- [ ] Días pendientes: tramo gris/oscuro
+- [ ] Checkpoints especiales en días 10, 20, 30, 40, 50, 66 con pequeño ícono/reward visual
+- [ ] Tap en un checkpoint muestra el logro asociado a ese hito
+- [ ] El monito se anima en su posición actual (pose `.idle` con parpadeo)
+- [ ] Transición animada cuando el monito avanza a una nueva posición (nuevo día completado)
 - [ ] Strings en es/en
 
-> **Depende de:** Tarea 3 (Tracker de carrera in-app)
+> **Depende de:** Tarea 4 (lógica de días completados vs calendario)
+
+---
+
+## 16. Apple Watch App
+**Prioridad:** Alta | **Complejidad:** Alta | **Estado:** Movido a P2
+
+> Ver BACKLOG_P2.md
 
 ---
 
