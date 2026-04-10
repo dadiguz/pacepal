@@ -48,7 +48,6 @@ struct RunTrackerView: View {
 
     var body: some View {
         ZStack {
-            // ✅ CLAUDE BUILD V4
             Color(hex: "#F9F496").ignoresSafeArea()
             AppBackground(imageName: "pattern")
                 .ignoresSafeArea()
@@ -75,6 +74,25 @@ struct RunTrackerView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(.easeInOut(duration: 0.35), value: phase)
 
+        }
+        .overlay(alignment: .top) {
+            HStack {
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .black))
+                        .foregroundStyle(.white)
+                        .frame(width: 36, height: 36)
+                        .background(Color.black)
+                        .clipShape(Circle())
+                }
+                .padding(.trailing, 36)
+            }
+            .frame(width: UIScreen.main.bounds.width)
+            .padding(.top, 60)
+            .opacity(phase == .idle ? 1 : 0)
+            .allowsHitTesting(phase == .idle)
+            .animation(.easeInOut(duration: 0.2), value: phase == .idle)
         }
         .sheet(isPresented: $showShareSheet) {
             RunShareSheet(items: shareItems.isEmpty ? [shareText] : shareItems)
@@ -106,49 +124,42 @@ struct RunTrackerView: View {
     // MARK: - Shared Nike-style header (Pace | Day | Time)
 
     private var nrcHeader: some View {
-        // GeometryReader guarantees each column gets exactly 1/3 of the width
-        GeometryReader { geo in
-            let col = geo.size.width / 3
-            HStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(tracker.formattedPace ?? "--:--")
-                        .font(.system(size: 22, weight: .black))
-                        .monospacedDigit()
-                        .foregroundStyle(.black)
-                    Text("PACE")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Color.black.opacity(0.4))
-                        .tracking(0.5)
-                }
-                .frame(width: col, alignment: .leading)
+        let screenW = UIScreen.main.bounds.width
+        let col = (screenW - 72) / 3   // 72 = 36pt padding × 2
 
-                VStack(alignment: .center, spacing: 3) {
-                    Text("\(currentDay)/66")
-                        .font(.system(size: 22, weight: .black))
-                        .monospacedDigit()
-                        .foregroundStyle(.black)
-                    Text("DAY")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Color.black.opacity(0.4))
-                        .tracking(0.5)
-                }
-                .frame(width: col, alignment: .center)
-
-                VStack(alignment: .trailing, spacing: 3) {
-                    Text(tracker.formattedTime)
-                        .font(.system(size: 22, weight: .black))
-                        .monospacedDigit()
-                        .foregroundStyle(.black)
-                    Text("TIME")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Color.black.opacity(0.4))
-                        .tracking(0.5)
-                }
-                .frame(width: col, alignment: .trailing)
+        return HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(tracker.formattedPace ?? "--:--")
+                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .foregroundStyle(.black)
+                Text("PACE")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(0.4))
             }
+            .frame(width: col, alignment: .leading)
+
+            VStack(alignment: .center, spacing: 3) {
+                Text("\(currentDay)/66")
+                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .foregroundStyle(.black)
+                Text("DAY")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(0.4))
+            }
+            .frame(width: col, alignment: .center)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(tracker.formattedTime)
+                    .font(.system(size: 22, weight: .black)).monospacedDigit()
+                    .foregroundStyle(.black)
+                Text("TIME")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(0.4))
+            }
+            .frame(width: col, alignment: .trailing)
         }
-        .frame(height: 52)
-        .padding(.horizontal, 24)
+        .frame(width: screenW - 72)
+        .padding(.horizontal, 36)
         .padding(.top, 56)
     }
 
@@ -176,21 +187,6 @@ struct RunTrackerView: View {
 
     private var idleContentView: some View {
         VStack(spacing: 0) {
-            // X button — same layer as the pet so it's guaranteed visible
-            HStack {
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .black))
-                        .foregroundStyle(.white)
-                        .frame(width: 48, height: 48)
-                        .background(Color.black)
-                        .clipShape(Circle())
-                }
-                Spacer()
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 16)
-
             Spacer()
 
             PetAnimationView(
@@ -245,12 +241,8 @@ struct RunTrackerView: View {
     private var runningView: some View {
         VStack(spacing: 0) {
             nrcHeader
-
             Spacer()
-
             kmDisplay
-
-            // Pause button — below KM
             Button { pauseRun() } label: {
                 Image(systemName: "pause.fill")
                     .font(.system(size: 28, weight: .bold))
@@ -261,14 +253,13 @@ struct RunTrackerView: View {
                     .shadow(color: .black.opacity(0.18), radius: 14, y: 5)
             }
             .padding(.top, 40)
-
             Spacer()
-
             PetAnimationView(dna: displayDNA, pose: currentPose, pixelSize: 9)
                 .frame(width: 200, height: 200)
                 .animation(.easeInOut(duration: 0.4), value: currentPose)
                 .padding(.bottom, 40)
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Paused
@@ -276,11 +267,8 @@ struct RunTrackerView: View {
     private var pausedView: some View {
         VStack(spacing: 0) {
             nrcHeader
-
             Spacer()
-
             kmDisplay
-
             HStack(spacing: 32) {
                 HoldCircle(
                     progress: stopHoldProgress,
@@ -293,7 +281,6 @@ struct RunTrackerView: View {
                         .onChanged { _ in stopHoldBegan() }
                         .onEnded   { _ in stopHoldCancelled() }
                 )
-
                 Button { resumeRun() } label: {
                     Image(systemName: "play.fill")
                         .font(.system(size: 28, weight: .bold))
@@ -305,14 +292,13 @@ struct RunTrackerView: View {
                 }
             }
             .padding(.top, 40)
-
             Spacer()
-
             PetAnimationView(dna: displayDNA, pose: currentPose, pixelSize: 9)
                 .frame(width: 200, height: 200)
                 .animation(.easeInOut(duration: 0.4), value: currentPose)
                 .padding(.bottom, 40)
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Finished
@@ -320,6 +306,7 @@ struct RunTrackerView: View {
     private var finishedView: some View {
         VStack(spacing: 0) {
             nrcHeader
+            .frame(maxWidth: .infinity)
 
             Spacer()
 
@@ -357,6 +344,7 @@ struct RunTrackerView: View {
                 .animation(.easeInOut(duration: 0.4), value: currentPose)
                 .padding(.bottom, 40)
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Share (screenshot card + optional route)
@@ -606,9 +594,10 @@ struct RunShareCard: View {
                     PetAnimationView(dna: dna, pose: .jump, pixelSize: 5)
                         .frame(width: 80, height: 80)
                     Spacer()
-                    Text("PacePal")
-                        .font(.system(size: 18, weight: .black, design: .rounded))
-                        .foregroundStyle(Color(hex: "#F9703E"))
+                    Image("Logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 28)
                 }
                 .padding(.horizontal, 28)
                 .padding(.top, 20)
