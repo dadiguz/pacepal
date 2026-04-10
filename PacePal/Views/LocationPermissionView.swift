@@ -14,8 +14,7 @@ struct LocationPermissionView: View {
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[1] }
     @State private var appeared = false
     @State private var locationManager = LocationPermissionManager()
-    @State private var pinBob = false
-    @State private var pinGlow = false
+    @State private var liftUp = false
 
     var body: some View {
         ZStack {
@@ -73,38 +72,24 @@ struct LocationPermissionView: View {
                 .blur(radius: 30)
 
             VStack(spacing: -14) {
-                // Location pin the pet holds up
-                ZStack {
-                    // Glow behind pin
-                    Image(systemName: "mappin.fill")
-                        .font(.system(size: 52, weight: .black))
-                        .foregroundStyle(Color(hex: "#F9703E").opacity(pinGlow ? 0.35 : 0.12))
-                        .blur(radius: 10)
-                        .scaleEffect(pinGlow ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: pinGlow)
+                PixelLocationPinView()
+                    .shadow(color: Color(hex: "#F9703E").opacity(0.4), radius: 8, y: 4)
 
-                    // Pin itself
-                    Image(systemName: "mappin.fill")
-                        .font(.system(size: 52, weight: .black))
-                        .foregroundStyle(Color(hex: "#F9703E"))
-                        .shadow(color: Color(hex: "#F9703E").opacity(0.5), radius: 8, y: 4)
-                }
-                .offset(y: pinBob ? -7 : 0)
-                .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: pinBob)
-
-                // Pet in sign pose (holding something up)
-                PetAnimationView(dna: displayDNA, pose: .sign, pixelSize: 9)
-                    .frame(width: 130, height: 130)
+                PixelPetArmsUpView(dna: displayDNA)
                     .scaleEffect(appeared ? 1 : 0.8)
                     .opacity(appeared ? 1 : 0)
                     .animation(.spring(duration: 0.55, bounce: 0.3).delay(0.1), value: appeared)
             }
+            .offset(y: liftUp ? -5 : 2)
+            .animation(
+                .interpolatingSpring(stiffness: 50, damping: 6)
+                    .repeatForever(autoreverses: true)
+                    .speed(0.45),
+                value: liftUp
+            )
         }
         .frame(height: 180)
-        .onAppear {
-            pinBob  = true
-            pinGlow = true
-        }
+        .onAppear { liftUp = true }
     }
 
     // MARK: - Pitch content

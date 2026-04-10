@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import CoreMotion
 import MapKit
 
 // MARK: - Phase
@@ -280,14 +281,9 @@ struct RunTrackerView: View {
             // Settings row
             HStack(spacing: 12) {
                 // Indoor / Outdoor toggle
+                let motionDenied = CMMotionActivityManager.authorizationStatus() == .denied
                 Button {
-                    if tracker.isIndoor {
-                        tracker.isIndoor = false
-                    } else if tracker.needsMotionPermission {
-                        withAnimation { phase = .motionPermission }
-                    } else {
-                        tracker.isIndoor = true
-                    }
+                    tracker.isIndoor.toggle()
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: tracker.isIndoor ? "figure.run.treadmill" : "location.fill")
@@ -295,12 +291,13 @@ struct RunTrackerView: View {
                         Text(tracker.isIndoor ? L("tracker.indoor") : L("tracker.outdoor"))
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                     }
-                    .foregroundStyle(tracker.isIndoor ? .white : Color.black.opacity(0.6))
+                    .foregroundStyle(motionDenied ? Color.black.opacity(0.3) : tracker.isIndoor ? .white : Color.black.opacity(0.6))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
-                    .background(tracker.isIndoor ? Color.black : Color.black.opacity(0.07))
+                    .background(motionDenied ? Color.black.opacity(0.04) : tracker.isIndoor ? Color.black : Color.black.opacity(0.07))
                     .clipShape(Capsule())
                 }
+                .disabled(motionDenied)
 
                 // Auto-pause toggle
                 Button {
@@ -344,11 +341,14 @@ struct RunTrackerView: View {
             appeared: motionPermAppeared,
             onAllow: {
                 tracker.requestMotionPermission { granted in
-                    if granted { tracker.isIndoor = true }
+                    if !granted { tracker.isIndoor = false }
                     withAnimation { phase = .idle }
                 }
             },
-            onCancel: { withAnimation { phase = .idle } }
+            onCancel: {
+                tracker.isIndoor = false
+                withAnimation { phase = .idle }
+            }
         )
     }
 
@@ -573,6 +573,10 @@ struct RunTrackerView: View {
             withAnimation { phase = .locationPermission }
             return
         }
+        // If motion permission was denied, indoor can't be used
+        if tracker.isIndoor && CMMotionActivityManager.authorizationStatus() == .denied {
+            tracker.isIndoor = false
+        }
         // Indoor + motion permission not yet granted
         if tracker.isIndoor && tracker.needsMotionPermission {
             withAnimation { phase = .motionPermission }
@@ -667,50 +671,141 @@ struct RunTrackerView: View {
 
 private struct PetCarryingPinStage: View {
     let dna: PetDNA
-    @State private var bobUp = false
-    @State private var glowOn = false
+    @State private var liftUp = false
 
     var body: some View {
         ZStack(alignment: .center) {
-            // Soft background glow
             Circle()
                 .fill(Color(hex: "#F9703E").opacity(0.08))
                 .frame(width: 180, height: 180)
                 .blur(radius: 30)
 
-            VStack(spacing: -12) {
-                // Location pin the pet is "holding up"
-                ZStack {
-                    // Shadow/glow behind pin
-                    Image(systemName: "mappin.fill")
-                        .font(.system(size: 48, weight: .black))
-                        .foregroundStyle(Color(hex: "#F9703E").opacity(glowOn ? 0.3 : 0.15))
-                        .blur(radius: 8)
-                        .scaleEffect(glowOn ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: glowOn)
+            VStack(spacing: -14) {
+                PixelLocationPinView()
+                    .shadow(color: Color(hex: "#F9703E").opacity(0.4), radius: 8, y: 4)
 
-                    // Pin itself
-                    Image(systemName: "mappin.fill")
-                        .font(.system(size: 48, weight: .black))
-                        .foregroundStyle(Color(hex: "#F9703E"))
-                        .shadow(color: Color(hex: "#F9703E").opacity(0.5), radius: 6, y: 3)
-                }
-                .offset(y: bobUp ? -6 : 0)
-                .animation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true), value: bobUp)
-
-                // Pet holding it up with .sign pose
-                PetAnimationView(dna: dna, pose: .sign, pixelSize: 9)
-                    .frame(width: 130, height: 130)
+                PixelPetArmsUpView(dna: dna)
             }
+            .offset(y: liftUp ? -5 : 2)
+            .animation(
+                .interpolatingSpring(stiffness: 50, damping: 6)
+                    .repeatForever(autoreverses: true)
+                    .speed(0.45),
+                value: liftUp
+            )
         }
-        .onAppear {
-            bobUp  = true
-            glowOn = true
+        .onAppear { liftUp = true }
+    }
+}
+
+// MARK: - PixelPetArmsUpView (pixel art pet holding pin — used in GPS permission screens)
+
+struct PixelPetArmsUpView: View {
+    let dna: PetDNA
+
+    var body: some View {
+        Canvas { ctx, _ in
+            let p: CGFloat = 8
+            let B  = Color(hex: "#1A1A1A")
+            let bd = Color(hex: dna.palette.body)
+            let sh = Color(hex: dna.palette.shade)
+            let fc = Color(hex: dna.palette.face)
+            let ey = Color(hex: dna.palette.eyeP)
+            let ck = Color(hex: dna.palette.cheek)
+
+            func px(_ c: Int, _ r: Int, _ col: Color) {
+                ctx.fill(Path(CGRect(x: CGFloat(c)*p, y: CGFloat(r)*p, width: p, height: p)),
+                         with: .color(col))
+            }
+
+            // MARK: Ears — animal-specific
+            switch dna.animalType {
+            case .bunny:
+                // Tall thin ears (cols 1 and 8, rows 0-1 — above head)
+                px(0,0,B); px(1,0,bd); px(8,0,bd); px(9,0,B)
+                px(0,1,B); px(1,1,bd); px(8,1,bd); px(9,1,B)
+            case .cat, .fox, .tiger, .dragon:
+                // Pointed ears — one row
+                px(0,1,B); px(1,1,bd); px(8,1,bd); px(9,1,B)
+            case .bear, .panda, .raccoon, .mouse, .dog, .corgi, .capuchin, .mandrill, .lion:
+                // Round bump ears alongside upper head
+                px(1,2,bd); px(8,2,bd)
+                px(1,3,bd); px(8,3,bd)
+            default:
+                break
+            }
+
+            // Row 0 — hands (gripping the pin stem)
+            px(2,0,bd); px(7,0,bd)
+            // Row 1 — wrists / raised arms
+            px(2,1,B); px(7,1,B)
+            // Row 2 — head top
+            px(2,2,B); px(3,2,B); px(4,2,B); px(5,2,B); px(6,2,B); px(7,2,B)
+            // Row 3 — face
+            px(2,3,B); px(3,3,fc); px(4,3,fc); px(5,3,fc); px(6,3,fc); px(7,3,B)
+            // Row 4 — eyes
+            px(2,4,B); px(3,4,fc); px(4,4,ey); px(5,4,fc); px(6,4,ey); px(7,4,B)
+            // Row 5 — mouth + cheeks (cheeks replace smile corners when present)
+            let mouthCorner = dna.hasCheeks ? ck : fc
+            px(2,5,B); px(3,5,mouthCorner); px(4,5,B); px(5,5,B); px(6,5,mouthCorner); px(7,5,B)
+            // Row 6 — chin
+            px(2,6,B); px(3,6,B); px(4,6,B); px(5,6,B); px(6,6,B); px(7,6,B)
+            // Row 7 — shoulders
+            px(1,7,B); px(2,7,bd); px(3,7,bd); px(4,7,bd); px(5,7,bd); px(6,7,bd); px(7,7,bd); px(8,7,B)
+            // Row 8 — body
+            px(1,8,B); px(2,8,bd); px(3,8,sh); px(4,8,sh); px(5,8,sh); px(6,8,sh); px(7,8,bd); px(8,8,B)
+            // Row 9 — waist
+            px(2,9,B); px(3,9,bd); px(4,9,bd); px(5,9,bd); px(6,9,bd); px(7,9,B)
+            // Row 10 — thighs
+            px(2,10,B); px(3,10,bd); px(6,10,bd); px(7,10,B)
+            // Row 11 — feet
+            px(1,11,B); px(2,11,bd); px(3,11,B); px(6,11,B); px(7,11,bd); px(8,11,B)
         }
+        .frame(width: 10 * 8, height: 12 * 8)
     }
 }
 
 // MARK: - PetIndoorStage (Motion/Indoor permission)
+
+// MARK: - PixelLocationPinView
+
+struct PixelLocationPinView: View {
+    var body: some View {
+        Canvas { ctx, _ in
+            let p: CGFloat = 5
+            let B = Color(hex: "#1A1A1A")   // black border + hole
+            let O = Color(hex: "#F9703E")   // orange fill
+            let H = Color(hex: "#FFAA78")   // highlight
+
+            func px(_ c: Int, _ r: Int, _ color: Color) {
+                ctx.fill(Path(CGRect(x: CGFloat(c)*p, y: CGFloat(r)*p, width: p, height: p)),
+                         with: .color(color))
+            }
+
+            // Row 0 — top border
+            px(1,0,B); px(2,0,B); px(3,0,B); px(4,0,B); px(5,0,B); px(6,0,B)
+            // Row 1
+            px(0,1,B); px(1,1,O); px(2,1,O); px(3,1,O); px(4,1,O); px(5,1,O); px(6,1,O); px(7,1,B)
+            // Row 2 — highlight top-left
+            px(0,2,B); px(1,2,O); px(2,2,H); px(3,2,H); px(4,2,H); px(5,2,O); px(6,2,O); px(7,2,B)
+            // Row 3 — hole top
+            px(0,3,B); px(1,3,O); px(2,3,H); px(3,3,B); px(4,3,B); px(5,3,H); px(6,3,O); px(7,3,B)
+            // Row 4 — hole bottom
+            px(0,4,B); px(1,4,O); px(2,4,O); px(3,4,B); px(4,4,B); px(5,4,O); px(6,4,O); px(7,4,B)
+            // Row 5
+            px(0,5,B); px(1,5,O); px(2,5,O); px(3,5,O); px(4,5,O); px(5,5,O); px(6,5,O); px(7,5,B)
+            // Row 6 — narrowing
+            px(1,6,B); px(2,6,O); px(3,6,O); px(4,6,O); px(5,6,O); px(6,6,B)
+            // Row 7
+            px(2,7,B); px(3,7,O); px(4,7,O); px(5,7,B)
+            // Row 8 — tip
+            px(3,8,B); px(4,8,B)
+            // Row 9 — point
+            px(3,9,B)
+        }
+        .frame(width: 8*5, height: 10*5)
+    }
+}
 
 private struct PetIndoorStage: View {
     let dna: PetDNA
