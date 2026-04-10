@@ -40,7 +40,17 @@ struct TutorialOverlayView: View {
     let onNext: () -> Void
     let onSkip: () -> Void
 
+    @Environment(AppState.self) private var appState
+
     private var current: TutorialStep { tutorialSteps[step] }
+
+    private var currentBody: String {
+        if current.bodyKey == "tutorial.km_body" {
+            let pct = Int(appState.challengeLevel.energyPerKm * 100)
+            return L("tutorial.km_body", pct)
+        }
+        return current.body
+    }
     private var isLast: Bool { step == tutorialSteps.count - 1 }
 
     private var highlight: CGRect {
@@ -116,7 +126,7 @@ struct TutorialOverlayView: View {
                 .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#1F2933"))
 
-            Text(current.body)
+            Text(currentBody)
                 .font(.system(size: 14, weight: .regular, design: .rounded))
                 .foregroundStyle(Color(hex: "#4A5568"))
                 .fixedSize(horizontal: false, vertical: true)
