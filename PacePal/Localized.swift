@@ -57,7 +57,7 @@ private let _allStrings: [String: [AppLang: String]] = {
         _common, _challengeLevel, _questionnaire,
         _onboarding, _paywall, _healthPerm, _notifPerm, _widgetPrompt,
         _charSelect, _home, _history, _settings, _tutorial, _notifications,
-        _achievements, _archetypes, _medal, _tips, _tipDetails, _tracker, _locationPerm,
+        _achievements, _archetypes, _medal, _tips, _tipDetails, _tracker, _locationPerm, _forceUpdate,
     ] {
         d.merge(section) { _, new in new }
     }
@@ -200,6 +200,17 @@ private let _locationPerm: [String: [AppLang: String]] = [
     "location_perm.pill_readonly":    [.es: "Solo lectura",            .en: "Read only"],
     "location_perm.activate_button":  [.es: "Activar ubicación",       .en: "Enable location"],
     "location_perm.skip":             [.es: "Omitir por ahora",        .en: "Skip for now"],
+]
+
+// MARK: - Force Update
+
+private let _forceUpdate: [String: [AppLang: String]] = [
+    "force_update.title":    [.es: "%@ está exigiendo que actualices la app",
+                              .en: "%@ is demanding you update the app"],
+    "force_update.subtitle": [.es: "Actualiza para obtener todas las mejoras y seguir corriendo.",
+                              .en: "Update to get all the improvements and keep running."],
+    "force_update.button":   [.es: "Actualizar ahora",
+                              .en: "Update now"],
 ]
 
 // MARK: - Run Tracker

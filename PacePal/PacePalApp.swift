@@ -7,6 +7,7 @@ struct PacepalApp: App {
     @State private var appState = AppState()
     @State private var health = HealthManager()
     @State private var store = PurchaseManager()
+    @State private var versionChecker = VersionChecker()
     @State private var showSplash = true
 
     var body: some Scene {
@@ -18,6 +19,12 @@ struct PacepalApp: App {
                     SplashView()
                         .transition(.opacity)
                         .zIndex(1)
+                }
+
+                if versionChecker.updateRequired {
+                    ForceUpdateView()
+                        .transition(.opacity)
+                        .zIndex(2)
                 }
             }
             .environment(appState)
