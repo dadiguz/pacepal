@@ -59,6 +59,7 @@ struct HomeView: View {
     @State private var showLocationDeniedAlert = false
     @State private var showRunner = false
     @State private var showDodgeRain = false
+    @State private var showFlip = false
     @State private var eggTapCount = 0
     @State private var eggTimer: Timer?
 
@@ -698,7 +699,11 @@ struct HomeView: View {
                     eggTimer?.invalidate()
                     if eggTapCount >= 3 {
                         eggTapCount = 0
-                        if Bool.random() { showRunner = true } else { showDodgeRain = true }
+                        switch Int.random(in: 0..<3) {
+                        case 0:  showRunner    = true
+                        case 1:  showDodgeRain = true
+                        default: showFlip      = true
+                        }
                         return
                     }
                     eggTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
@@ -717,6 +722,9 @@ struct HomeView: View {
                 }
                 .fullScreenCover(isPresented: $showDodgeRain) {
                     DodgeRainView(dna: dna) { showDodgeRain = false }
+                }
+                .fullScreenCover(isPresented: $showFlip) {
+                    GravityFlipView(dna: dna) { showFlip = false }
                 }
         }
         // Hide visually when dead (layout space is preserved)

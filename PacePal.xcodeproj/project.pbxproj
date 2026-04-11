@@ -44,6 +44,7 @@
 		F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFD71C59100C3272E16C7E9 /* HomeView.swift */; };
 		DEC3395FDA834F2B9A98D04C /* ObstacleArtist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6171E79D359541D8A881AAA8 /* ObstacleArtist.swift */; };
 		1E78519BD6D846A18235FFB4 /* DodgeRainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E958C5D09645599CBCE834 /* DodgeRainView.swift */; };
+		71553761686140C8B5FC900E /* GravityFlipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13295A0CBB7F4380917F4258 /* GravityFlipView.swift */; };
 		C87D157E0F6E46F495CA7CCF /* RunnerGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271509B463B04FFA93342D27 /* RunnerGameView.swift */; };
 		FCBACADBCAF95ABB6DC718D4 /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37D777A23CBF470526B1C13 /* NotificationPermissionView.swift */; };
 		FDD4105AE853DA1FA962DB9B /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F21EE2A12883EC3E974CC0F6 /* CoreLocation.framework */; };
@@ -100,6 +101,7 @@
 		F21EE2A12883EC3E974CC0F6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FAFD71C59100C3272E16C7E9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		67E958C5D09645599CBCE834 /* DodgeRainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DodgeRainView.swift; sourceTree = "<group>"; };
+		13295A0CBB7F4380917F4258 /* GravityFlipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityFlipView.swift; sourceTree = "<group>"; };
 		6171E79D359541D8A881AAA8 /* ObstacleArtist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObstacleArtist.swift; sourceTree = "<group>"; };
 		271509B463B04FFA93342D27 /* RunnerGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerGameView.swift; sourceTree = "<group>"; };
 		FF72C8057EA6268B152E458B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -240,6 +242,7 @@
 			children = (
 				7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */,
 				67E958C5D09645599CBCE834 /* DodgeRainView.swift */,
+				13295A0CBB7F4380917F4258 /* GravityFlipView.swift */,
 				537D6D7F38C07456906FEDF1 /* ForceUpdateView.swift */,
 				FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */,
 				E1792ED93F8A896E09756EBD /* HistoryView.swift */,
@@ -380,6 +383,7 @@
 				E26E638CEFD57BE547584CEF /* PurchaseManager.swift in Sources */,
 				9C49A5204BD8223839F84CBE /* QuestionnaireView.swift in Sources */,
 				1E78519BD6D846A18235FFB4 /* DodgeRainView.swift in Sources */,
+				71553761686140C8B5FC900E /* GravityFlipView.swift in Sources */,
 				DEC3395FDA834F2B9A98D04C /* ObstacleArtist.swift in Sources */,
 				0B704F1071C041EF4CE43D0B /* RunTracker.swift in Sources */,
 				1978C497BAD35DD043F70FB3 /* RunTrackerView.swift in Sources */,
