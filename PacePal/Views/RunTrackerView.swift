@@ -42,7 +42,10 @@ struct RunTrackerView: View {
     @State private var motionPermAppeared = false
 
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
-    private var currentDay: Int { min(66, appState.completedDays + 1) }
+    private var currentDay: Int {
+        let alreadyRanToday = health.todayKm >= appState.challengeLevel.runThreshold
+        return min(66, alreadyRanToday ? appState.completedDays : appState.completedDays + 1)
+    }
 
     private var currentPose: PetPose {
         switch phase {
@@ -250,13 +253,20 @@ struct RunTrackerView: View {
         VStack(spacing: 0) {
             Spacer()
 
-            PetAnimationView(
-                dna: displayDNA,
-                pose: startHoldProgress > 0 ? .sign : .idle,
-                pixelSize: 9
-            )
+            ZStack {
+                PetAnimationView(
+                    dna: displayDNA,
+                    pose: startHoldProgress > 0 ? .sign : .idle,
+                    pixelSize: 9
+                )
+                .animation(.easeInOut(duration: 0.2), value: startHoldProgress > 0)
+                .opacity(tracker.isIndoor ? 0 : 1)
+
+                PetIndoorStage(dna: displayDNA, isRunning: false)
+                    .opacity(tracker.isIndoor ? 1 : 0)
+            }
             .frame(width: 200, height: 200)
-            .animation(.easeInOut(duration: 0.2), value: startHoldProgress > 0)
+            .animation(.easeInOut(duration: 0.25), value: tracker.isIndoor)
 
             Circle()
                 .fill(Color(hex: "#F9703E"))
@@ -295,9 +305,9 @@ struct RunTrackerView: View {
                     }
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: tracker.isIndoor ? "figure.run.treadmill" : "location.fill")
+                        Image(systemName: "figure.run.treadmill")
                             .font(.system(size: 12, weight: .semibold))
-                        Text(tracker.isIndoor ? L("tracker.indoor") : L("tracker.outdoor"))
+                        Text(L("tracker.indoor"))
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                     }
                     .foregroundStyle(motionDenied ? Color.black.opacity(0.3) : tracker.isIndoor ? .white : Color.black.opacity(0.6))
@@ -818,6 +828,7 @@ struct PixelLocationPinView: View {
 
 private struct PetIndoorStage: View {
     let dna: PetDNA
+    var isRunning: Bool = true
 
     var body: some View {
         ZStack(alignment: .center) {
@@ -828,15 +839,17 @@ private struct PetIndoorStage: View {
 
             VStack(spacing: -12) {
                 ZStack(alignment: .topTrailing) {
-                    PetAnimationView(dna: dna, pose: .running, pixelSize: 7)
+                    PetAnimationView(dna: dna, pose: isRunning ? .running : .idle, pixelSize: 7)
                         .frame(width: 90, height: 145)
                         .offset(y: 23)
 
-                    SweatDropsView()
-                        .offset(x: 10, y: 61)
+                    if isRunning {
+                        SweatDropsView()
+                            .offset(x: 10, y: 61)
+                    }
                 }
 
-                PixelTreadmillView()
+                PixelTreadmillView(isRunning: isRunning)
             }
         }
     }
@@ -894,11 +907,13 @@ private struct SweatDrop: View {
 // MARK: - PixelTreadmillView
 
 private struct PixelTreadmillView: View {
+    var isRunning: Bool = true
+
     var body: some View {
         TimelineView(.periodic(from: .now, by: 0.08)) { tl in
             Canvas { ctx, _ in
                 let p: CGFloat = 8
-                let t = tl.date.timeIntervalSinceReferenceDate
+                let t = isRunning ? tl.date.timeIntervalSinceReferenceDate : 0
 
                 let orange = Color(hex: "#F9703E")
                 let gray   = Color(hex: "#4A4A4A")

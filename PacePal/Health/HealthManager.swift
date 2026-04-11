@@ -14,10 +14,15 @@ final class HealthManager {
         sessionKm = UserDefaults.standard.double(forKey: HealthManager.sessionKmKey())
     }
 
+    /// Set from AppState.challengeLevel.runThreshold — synced on launch and level change.
+    var runThreshold: Double = 0.5
+
     // Run stats populated by fetchRunStats(since:)
     private(set) var totalRuns: Int = 0
     private(set) var totalKmAllTime: Double = 0.0
     private(set) var bestStreak: Int = 0
+    /// True if today was already counted in totalRuns (HealthKit had a qualifying workout today)
+    private(set) var todayCountedInStats: Bool = false
 
     enum AuthState { case idle, requesting, authorized, denied, unavailable }
     var authState: AuthState = .idle
@@ -101,7 +106,7 @@ final class HealthManager {
         let today = cal.startOfDay(for: now)
         var runs = 0, currentStreak = 0, best = 0
         while day <= today {
-            if (dayKm[day] ?? 0) >= 0.5 {
+            if (dayKm[day] ?? 0) >= runThreshold {
                 runs += 1
                 currentStreak += 1
                 best = max(best, currentStreak)
@@ -112,13 +117,15 @@ final class HealthManager {
             day = next
         }
 
-        let finalRuns = runs
-        let finalKm   = totalKm
-        let finalBest = best
+        let finalRuns         = runs
+        let finalKm           = totalKm
+        let finalBest         = best
+        let finalTodayCounted = (dayKm[today] ?? 0) >= runThreshold
         await MainActor.run {
-            self.totalRuns       = finalRuns
-            self.totalKmAllTime  = finalKm
-            self.bestStreak      = finalBest
+            self.totalRuns            = finalRuns
+            self.totalKmAllTime       = finalKm
+            self.bestStreak           = finalBest
+            self.todayCountedInStats  = finalTodayCounted
         }
     }
 

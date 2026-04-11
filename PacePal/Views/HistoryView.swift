@@ -1,7 +1,7 @@
 import SwiftUI
 
 private let totalDays = 66
-private let runThreshold = 0.5  // km required for a completed day
+// runThreshold is now dynamic — read from appState.challengeLevel.runThreshold
 
 // MARK: – Day state
 
@@ -19,6 +19,8 @@ struct HistoryView: View {
     @State private var dailyKm: [Int: Double] = [:]   // dayIndex → km
     @State private var isLoading = false
     @State private var selectedDayIndex: SelectedDay? = nil
+
+    private var runThreshold: Double { appState.challengeLevel.runThreshold }
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 5), count: 7)
     private var weekLabels: [String] { [L("history.weekday_sun"), L("history.weekday_mon"), L("history.weekday_tue"), L("history.weekday_wed"), L("history.weekday_thu"), L("history.weekday_fri"), L("history.weekday_sat")] }
@@ -137,7 +139,8 @@ struct HistoryView: View {
                 runNumber: runNumbers[sel.index] ?? (completedCount + 1),
                 date: date(for: sel.index),
                 state: state(for: sel.index),
-                km: sel.index == todayIndex ? health.todayKm : (dailyKm[sel.index] ?? 0)
+                km: sel.index == todayIndex ? health.todayKm : (dailyKm[sel.index] ?? 0),
+                runThreshold: runThreshold
             )
             .presentationDetents([.fraction(0.35)])
             .presentationDragIndicator(.visible)
@@ -213,7 +216,8 @@ struct HistoryView: View {
                         state: state(for: i),
                         km: dailyKm[i] ?? 0,
                         todayKm: i == todayIndex ? health.todayKm : nil,
-                        runNumber: nums[i]
+                        runNumber: nums[i],
+                        runThreshold: runThreshold
                     )
                     .aspectRatio(1, contentMode: .fit)
                     .id(i == todayIndex ? "today" : "day-\(i)")
@@ -306,6 +310,7 @@ private struct DayCell: View {
     let km: Double
     let todayKm: Double?   // non-nil only for today
     let runNumber: Int?    // sequential run count, nil if not a completed run
+    let runThreshold: Double
 
     private var effectiveKm: Double { todayKm ?? km }
 
@@ -394,6 +399,7 @@ private struct DayDetailView: View {
     let date: Date
     let state: DayState
     let km: Double
+    let runThreshold: Double
 
     private var dateLabel: String {
         let fmt = DateFormatter()

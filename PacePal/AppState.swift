@@ -87,6 +87,15 @@ enum ChallengeLevel: String, CaseIterable {
     case resistencia = "resistencia"
     case rendimiento = "rendimiento"
 
+    /// Minimum km in a day to count it as completed (check ✓)
+    var runThreshold: Double {
+        switch self {
+        case .habito:      return 0.1
+        case .resistencia: return 0.5
+        case .rendimiento: return 1.0
+        }
+    }
+
     /// Energy gained per km run (fraction 0–1)
     var energyPerKm: Double {
         switch self {

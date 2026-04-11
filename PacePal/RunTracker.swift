@@ -91,6 +91,8 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     func resume() {
         guard state == .paused else { return }
         autoPauseTriggered = false
+        hasMovedSinceStart = false
+        notMovingSeconds = 0
         if isIndoor {
             startPedometer()
         } else {
@@ -199,9 +201,5 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         locationAuthStatus = manager.authorizationStatus
-        if manager.authorizationStatus == .authorizedWhenInUse ||
-           manager.authorizationStatus == .authorizedAlways {
-            if state == .idle { start() }
-        }
     }
 }

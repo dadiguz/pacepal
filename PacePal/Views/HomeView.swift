@@ -537,8 +537,12 @@ struct HomeView: View {
         await health.fetchRunStats(since: appState.challengeStartDate)
         // fetchRunStats only sees real HealthKit workouts. If test km pushed today
         // over the threshold without a real workout, add 1 for today.
-        let todayBonus = (health.todayKm >= 0.5 && health.realKm < 0.5) ? 1 : 0
-        appState.updateCompletedDays(health.totalRuns + todayBonus)
+        let threshold = appState.challengeLevel.runThreshold
+        let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
+        // Cap at days elapsed since challenge start — can't be day 2 if challenge started today
+        let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
+        let maxDays = min(66, elapsed + 1)
+        appState.updateCompletedDays(min(health.totalRuns + todayBonus, maxDays))
         checkForAchievement()
     }
 
@@ -602,7 +606,7 @@ struct HomeView: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Color(hex: "#FFD700"))
                     }
-                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, health.todayKm >= 0.5 ? appState.completedDays : appState.completedDays + 1))))
+                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, health.todayKm >= appState.challengeLevel.runThreshold ? appState.completedDays : appState.completedDays + 1))))
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -988,7 +992,11 @@ private struct PetStatusSheet: View {
         } // ScrollView
         .task {
             await health.fetchRunStats(since: appState.challengeStartDate)
-            appState.updateCompletedDays(health.totalRuns)
+            let threshold = appState.challengeLevel.runThreshold
+            let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
+            let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
+            let maxDays = min(66, elapsed + 1)
+            appState.updateCompletedDays(min(health.totalRuns + todayBonus, maxDays))
         }
     }
 

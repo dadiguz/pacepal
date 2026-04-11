@@ -76,11 +76,11 @@ private let _common: [String: [AppLang: String]] = [
 
 private let _challengeLevel: [String: [AppLang: String]] = [
     "level.habito.label":         [.es: "Hábito",      .en: "Habit"],
-    "level.habito.subtitle":      [.es: "1 km = 15% energía", .en: "1 km = 15% energy"],
+    "level.habito.subtitle":      [.es: "Construye el hábito",   .en: "Build the habit"],
     "level.resistencia.label":    [.es: "Resistencia", .en: "Endurance"],
-    "level.resistencia.subtitle": [.es: "1 km = 10% energía", .en: "1 km = 10% energy"],
+    "level.resistencia.subtitle": [.es: "Balance ideal",         .en: "Ideal balance"],
     "level.rendimiento.label":    [.es: "Rendimiento", .en: "Performance"],
-    "level.rendimiento.subtitle": [.es: "1 km = 7% energía",  .en: "1 km = 7% energy"],
+    "level.rendimiento.subtitle": [.es: "Máximo desafío",        .en: "Maximum challenge"],
 ]
 
 // MARK: - Questionnaire
@@ -116,9 +116,14 @@ private let _questionnaire: [String: [AppLang: String]] = [
     "q4.c":                     [.es: "Rendir al máximo",             .en: "Perform at my best"],
 
     "q.result_title":           [.es: "Tu nivel recomendado",         .en: "Your recommended level"],
-    "q.result_body_habito":     [.es: "Empezar con Hábito te ayuda a construir una rutina sólida sin agobiarte.", .en: "Starting with Habit helps you build a solid routine without pressure."],
-    "q.result_body_resistencia":[.es: "Resistencia es el balance perfecto para corredores regulares.", .en: "Endurance is the perfect balance for regular runners."],
-    "q.result_body_rendimiento":[.es: "Rendimiento es para quienes ya corren fuerte y quieren un desafío real.", .en: "Performance is for those who already run hard and want a real challenge."],
+    "q.result_body_habito":     [.es: "Solo necesitas correr 0.1 km al día para que cuente. Perfecto para construir el hábito sin presión.",
+                                 .en: "Just 0.1 km a day counts as a completed day. Perfect for building the habit without pressure."],
+    "q.result_body_resistencia":[.es: "0.5 km al día marca el día como completado. El balance ideal para corredores regulares.",
+                                 .en: "0.5 km a day marks the day as completed. The ideal balance for regular runners."],
+    "q.result_body_rendimiento":[.es: "Necesitas correr 1 km al día para que cuente. Para quienes ya corren fuerte y quieren un reto real.",
+                                 .en: "You need to run 1 km a day for it to count. For those who already run hard and want a real challenge."],
+    "q.stat_min_day":           [.es: "mín/día",                      .en: "min/day"],
+    "q.stat_energy":            [.es: "energía",                      .en: "energy"],
     "q.result_badge":           [.es: "TU NIVEL",                     .en: "YOUR LEVEL"],
     "q.result_change":          [.es: "Cambiar nivel",                .en: "Change level"],
     "q.result_confirm":         [.es: "Empezar con este nivel",       .en: "Start with this level"],
@@ -395,8 +400,8 @@ private let _tutorial: [String: [AppLang: String]] = [
     "tutorial.energy_body":  [.es: "Baja con el tiempo. Si llega a 0% tu compañero se agota y tendrás que elegir uno nuevo.",
                               .en: "Drops over time. If it reaches 0% your companion collapses and you'll have to choose a new one."],
     "tutorial.km_title":     [.es: "Kilómetros",    .en: "Kilometers"],
-    "tutorial.km_body":      [.es: "Cada km que corres suma %d%% de energía. ¡Corre seguido para mantener a tu compañero al máximo!",
-                              .en: "Each km you run adds %d%% energy. Keep running to keep your companion at full power!"],
+    "tutorial.km_body":      [.es: "Cada km suma %d%% de energía. Alcanza el mínimo diario de tu nivel para marcar el día como completado ✓",
+                              .en: "Each km adds %d%% energy. Hit your level's daily minimum to mark the day as completed ✓"],
     "tutorial.skip":         [.es: "Saltar",         .en: "Skip"],
     "tutorial.done":         [.es: "Entendido ✓",    .en: "Got it ✓"],
     "tutorial.next":         [.es: "Siguiente →",    .en: "Next →"],

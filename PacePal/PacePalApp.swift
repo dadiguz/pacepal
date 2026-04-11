@@ -31,6 +31,12 @@ struct PacepalApp: App {
             .environment(health)
             .environment(store)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
+            .onAppear {
+                health.runThreshold = appState.challengeLevel.runThreshold
+            }
+            .onChange(of: appState.challengeLevel) { _, level in
+                health.runThreshold = level.runThreshold
+            }
             .task {
                 // Set delegate so foreground banners work for returning users.
                 // New users go through NotificationPermissionView which calls requestPermission().

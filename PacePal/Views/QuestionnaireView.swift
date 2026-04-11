@@ -321,9 +321,7 @@ struct QuestionnaireView: View {
                                 .font(.system(size: 32, weight: .black, design: .rounded))
                                 .foregroundStyle(.white)
                         }
-                        Text(finalLevel.subtitle)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(finalLevel.color)
+                        LevelStatsBullets(level: finalLevel, color: finalLevel.color)
                         Text(L("q.result_body_\(finalLevel.rawValue)"))
                             .font(.system(size: 14, weight: .regular, design: .rounded))
                             .foregroundStyle(.white.opacity(0.75))
@@ -410,9 +408,7 @@ private struct QuestionnairePickerSheet: View {
                                 Text(level.label)
                                     .font(.system(size: 16, weight: isSelected ? .semibold : .regular, design: .rounded))
                                     .foregroundStyle(Color(hex: "#1F2933"))
-                                Text(level.subtitle)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                                LevelStatsBullets(level: level, color: Color(hex: "#9AA5B4"))
                             }
                             Spacer()
                             if isSelected {
@@ -439,6 +435,34 @@ private struct QuestionnairePickerSheet: View {
             Spacer()
         }
         .background(Color(hex: "#F5F8FC").ignoresSafeArea())
+    }
+}
+
+// MARK: - Level stats bullets (km minimum + energy per km)
+
+private struct LevelStatsBullets: View {
+    let level: ChallengeLevel
+    let color: Color
+
+    private var kmLabel: String {
+        let km = level.runThreshold
+        let s = km == km.rounded(.towardZero) && km >= 1
+            ? String(Int(km))
+            : String(format: "%.1g", km)
+        return "\(s) km \(L("q.stat_min_day"))"
+    }
+
+    private var energyLabel: String {
+        "\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label(kmLabel,     systemImage: "figure.run")
+            Label(energyLabel, systemImage: "bolt.fill")
+        }
+        .font(.system(size: 13, weight: .semibold, design: .rounded))
+        .foregroundStyle(color)
     }
 }
 
