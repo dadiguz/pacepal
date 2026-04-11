@@ -468,7 +468,7 @@ struct RunTrackerView: View {
 
             HStack(spacing: 20) {
                 // Share
-                Button { prepareShare() } label: {
+                Button { Task { await prepareShare() } } label: {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(.black)
@@ -504,17 +504,25 @@ struct RunTrackerView: View {
     // MARK: - Share (screenshot card + optional route)
 
     @MainActor
-    private func prepareShare() {
+    private func prepareShare() async {
+        let routeSnapshot: UIImage?
+        if !tracker.isIndoor && tracker.routeCoordinates.count > 1 {
+            routeSnapshot = await makeRouteSnapshot(coordinates: tracker.routeCoordinates)
+        } else {
+            routeSnapshot = nil
+        }
+
         let card = RunShareCard(
             km: tracker.distanceKm,
             time: tracker.formattedTime,
             pace: tracker.formattedPace,
             day: currentDay,
-            dna: displayDNA
+            dna: displayDNA,
+            routeSnapshot: routeSnapshot
         )
         let renderer = ImageRenderer(content: card)
-        renderer.proposedSize = .init(width: 390, height: 500)
-        renderer.scale = 3
+        renderer.proposedSize = .init(width: 1080, height: 1920)
+        renderer.scale = 1
 
         let items: [Any]
         if let img = renderer.uiImage, let data = img.pngData() {
@@ -536,6 +544,77 @@ struct RunTrackerView: View {
         while let next = top.presentedViewController { top = next }
         let vc = UIActivityViewController(activityItems: items, applicationActivities: nil)
         top.present(vc, animated: true)
+    }
+
+    private func makeRouteSnapshot(coordinates: [CLLocationCoordinate2D]) async -> UIImage? {
+        guard coordinates.count > 1 else { return nil }
+
+        var minLat = coordinates[0].latitude, maxLat = coordinates[0].latitude
+        var minLon = coordinates[0].longitude, maxLon = coordinates[0].longitude
+        for c in coordinates {
+            minLat = min(minLat, c.latitude); maxLat = max(maxLat, c.latitude)
+            minLon = min(minLon, c.longitude); maxLon = max(maxLon, c.longitude)
+        }
+        let pad = 0.0015
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        let span = MKCoordinateSpan(
+            latitudeDelta: max(maxLat - minLat, 0.004) + pad * 2,
+            longitudeDelta: max(maxLon - minLon, 0.004) + pad * 2
+        )
+
+        let options = MKMapSnapshotter.Options()
+        options.region = MKCoordinateRegion(center: center, span: span)
+        options.size = CGSize(width: 1000, height: 740)
+        options.mapType = .standard
+        options.showsBuildings = false
+
+        guard let snapshot = try? await MKMapSnapshotter(options: options).start() else { return nil }
+
+        let orange = UIColor(red: 0xF9/255.0, green: 0x70/255.0, blue: 0x3E/255.0, alpha: 1)
+        return UIGraphicsImageRenderer(size: snapshot.image.size).image { _ in
+            snapshot.image.draw(at: .zero)
+
+            let points = coordinates.map { snapshot.point(for: $0) }
+            let path = UIBezierPath()
+            path.move(to: points[0])
+            points.dropFirst().forEach { path.addLine(to: $0) }
+            path.lineCapStyle = .round
+            path.lineJoinStyle = .round
+
+            // Shadow stroke
+            UIColor.black.withAlphaComponent(0.25).setStroke()
+            path.lineWidth = 12
+            path.stroke()
+
+            // Main stroke
+            orange.setStroke()
+            path.lineWidth = 8
+            path.stroke()
+
+            // Start dot (white ring + orange fill)
+            if let first = points.first {
+                drawDot(at: first, fill: orange, in: snapshot.image.size)
+            }
+            // End dot (white ring + black fill)
+            if let last = points.last {
+                drawDot(at: last, fill: .black, in: snapshot.image.size)
+            }
+        }
+    }
+
+    private func drawDot(at point: CGPoint, fill: UIColor, in size: CGSize) {
+        guard point.x >= 0, point.y >= 0, point.x <= size.width, point.y <= size.height else { return }
+        let outer: CGFloat = 18
+        let inner: CGFloat = 10
+        let outerRect = CGRect(x: point.x - outer/2, y: point.y - outer/2, width: outer, height: outer)
+        UIColor.white.setFill()
+        UIBezierPath(ovalIn: outerRect).fill()
+        let innerRect = CGRect(x: point.x - inner/2, y: point.y - inner/2, width: inner, height: inner)
+        fill.setFill()
+        UIBezierPath(ovalIn: innerRect).fill()
     }
 
     // MARK: - Hold-to-start logic
@@ -1274,79 +1353,100 @@ struct RunShareCard: View {
     let pace: String?
     let day: Int
     let dna: PetDNA
+    let routeSnapshot: UIImage?
 
     var body: some View {
         ZStack {
             Color(hex: "#F9F496")
 
             VStack(spacing: 0) {
-                // Header row — fixed 390pt width so GeometryReader isn't needed
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(pace ?? "--:--")
-                            .font(.system(size: 20, weight: .black)).monospacedDigit()
-                            .foregroundStyle(.black)
-                        Text(L("tracker.label_pace"))
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.black.opacity(0.4))
-                    }
-                    .frame(width: 110, alignment: .leading)
-
-                    VStack(alignment: .center, spacing: 2) {
-                        Text("\(day)/66")
-                            .font(.system(size: 20, weight: .black)).monospacedDigit()
-                            .foregroundStyle(.black)
-                        Text(L("tracker.label_day"))
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.black.opacity(0.4))
-                    }
-                    .frame(width: 110, alignment: .center)
-
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(time)
-                            .font(.system(size: 20, weight: .black)).monospacedDigit()
-                            .foregroundStyle(.black)
-                        Text(L("tracker.label_time"))
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.black.opacity(0.4))
-                    }
-                    .frame(width: 110, alignment: .trailing)
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 32)
+                // Logo
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 52)
+                    .padding(.top, 88)
 
                 // Big KM
                 Text(String(format: "%.2f", km))
-                    .font(.system(size: 100, weight: .black))
+                    .font(.system(size: 220, weight: .black))
                     .monospacedDigit()
                     .foregroundStyle(.black)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                     .lineLimit(1)
-                    .padding(.top, 16)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 40)
+                    .padding(.top, 36)
 
                 Text("KILOMETERS")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.black.opacity(0.4))
-                    .tracking(1.5)
-                    .padding(.top, 4)
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(Color.black.opacity(0.35))
+                    .tracking(5)
+                    .padding(.top, 6)
 
-                // Pet + branding
-                HStack(alignment: .bottom) {
-                    PetAnimationView(dna: dna, pose: .jump, pixelSize: 5)
-                        .frame(width: 80, height: 80)
-                    Spacer()
-                    Image("Logo")
+                // Map (outdoor) or pet centered (indoor)
+                if let mapImage = routeSnapshot {
+                    Image(uiImage: mapImage)
                         .resizable()
-                        .scaledToFit()
-                        .frame(height: 28)
+                        .scaledToFill()
+                        .frame(width: 1000, height: 740)
+                        .clipShape(RoundedRectangle(cornerRadius: 28))
+                        .padding(.top, 56)
+                } else {
+                    PetAnimationView(dna: dna, pose: .jump, pixelSize: 14)
+                        .frame(width: 280, height: 280)
+                        .padding(.top, 56)
                 }
-                .padding(.horizontal, 28)
-                .padding(.top, 20)
-                .padding(.bottom, 28)
+
+                Spacer()
+
+                // Stats row
+                HStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(pace ?? "--:--")
+                            .font(.system(size: 48, weight: .black)).monospacedDigit()
+                            .foregroundStyle(.black)
+                        Text(L("tracker.label_pace"))
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(Color.black.opacity(0.35))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    VStack(alignment: .center, spacing: 8) {
+                        Text("\(day)/66")
+                            .font(.system(size: 48, weight: .black)).monospacedDigit()
+                            .foregroundStyle(.black)
+                        Text(L("tracker.label_day"))
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(Color.black.opacity(0.35))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                    VStack(alignment: .trailing, spacing: 8) {
+                        Text(time)
+                            .font(.system(size: 48, weight: .black)).monospacedDigit()
+                            .foregroundStyle(.black)
+                        Text(L("tracker.label_time"))
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(Color.black.opacity(0.35))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                .padding(.horizontal, 60)
+                .padding(.bottom, 44)
+
+                // Pet + branding (only when map is shown, indoor already shows the pet above)
+                HStack(alignment: .bottom) {
+                    if routeSnapshot != nil {
+                        PetAnimationView(dna: dna, pose: .jump, pixelSize: 9)
+                            .frame(width: 120, height: 120)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 60)
+                .padding(.bottom, 80)
             }
         }
-        .frame(width: 390, height: 500)
-        .clipShape(RoundedRectangle(cornerRadius: 28))
+        .frame(width: 1080, height: 1920)
+        .clipShape(RoundedRectangle(cornerRadius: 48))
     }
 }

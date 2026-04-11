@@ -118,6 +118,7 @@ struct TutorialOverlayView: View {
                         .animation(.spring(duration: 0.35), value: step)
                     }
                 }
+                .ignoresSafeArea()
             )
     }
 
