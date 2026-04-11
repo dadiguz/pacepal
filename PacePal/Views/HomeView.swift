@@ -126,7 +126,7 @@ struct HomeView: View {
                     .padding(.horizontal, 28)
                     .background(GeometryReader { geo in
                         Color.clear.preference(key: TutorialFrameKey.self,
-                            value: ["energy": geo.frame(in: .global)])
+                            value: ["energy": geo.frame(in: .named("homeRoot"))])
                     })
 
                 Spacer(minLength: 16)
@@ -170,7 +170,7 @@ struct HomeView: View {
                 kmSection
                     .background(GeometryReader { geo in
                         Color.clear.preference(key: TutorialFrameKey.self,
-                            value: ["km": geo.frame(in: .global)])
+                            value: ["km": geo.frame(in: .named("homeRoot"))])
                     })
 
                 // ── Track Run button ─────────────────────────────────────
@@ -317,6 +317,7 @@ struct HomeView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
         .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
+        .coordinateSpace(name: "homeRoot")
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
         .onChange(of: appState.selectedCharacter?.id) { _, _ in
             isInitialLoad = true
@@ -699,7 +700,7 @@ struct HomeView: View {
         // Capture frame for game over overlay positioning
         .background(GeometryReader { geo in
             Color.clear.preference(key: TutorialFrameKey.self,
-                value: ["pet": geo.frame(in: .global)])
+                value: ["pet": geo.frame(in: .named("homeRoot"))])
         })
     }
 

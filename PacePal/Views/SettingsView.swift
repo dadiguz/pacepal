@@ -686,14 +686,17 @@ struct LevelPickerSheet: View {
                                 .font(.system(size: 18, weight: .bold))
                                 .foregroundStyle(level.color)
                                 .frame(width: 28)
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 5) {
                                 Text(level.label)
                                     .font(.system(size: 16, weight: isSelected ? .semibold : .regular, design: .rounded))
                                     .foregroundStyle(Color(hex: "#1F2933"))
-                                Text(level.subtitle)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color(hex: "#9AA5B4"))
+                                let km = level.runThreshold
+                                let kmStr = km == km.rounded(.towardZero) && km >= 1 ? String(Int(km)) : String(format: "%.1g", km)
+                                Label("\(kmStr) km \(L("q.stat_min_day"))", systemImage: "figure.run")
+                                Label("\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km", systemImage: "bolt.fill")
                             }
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#9AA5B4"))
                             Spacer()
                             if isSelected {
                                 Image(systemName: "checkmark.circle.fill")
