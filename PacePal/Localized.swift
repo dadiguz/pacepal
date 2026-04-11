@@ -20,7 +20,8 @@ enum AppLang: String, CaseIterable {
            let lang = AppLang(rawValue: saved) {
             return lang
         }
-        let code = Locale.current.language.languageCode?.identifier ?? "es"
+        let preferred = Locale.preferredLanguages.first ?? "es"
+        let code = String(preferred.prefix(2))
         return AppLang(rawValue: code) ?? .es
     }
 
@@ -223,6 +224,10 @@ private let _forceUpdate: [String: [AppLang: String]] = [
 private let _tracker: [String: [AppLang: String]] = [
     "tracker.track_run":               [.es: "¡Corre!",                 .en: "Run!"],
     "tracker.km":                      [.es: "km",                      .en: "km"],
+    "tracker.label_pace":              [.es: "RITMO",                   .en: "PACE"],
+    "tracker.label_day":               [.es: "DÍA",                     .en: "DAY"],
+    "tracker.label_time":              [.es: "TIEMPO",                  .en: "TIME"],
+    "tracker.label_kilometers":        [.es: "kilómetros",              .en: "kilometers"],
     "tracker.hold_to_start":           [.es: "Mantén presionado para iniciar", .en: "Hold to start"],
     "tracker.start_button":            [.es: "INICIO",                  .en: "START"],
     "tracker.stop_button":             [.es: "PARAR",                   .en: "STOP"],

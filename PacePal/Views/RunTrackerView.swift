@@ -196,7 +196,7 @@ struct RunTrackerView: View {
                 Text(tracker.formattedPace ?? "--:--")
                     .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
-                Text("PACE")
+                Text(L("tracker.label_pace"))
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Color.black.opacity(0.4))
             }
@@ -206,7 +206,7 @@ struct RunTrackerView: View {
                 Text("\(currentDay)/66")
                     .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
-                Text("DAY")
+                Text(L("tracker.label_day"))
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Color.black.opacity(0.4))
             }
@@ -216,7 +216,7 @@ struct RunTrackerView: View {
                 Text(tracker.formattedTime)
                     .font(.system(size: 28, weight: .black)).monospacedDigit()
                     .foregroundStyle(.black)
-                Text("TIME")
+                Text(L("tracker.label_time"))
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(Color.black.opacity(0.4))
             }
@@ -239,7 +239,7 @@ struct RunTrackerView: View {
                 .lineLimit(1)
                 .contentTransition(.numericText())
                 .animation(.spring(duration: 0.3), value: tracker.distanceKm)
-            Text("kilometers")
+            Text(L("tracker.label_kilometers"))
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Color.black.opacity(0.4))
                 .textCase(.uppercase)
@@ -1286,7 +1286,7 @@ struct RunShareCard: View {
                         Text(pace ?? "--:--")
                             .font(.system(size: 20, weight: .black)).monospacedDigit()
                             .foregroundStyle(.black)
-                        Text("PACE")
+                        Text(L("tracker.label_pace"))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.black.opacity(0.4))
                     }
@@ -1296,7 +1296,7 @@ struct RunShareCard: View {
                         Text("\(day)/66")
                             .font(.system(size: 20, weight: .black)).monospacedDigit()
                             .foregroundStyle(.black)
-                        Text("DAY")
+                        Text(L("tracker.label_day"))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.black.opacity(0.4))
                     }
@@ -1306,7 +1306,7 @@ struct RunShareCard: View {
                         Text(time)
                             .font(.system(size: 20, weight: .black)).monospacedDigit()
                             .foregroundStyle(.black)
-                        Text("TIME")
+                        Text(L("tracker.label_time"))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.black.opacity(0.4))
                     }
