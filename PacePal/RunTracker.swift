@@ -122,6 +122,57 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         state = .idle
     }
 
+    // MARK: - State Persistence
+
+    private static let udDistanceKm  = "rt.distanceKm"
+    private static let udElapsedSecs = "rt.elapsedSeconds"
+    private static let udStateStr    = "rt.state"
+    private static let udIsIndoor    = "rt.isIndoor"
+    private static let udBgTimestamp = "rt.backgroundedAt"
+
+    /// Saves current run state so it survives app kill or background.
+    func saveState() {
+        guard state == .running || state == .paused else { return }
+        let ud = UserDefaults.standard
+        ud.set(distanceKm,     forKey: Self.udDistanceKm)
+        ud.set(elapsedSeconds, forKey: Self.udElapsedSecs)
+        ud.set(state == .running ? "running" : "paused", forKey: Self.udStateStr)
+        ud.set(isIndoor,       forKey: Self.udIsIndoor)
+        if state == .running {
+            ud.set(Date().timeIntervalSince1970, forKey: Self.udBgTimestamp)
+        } else {
+            ud.removeObject(forKey: Self.udBgTimestamp)
+        }
+    }
+
+    /// Restores a saved in-progress run. Returns true if state was restored.
+    @discardableResult
+    func restoreStateIfNeeded() -> Bool {
+        let ud = UserDefaults.standard
+        guard let stateStr = ud.string(forKey: Self.udStateStr),
+              stateStr == "running" || stateStr == "paused" else { return false }
+
+        distanceKm = ud.double(forKey: Self.udDistanceKm)
+        isIndoor   = ud.bool(forKey: Self.udIsIndoor)
+
+        var secs = ud.integer(forKey: Self.udElapsedSecs)
+        // If the run was active when backgrounded, add time elapsed since then
+        if stateStr == "running",
+           let ts = ud.object(forKey: Self.udBgTimestamp) as? Double {
+            secs += max(0, Int(Date().timeIntervalSince1970 - ts))
+        }
+        elapsedSeconds = secs
+        state = .paused   // always restore as paused — user taps to resume consciously
+        return true
+    }
+
+    /// Clears persisted run state (call after finish or intentional reset).
+    func clearSavedState() {
+        let ud = UserDefaults.standard
+        [Self.udDistanceKm, Self.udElapsedSecs, Self.udStateStr,
+         Self.udIsIndoor, Self.udBgTimestamp].forEach { ud.removeObject(forKey: $0) }
+    }
+
     // MARK: - Indoor (pedometer)
 
     private func startPedometer() {

@@ -21,6 +21,7 @@ struct RunTrackerView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var tracker = RunTracker()
     @State private var phase: TrackerPhase = .idle
@@ -167,12 +168,22 @@ struct RunTrackerView: View {
             }
         }
         .onAppear {
-            // Fresh state every time the view is presented
-            tracker.reset()
-            phase = .idle
+            if tracker.restoreStateIfNeeded() {
+                phase = .paused   // show paused state with progress intact
+            } else {
+                tracker.reset()
+                phase = .idle
+            }
             startHoldProgress = 0
             stopHoldProgress = 0
             pendingKm = 0
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard phase == .running || phase == .paused else { return }
+            if newPhase == .background {
+                tracker.saveState()
+                if phase == .running { pauseRun() }
+            }
         }
         .onDisappear {
             // Apply km credit here so HomeView's animation triggers on arrival
@@ -682,6 +693,7 @@ struct RunTrackerView: View {
     private func finishAndSave() {
         stopHoldProgress = 0
         tracker.finish()
+        tracker.clearSavedState()
         let km = tracker.distanceKm
         if km > 0 { pendingKm = km }   // applied on dismiss so HomeView's km animation fires
         withAnimation { phase = .finished }
