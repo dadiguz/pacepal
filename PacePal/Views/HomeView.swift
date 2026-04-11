@@ -126,7 +126,7 @@ struct HomeView: View {
                     .padding(.horizontal, 28)
                     .background(GeometryReader { geo in
                         Color.clear.preference(key: TutorialFrameKey.self,
-                            value: ["energy": geo.frame(in: .named("homeRoot"))])
+                            value: ["energy": geo.frame(in: .global)])
                     })
 
                 Spacer(minLength: 16)
@@ -170,7 +170,7 @@ struct HomeView: View {
                 kmSection
                     .background(GeometryReader { geo in
                         Color.clear.preference(key: TutorialFrameKey.self,
-                            value: ["km": geo.frame(in: .named("homeRoot"))])
+                            value: ["km": geo.frame(in: .global)])
                     })
 
                 // ── Track Run button ─────────────────────────────────────
@@ -317,7 +317,6 @@ struct HomeView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
         .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
-        .coordinateSpace(name: "homeRoot")
         .onPreferenceChange(TutorialFrameKey.self) { tutorialFrames = $0 }
         .onChange(of: appState.selectedCharacter?.id) { _, _ in
             isInitialLoad = true
@@ -363,12 +362,17 @@ struct HomeView: View {
                 isInitialLoad = false
                 appState.isFirstRunForCharacter = false
                 let alreadyCounted = appState.kmCountedForEnergy
-                let delta = newVal - alreadyCounted
+                // Use realKm (HealthKit) for the initial delta — avoids counting residual
+                // sessionKm from a previous character as uncounted km for the new one.
+                let baseKm = max(health.realKm, appState.kmCountedForEnergy)
+                let delta = baseKm - alreadyCounted
                 if delta > 0.01 {
-                    // Uncounted km (new character or ran while app was closed): animate + add energy
+                    // Uncounted km: ran while app was closed, animate + add energy.
+                    // Only count toward completedDays if the challenge was already underway —
+                    // prevents HealthKit data on day 1 from incorrectly setting completedDays = 1.
                     displayedKm = alreadyCounted
                     lastKnownKm = alreadyCounted
-                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: newVal) }
+                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: baseKm, countForProgress: appState.challengeStarted) }
                 } else {
                     // All km already counted in a previous session
                     displayedKm = newVal
@@ -504,7 +508,7 @@ struct HomeView: View {
 
     // MARK: – KM animation state machine
     @MainActor
-    private func runKmAnimation(delta: Double, newTotal: Double) async {
+    private func runKmAnimation(delta: Double, newTotal: Double, countForProgress: Bool = true) async {
         if energy <= 0 && delta < 0.1 {
             lastKnownKm = newTotal; displayedKm = newTotal; return
         }
@@ -534,13 +538,11 @@ struct HomeView: View {
         }
         isAnimating = false
         currentPose = normalPose
+        guard countForProgress else { return }
         appState.confirmChallengeStart()
         await health.fetchRunStats(since: appState.challengeStartDate)
-        // fetchRunStats only sees real HealthKit workouts. If test km pushed today
-        // over the threshold without a real workout, add 1 for today.
         let threshold = appState.challengeLevel.runThreshold
         let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
-        // Cap at days elapsed since challenge start — can't be day 2 if challenge started today
         let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
         let maxDays = min(66, elapsed + 1)
         appState.updateCompletedDays(min(health.totalRuns + todayBonus, maxDays))
@@ -700,7 +702,7 @@ struct HomeView: View {
         // Capture frame for game over overlay positioning
         .background(GeometryReader { geo in
             Color.clear.preference(key: TutorialFrameKey.self,
-                value: ["pet": geo.frame(in: .named("homeRoot"))])
+                value: ["pet": geo.frame(in: .global)])
         })
     }
 

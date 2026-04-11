@@ -37,6 +37,11 @@ struct PacepalApp: App {
             .onChange(of: appState.challengeLevel) { _, level in
                 health.runThreshold = level.runThreshold
             }
+            .onChange(of: appState.selectedCharacter?.id) { oldID, _ in
+                // Reset in-app session km when switching characters so the previous
+                // character's km doesn't inflate the new character's completedDays.
+                if oldID != nil { health.resetSession() }
+            }
             .task {
                 // Set delegate so foreground banners work for returning users.
                 // New users go through NotificationPermissionView which calls requestPermission().

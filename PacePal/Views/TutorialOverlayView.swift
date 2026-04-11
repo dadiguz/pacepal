@@ -59,56 +59,66 @@ struct TutorialOverlayView: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack {
-                // ── Dimmed overlay with spotlight cutout ────────────────
-                Color.black.opacity(0.65)
-                    .ignoresSafeArea()
-                    .mask(
-                        ZStack {
-                            Rectangle()
-                            if highlight != .zero {
-                                RoundedRectangle(cornerRadius: 16)
-                                    .frame(width: highlight.width, height: highlight.height)
-                                    .position(x: highlight.midX, y: highlight.midY)
-                                    .blendMode(.destinationOut)
+        // Full-screen overlay that ignores safe areas so its local (0,0)
+        // matches global screen coordinates — same space used by frame captures.
+        Color.clear
+            .ignoresSafeArea()
+            .overlay(
+                GeometryReader { geo in
+                    // geo.frame(in: .global) tells us where this overlay sits on screen.
+                    // Subtracting its origin converts global highlight coords → local coords.
+                    let origin = geo.frame(in: .global).origin
+                    let local = highlight.offsetBy(dx: -origin.x, dy: -origin.y)
+                    let screenH = geo.size.height
+
+                    ZStack {
+                        // ── Dimmed overlay with spotlight cutout ──────────
+                        Color.black.opacity(0.65)
+                            .mask(
+                                ZStack {
+                                    Rectangle()
+                                    if local != .zero {
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .frame(width: local.width, height: local.height)
+                                            .position(x: local.midX, y: local.midY)
+                                            .blendMode(.destinationOut)
+                                    }
+                                }
+                                .compositingGroup()
+                            )
+
+                        // ── Orange border around highlight ────────────────
+                        if local != .zero {
+                            RoundedRectangle(cornerRadius: 16)
+                                .strokeBorder(Color(hex: "#F9703E"), lineWidth: 2)
+                                .frame(width: local.width, height: local.height)
+                                .position(x: local.midX, y: local.midY)
+                        }
+
+                        // ── Callout card ──────────────────────────────────
+                        let putBelow = local.midY < screenH / 2
+
+                        VStack(spacing: 0) {
+                            if putBelow {
+                                Spacer().frame(height: max(local.maxY + 20, 0))
+                            } else {
+                                Spacer()
+                            }
+
+                            calloutCard(step: step, isLast: isLast)
+                                .padding(.horizontal, 24)
+                                .transition(.move(edge: putBelow ? .bottom : .top).combined(with: .opacity))
+
+                            if putBelow {
+                                Spacer()
+                            } else {
+                                Spacer().frame(height: max(screenH - local.minY + 20, 0))
                             }
                         }
-                        .compositingGroup()
-                    )
-
-                // ── Orange border around highlight ──────────────────────
-                if highlight != .zero {
-                    RoundedRectangle(cornerRadius: 16)
-                        .strokeBorder(Color(hex: "#F9703E"), lineWidth: 2)
-                        .frame(width: highlight.width, height: highlight.height)
-                        .position(x: highlight.midX, y: highlight.midY)
-                }
-
-                // ── Callout card ────────────────────────────────────────
-                let putBelow = highlight.midY < geo.size.height / 2
-
-                VStack(spacing: 0) {
-                    if putBelow {
-                        Spacer().frame(height: max(highlight.maxY + 20, 0))
-                    } else {
-                        Spacer()
-                    }
-
-                    calloutCard(step: step, isLast: isLast)
-                        .padding(.horizontal, 24)
-                        .transition(.move(edge: putBelow ? .bottom : .top).combined(with: .opacity))
-
-                    if putBelow {
-                        Spacer()
-                    } else {
-                        Spacer().frame(height: max(geo.size.height - highlight.minY + 20, 0))
+                        .animation(.spring(duration: 0.35), value: step)
                     }
                 }
-                .animation(.spring(duration: 0.35), value: step)
-            }
-        }
-        .ignoresSafeArea()
+            )
     }
 
     private func calloutCard(step: Int, isLast: Bool) -> some View {

@@ -142,6 +142,13 @@ final class HealthManager {
 
     func resetKm() { testKmOffset = 0; realKm = 0 }
 
+    /// Clears the in-app session km for today. Call when switching characters so
+    /// the previous character's in-app km doesn't bleed into the new one.
+    func resetSession() {
+        sessionKm = 0
+        UserDefaults.standard.set(0.0, forKey: HealthManager.sessionKmKey())
+    }
+
     private static func sessionKmKey() -> String {
         let day = Calendar.current.startOfDay(for: Date())
         return "pacepal.sessionKm.\(Int(day.timeIntervalSince1970))"
