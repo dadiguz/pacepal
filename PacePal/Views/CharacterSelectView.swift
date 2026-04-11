@@ -28,6 +28,7 @@ struct CharacterSelectView: View {
     @State private var nickname      = ""
     @State private var namingPose    = PetPose.jump
     @State private var showNameError = false
+    @State private var nameErrorKey  = "char_select.name_error"
     @FocusState private var keyboardUp: Bool
     @State private var glowPulse = false
     @State private var glowAngle: Double = 0
@@ -178,7 +179,7 @@ struct CharacterSelectView: View {
             Text(L("char_select.name_prompt"))
                 .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#1F2933"))
-            Text(showNameError ? L("char_select.name_error") : L("char_select.name_max", maxNicknameLength))
+            Text(showNameError ? L(nameErrorKey) : L("char_select.name_max", maxNicknameLength))
                 .font(.system(size: 13, weight: showNameError ? .semibold : .regular, design: .rounded))
                 .foregroundStyle(showNameError ? Color(hex: "#E12D39") : Color(hex: "#9AA5B4"))
                 .padding(.top, 4)
@@ -262,17 +263,25 @@ struct CharacterSelectView: View {
 
     // MARK: – Confirm
 
+    private func triggerNameError(key: String) {
+        nameErrorKey = key
+        showNameError = true
+        namingPose = .angry
+        SoundManager.shared.play(.angry, enabled: appState.soundsEnabled)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            namingPose = .jump
+            withAnimation { showNameError = false }
+        }
+    }
+
     private func confirmNickname() {
         let trimmed = nickname.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else {
-            // Angry flash: switch to angry pose then back to jump
-            showNameError = true
-            namingPose = .angry
-            SoundManager.shared.play(.angry, enabled: appState.soundsEnabled)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                namingPose = .jump
-                withAnimation { showNameError = false }
-            }
+            triggerNameError(key: "char_select.name_error")
+            return
+        }
+        guard ProfanityFilter.isClean(trimmed) else {
+            triggerNameError(key: "char_select.name_profanity")
             return
         }
         var namedDNA = selected

@@ -39,6 +39,7 @@
 		CABF66AF94FB725BC5AA6B1D /* VersionChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD5DE7733D3B0075AF4A63C /* VersionChecker.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
 		E26E638CEFD57BE547584CEF /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBAB1B8890307335FAEB869D /* PurchaseManager.swift */; };
+		C5E6A1D4F087B3920E4C7F85 /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */; };
 		F12E925BF9188C80E74FC69C /* WidgetPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32501B9F33774EC123EA1B /* WidgetPromptView.swift */; };
 		F40E551CEEDEF9871328A62B /* PetCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */; };
 		F6A7F99F104E7AAC4CAD69C5 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFD71C59100C3272E16C7E9 /* HomeView.swift */; };
@@ -92,6 +93,7 @@
 		C1918003EAED4B99DE32E955 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		C22508188270B367DA4BFC1D /* songs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = songs; sourceTree = SOURCE_ROOT; };
 		CBAB1B8890307335FAEB869D /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfanityFilter.swift; sourceTree = "<group>"; };
 		CBB86B997403962A912F5DD1 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedCharacter.swift; sourceTree = "<group>"; };
 		E1792ED93F8A896E09756EBD /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 				CBB86B997403962A912F5DD1 /* NotificationManager.swift */,
 				21204707A39D2F5D0852F039 /* PacePalApp.swift */,
 				CBAB1B8890307335FAEB869D /* PurchaseManager.swift */,
+				A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */,
 				5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */,
 				A65F29BAC0D5243DCF956A0A /* RunTracker.swift */,
 				8B18ECDE05BD7F57EC68A1BD /* SoundManager.swift */,
@@ -381,6 +384,7 @@
 				1B8540E3E208B4546AE2A881 /* PetPalette.swift in Sources */,
 				8340550C0AA71F9E8A2B9EC4 /* PetTypes.swift in Sources */,
 				E26E638CEFD57BE547584CEF /* PurchaseManager.swift in Sources */,
+				C5E6A1D4F087B3920E4C7F85 /* ProfanityFilter.swift in Sources */,
 				9C49A5204BD8223839F84CBE /* QuestionnaireView.swift in Sources */,
 				1E78519BD6D846A18235FFB4 /* DodgeRainView.swift in Sources */,
 				71553761686140C8B5FC900E /* GravityFlipView.swift in Sources */,
