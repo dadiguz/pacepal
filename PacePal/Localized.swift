@@ -138,6 +138,68 @@ private let _onboarding: [String: [AppLang: String]] = [
     "onboarding.title_part3":    [.es: " te espera.",        .en: " companion awaits."],
     "onboarding.subtitle":       [.es: "Corre. Mantenlo vivo.", .en: "Run. Keep it alive."],
     "onboarding.choose_button":  [.es: "Elegir mi compañero",  .en: "Choose my companion"],
+
+    // Welcome
+    "ob.welcome_title":   [.es: "Corre 66 días.\nTu pet depende de ti.",    .en: "Run 66 days.\nYour pet depends on you."],
+    "ob.welcome_sub":     [.es: "El hábito de correr que sí va a durar",    .en: "The running habit that actually sticks"],
+    "ob.start":           [.es: "Empezar",                                  .en: "Get Started"],
+    // Goal
+    "ob.goal_title":      [.es: "¿Cuál es tu meta?",                        .en: "What's your goal?"],
+    "ob.goal_sub":        [.es: "Elige una opción",                         .en: "Choose one option"],
+    "ob.goal_1":          [.es: "Crear un hábito de correr",                .en: "Build a running habit"],
+    "ob.goal_2":          [.es: "Mejorar mi resistencia",                   .en: "Improve my endurance"],
+    "ob.goal_3":          [.es: "Prepararme para una carrera",              .en: "Train for a race"],
+    "ob.goal_4":          [.es: "Reducir el estrés",                        .en: "Reduce stress"],
+    "ob.goal_5":          [.es: "Estar más saludable",                      .en: "Get healthier"],
+    // Pain
+    "ob.pain_title":      [.es: "¿Qué te ha frenado antes?",               .en: "What's held you back?"],
+    "ob.pain_sub":        [.es: "Elige todo lo que aplique",                .en: "Choose all that apply"],
+    "ob.pain_1":          [.es: "Me falta motivación al día siguiente",     .en: "I lose motivation the next day"],
+    "ob.pain_2":          [.es: "Empiezo bien y después lo dejo",           .en: "I start strong then quit"],
+    "ob.pain_3":          [.es: "No sé cuánto ni qué tan rápido correr",   .en: "I don't know how far or fast to run"],
+    "ob.pain_4":          [.es: "Se me hace aburrido correr solo",          .en: "Running alone gets boring"],
+    "ob.pain_5":          [.es: "Siempre digo \"mañana empiezo\"",          .en: "I always say \"I'll start tomorrow\""],
+    // Social proof
+    "ob.proof_title":     [.es: "Miles ya lo lograron",                     .en: "Thousands have done it"],
+    "ob.proof_sub":       [.es: "Personas como tú completaron los 66 días", .en: "People just like you completed all 66 days"],
+    "ob.proof_1_name":    [.es: "Ana M.",                                   .en: "Ana M."],
+    "ob.proof_1_badge":   [.es: "Día 66 completado",                        .en: "Day 66 completed"],
+    "ob.proof_1_text":    [.es: "Nunca creí que correría 66 días seguidos. Mi pet fue mi mayor motivación para no fallar.", .en: "I never thought I'd run 66 days straight. My pet was my biggest motivation not to quit."],
+    "ob.proof_2_name":    [.es: "Carlos R.",                                .en: "Carlos R."],
+    "ob.proof_2_badge":   [.es: "Nivel Resistencia",                        .en: "Endurance level"],
+    "ob.proof_2_text":    [.es: "Llevaba años queriendo correr seguido. Pacepal fue lo único que realmente funcionó.", .en: "I'd been trying to run consistently for years. Pacepal was the only thing that actually worked."],
+    "ob.proof_3_name":    [.es: "Sofía L.",                                 .en: "Sofía L."],
+    "ob.proof_3_badge":   [.es: "Nivel Hábito",                             .en: "Habit level"],
+    "ob.proof_3_text":    [.es: "El día 3 quería rendirme. Ver a mi pet triste me hizo salir de todos modos.", .en: "On day 3 I wanted to give up. Seeing my sad pet made me go out anyway."],
+    // Tinder
+    "ob.tinder_title":    [.es: "¿Te identificas?",                         .en: "Can you relate?"],
+    "ob.tinder_sub":      [.es: "Desliza o toca para responder",            .en: "Swipe or tap to respond"],
+    "ob.tinder_1":        [.es: "Siempre digo \"mañana empiezo\" y nunca arranco", .en: "I always say \"I'll start tomorrow\" and never do"],
+    "ob.tinder_2":        [.es: "Empiezo a correr motivado y al tercer día ya no quiero", .en: "I start running motivated but by day 3 I don't want to anymore"],
+    "ob.tinder_3":        [.es: "Sé que debo correr pero el sillón siempre gana", .en: "I know I should run but the couch always wins"],
+    "ob.tinder_4":        [.es: "Necesito una razón más fuerte para no fallar", .en: "I need a stronger reason not to quit"],
+    "ob.tinder_done":     [.es: "Te entendemos",                             .en: "We get it"],
+    "ob.tinder_done_sub": [.es: "Pacepal está diseñado exactamente para esto", .en: "Pacepal is built exactly for this"],
+    "ob.tinder_nope":     [.es: "No tanto",                                 .en: "Not really"],
+    "ob.tinder_agree":    [.es: "¡Sí, yo!",                                 .en: "That's me!"],
+    "ob.tinder_cta":      [.es: "Ver cómo Pacepal lo resuelve",             .en: "See how Pacepal solves this"],
+    // Solution
+    "ob.solution_title":  [.es: "Pacepal lo cambia todo",                   .en: "Pacepal changes everything"],
+    "ob.solution_sub":    [.es: "Hecho para las excusas que todos ponemos", .en: "Built for the excuses we all make"],
+    "ob.sol_1_prob":      [.es: "Motivación inestable",                     .en: "Unstable motivation"],
+    "ob.sol_1_fix":       [.es: "Tu pet muere si no corres en 24h — funciona sí o sí", .en: "Your pet dies if you don't run in 24h — it works every time"],
+    "ob.sol_2_prob":      [.es: "El hábito no dura",                        .en: "Habits don't stick"],
+    "ob.sol_2_fix":       [.es: "La racha de 66 días te mantiene en ruta cada día", .en: "The 66-day streak keeps you on track every single day"],
+    "ob.sol_3_prob":      [.es: "Correr es aburrido",                       .en: "Running is boring"],
+    "ob.sol_3_fix":       [.es: "Tu pet crece, evoluciona y reacciona a tus km", .en: "Your pet grows, evolves and reacts to your km"],
+    "ob.sol_4_prob":      [.es: "No saber por dónde empezar",               .en: "Not knowing where to start"],
+    "ob.sol_4_fix":       [.es: "Elige tu nivel: Hábito, Resistencia o Rendimiento", .en: "Pick your level: Habit, Endurance or Performance"],
+    // Processing
+    "ob.processing_title":[.es: "Armando tu plan de 66 días...",            .en: "Building your 66-day plan..."],
+    "ob.processing_sub":  [.es: "Basado en tus respuestas",                 .en: "Based on your answers"],
+    // Shared CTAs
+    "ob.continue":        [.es: "Continuar",                                .en: "Continue"],
+    "ob.create_plan":     [.es: "Crear mi plan",                            .en: "Create my plan"],
 ]
 
 // MARK: - Paywall
