@@ -18,6 +18,14 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Pacepal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>PacePal no escribe datos en Health.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PacePal usa tu ubicación para medir la distancia que corres en tiempo real.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>PacePal usa el podómetro para medir tu distancia cuando corres en interiores.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -29,14 +37,6 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>PacePal usa tu ubicación para medir la distancia que corres en tiempo real.</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Pacepal lee tus kilómetros de hoy para alimentar a tu compañero de carrera.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>PacePal no escribe datos en Health.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>PacePal usa el podómetro para medir tu distancia cuando corres en interiores.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

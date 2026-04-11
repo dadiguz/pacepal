@@ -755,7 +755,7 @@ struct HomeView: View {
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(String(format: "%.1f", displayedKm))
+                Text(String(format: "%.2f", displayedKm))
                     .font(.system(size: 56, weight: .black, design: .rounded))
                     .foregroundStyle(Color(hex: "#F9703E"))
                     .shadow(color: hasPhotoBackground ? .black.opacity(0.55) : .clear, radius: 6, x: 0, y: 1)

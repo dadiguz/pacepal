@@ -251,16 +251,6 @@ struct RunTrackerView: View {
 
     private var idleContentView: some View {
         ZStack {
-            // Blurred live map background (outdoor only)
-            if !tracker.isIndoor {
-                Map(position: .constant(.userLocation(fallback: .automatic)))
-                    .disabled(true)
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
-                    .blur(radius: 18)
-                    .overlay(Color(hex: "#F9F496").opacity(0.55))
-                    .ignoresSafeArea()
-            }
 
         VStack(spacing: 0) {
             Spacer()
