@@ -118,6 +118,66 @@ enum ObstacleKind {
     }
 }
 
+// MARK: - Rain sprite palettes
+
+private let rkO: Px = Color(hex: "#37474F")   // rock outline
+private let rkM: Px = Color(hex: "#78909C")   // rock main
+private let rkL: Px = Color(hex: "#CFD8DC")   // rock highlight
+
+private let ltO: Px = Color(hex: "#E65100")   // bolt dark
+private let ltM: Px = Color(hex: "#FFB300")   // bolt main
+private let ltL: Px = Color(hex: "#FFF9C4")   // bolt highlight
+
+// MARK: - Rock  (6 × 5)
+private let rockFrame: [[Px]] = [
+    [ n,   rkO, rkO, rkO, n,   n   ],
+    [ rkO, rkM, rkL, rkM, rkO, n   ],
+    [ rkO, rkM, rkM, rkM, rkM, rkO ],
+    [ rkO, rkL, rkM, rkM, rkO, n   ],
+    [ n,   rkO, rkO, rkO, n,   n   ],
+]
+
+// MARK: - Lightning bolt  (4 × 9)
+private let boltFrame: [[Px]] = [
+    [ n,   ltO, ltM, ltL ],
+    [ n,   ltO, ltM, n   ],
+    [ ltO, ltM, ltO, n   ],
+    [ ltO, ltM, ltM, ltO ],
+    [ n,   ltO, ltM, ltM ],
+    [ n,   n,   ltO, ltM ],
+    [ n,   ltO, ltM, n   ],
+    [ ltO, ltM, n,   n   ],
+    [ ltO, ltO, n,   n   ],
+]
+
+// MARK: - Rain sprite types
+
+struct RainSprite {
+    let frame: [[Px]]
+    let pixelSize: Double
+    var cols: Int    { frame[0].count }
+    var rows: Int    { frame.count }
+    var width: Double  { Double(cols) * pixelSize }
+    var height: Double { Double(rows) * pixelSize }
+}
+
+enum RainKind {
+    case rock, bolt
+    static func random(score: Int) -> RainKind {
+        if score > 200, Int.random(in: 0..<3) == 0 { return .bolt }
+        return .rock
+    }
+}
+
+func rainSprite(for kind: RainKind) -> RainSprite {
+    switch kind {
+    case .rock: return RainSprite(frame: rockFrame, pixelSize: 4.5)
+    case .bolt: return RainSprite(frame: boltFrame, pixelSize: 4.0)
+    }
+}
+
+// MARK: - Runner sprite API
+
 func obstacleSprite(for kind: ObstacleKind) -> ObstacleSprite {
     switch kind {
     case .cactusSmall:
