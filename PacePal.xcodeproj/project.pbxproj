@@ -29,12 +29,14 @@
 		86BD4AEBF10F47511326CA1F /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = 542A052198576C90FE009205 /* sounds */; };
 		9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF3C2194692874670A6BB4F /* SplashView.swift */; };
 		9C49A5204BD8223839F84CBE /* QuestionnaireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CD876CEF2D3A1C14C03B56 /* QuestionnaireView.swift */; };
+		A89D566B0838EA036CC31F00 /* ForceUpdateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D6D7F38C07456906FEDF1 /* ForceUpdateView.swift */; };
 		B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECB56EF581B42616F072F3A /* HealthManager.swift */; };
 		B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87722B94D0D1737F52EC447F /* PaywallView.swift */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		C72603304C3B25DCAB244C2E /* LocationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9DDE66C35D155559A8FC60 /* LocationPermissionView.swift */; };
 		C9BC3403C94B0D8F94FF8F39 /* songs in Resources */ = {isa = PBXBuildFile; fileRef = C22508188270B367DA4BFC1D /* songs */; };
+		CABF66AF94FB725BC5AA6B1D /* VersionChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD5DE7733D3B0075AF4A63C /* VersionChecker.swift */; };
 		D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */; };
 		E26E638CEFD57BE547584CEF /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBAB1B8890307335FAEB869D /* PurchaseManager.swift */; };
 		F12E925BF9188C80E74FC69C /* WidgetPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA32501B9F33774EC123EA1B /* WidgetPromptView.swift */; };
@@ -53,8 +55,10 @@
 		35B7D21F9091F1CEDBAC3507 /* PetGridBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetGridBuilder.swift; sourceTree = "<group>"; };
 		35CD876CEF2D3A1C14C03B56 /* QuestionnaireView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionnaireView.swift; sourceTree = "<group>"; };
 		35CFC4735EC647C641C99A93 /* PetTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetTypes.swift; sourceTree = "<group>"; };
+		4BD5DE7733D3B0075AF4A63C /* VersionChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionChecker.swift; sourceTree = "<group>"; };
 		4EF3C2194692874670A6BB4F /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		50F1DC0C152081AE60BE85FA /* PetDNA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDNA.swift; sourceTree = "<group>"; };
+		537D6D7F38C07456906FEDF1 /* ForceUpdateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForceUpdateView.swift; sourceTree = "<group>"; };
 		542A052198576C90FE009205 /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sounds; sourceTree = SOURCE_ROOT; };
 		5BF0218419DD8150496DC2B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningPhrases.swift; sourceTree = "<group>"; };
@@ -127,6 +131,7 @@
 				5F267E395A248F6EE8A2F33E /* RunningPhrases.swift */,
 				A65F29BAC0D5243DCF956A0A /* RunTracker.swift */,
 				8B18ECDE05BD7F57EC68A1BD /* SoundManager.swift */,
+				4BD5DE7733D3B0075AF4A63C /* VersionChecker.swift */,
 				924E2FE57E3D70EA88B28530 /* Engine */,
 				1B21660C88236FFF6E105047 /* Health */,
 				D1AC9720282703724E2412A6 /* Persistence */,
@@ -179,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				7A4A705D9C506164FD5ECD1F /* CharacterSelectView.swift */,
+				537D6D7F38C07456906FEDF1 /* ForceUpdateView.swift */,
 				FFD423FB9553894593F6BA4C /* HealthPermissionView.swift */,
 				E1792ED93F8A896E09756EBD /* HistoryView.swift */,
 				FAFD71C59100C3272E16C7E9 /* HomeView.swift */,
@@ -272,6 +278,7 @@
 			files = (
 				6A60E5F1C6C061547B1B150F /* AppState.swift in Sources */,
 				0061DE2AC33314850435DCAD /* CharacterSelectView.swift in Sources */,
+				A89D566B0838EA036CC31F00 /* ForceUpdateView.swift in Sources */,
 				B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */,
 				D13F8C1D906180F077159A10 /* HealthPermissionView.swift in Sources */,
 				79105446F07FFC6FE1B33EDD /* HistoryView.swift in Sources */,
@@ -298,6 +305,7 @@
 				2FC6A836FF4C6242DD322ED7 /* SoundManager.swift in Sources */,
 				9172F2CD00B5CC39F9C916DF /* SplashView.swift in Sources */,
 				391DB47B58EA508DF702D0E6 /* TutorialOverlayView.swift in Sources */,
+				CABF66AF94FB725BC5AA6B1D /* VersionChecker.swift in Sources */,
 				F12E925BF9188C80E74FC69C /* WidgetPromptView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

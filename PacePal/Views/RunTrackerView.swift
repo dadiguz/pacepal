@@ -283,7 +283,16 @@ struct RunTrackerView: View {
                 // Indoor / Outdoor toggle
                 let motionDenied = CMMotionActivityManager.authorizationStatus() == .denied
                 Button {
-                    tracker.isIndoor.toggle()
+                    if tracker.isIndoor {
+                        tracker.isIndoor = false
+                    } else {
+                        let status = CMMotionActivityManager.authorizationStatus()
+                        if status == .authorized {
+                            tracker.isIndoor = true
+                        } else if status == .notDetermined {
+                            withAnimation { phase = .motionPermission }
+                        }
+                    }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: tracker.isIndoor ? "figure.run.treadmill" : "location.fill")
@@ -341,7 +350,7 @@ struct RunTrackerView: View {
             appeared: motionPermAppeared,
             onAllow: {
                 tracker.requestMotionPermission { granted in
-                    if !granted { tracker.isIndoor = false }
+                    tracker.isIndoor = granted
                     withAnimation { phase = .idle }
                 }
             },
