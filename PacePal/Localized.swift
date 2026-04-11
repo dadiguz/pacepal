@@ -344,6 +344,7 @@ private let _home: [String: [AppLang: String]] = [
     "home.mood_dizzy":          [.es: "%@ está a punto de colapsar...", .en: "%@ is about to collapse..."],
     "home.mood_dead":           [.es: "%@ está exhausto... ¡ve a correr!", .en: "%@ is exhausted... go run!"],
     "home.mood_default":        [.es: "%@ está listo",                .en: "%@ is ready"],
+    "home.day_complete_float":  [.es: "+1 día completado",            .en: "+1 day completed"],
 ]
 
 // MARK: - History

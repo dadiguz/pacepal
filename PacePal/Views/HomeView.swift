@@ -24,6 +24,72 @@ private struct RedPulseOverlay: View {
     }
 }
 
+// MARK: - Confetti overlay (day completion celebration)
+private struct ConfettiOverlay: View {
+    private static let palette: [Color] = [
+        Color(hex: "#FADB5F"), Color(hex: "#F9703E"),
+        Color(hex: "#43C6DB"), Color(hex: "#4ADE80"),
+        Color(hex: "#C084FC"), Color(hex: "#F472B6"),
+    ]
+
+    private struct Particle: Identifiable {
+        let id = UUID()
+        let xFrac: CGFloat
+        let color: Color
+        let size: CGFloat
+        let delay: Double
+        let duration: Double
+    }
+
+    private let particles: [Particle]
+    @State private var yFrac: [CGFloat]
+
+    init() {
+        var ps: [Particle] = []
+        for _ in 0..<26 {
+            ps.append(Particle(
+                xFrac:    CGFloat.random(in: 0.05...0.95),
+                color:    Self.palette.randomElement()!,
+                size:     CGFloat.random(in: 5...10),
+                delay:    Double.random(in: 0...0.55),
+                duration: Double.random(in: 1.3...2.1)
+            ))
+        }
+        particles = ps
+        _yFrac = State(initialValue: Array(repeating: -0.04, count: ps.count))
+    }
+
+    @ViewBuilder
+    private func particleView(_ p: Particle, index i: Int, in geo: GeometryProxy) -> some View {
+        let y = yFrac[i]
+        let fade: Double = y > 0.82 ? 1.0 - (y - 0.82) / 0.18 : 1.0
+        Rectangle()
+            .fill(p.color)
+            .frame(width: p.size, height: p.size)
+            .rotationEffect(.degrees(y * 720))
+            .position(x: p.xFrac * geo.size.width,
+                      y: y * (geo.size.height + 60) - 30)
+            .opacity(fade)
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ForEach(Array(particles.enumerated()), id: \.element.id) { i, p in
+                particleView(p, index: i, in: geo)
+            }
+        }
+        .allowsHitTesting(false)
+        .onAppear {
+            for i in particles.indices {
+                withAnimation(.linear(duration: particles[i].duration)
+                    .delay(particles[i].delay)) {
+                    yFrac[i] = 1.04
+                }
+            }
+        }
+    }
+}
+
 struct HomeView: View {
     @Environment(AppState.self) private var appState
     @Environment(HealthManager.self) private var health
@@ -62,6 +128,13 @@ struct HomeView: View {
     @State private var showFlip = false
     @State private var eggTapCount = 0
     @State private var eggTimer: Timer?
+
+    // Day-completion celebration
+    @State private var celebrationPending = false
+    @State private var showDayCelebration = false
+    @State private var goldFlashOpacity: Double = 0
+    @State private var floatingTextOpacity: Double = 0
+    @State private var floatingTextY: CGFloat = 60
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -239,6 +312,29 @@ struct HomeView: View {
                 .presentationBackground { AppBackground() }
             }
 
+            // ── Day completion celebration ─────────────────────────────────
+            Color(hex: "#FADB5F")
+                .opacity(goldFlashOpacity)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+                .zIndex(3)
+            if showDayCelebration {
+                ConfettiOverlay()
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+                    .zIndex(4)
+            }
+            if floatingTextOpacity > 0 {
+                Text(L("home.day_complete_float"))
+                    .font(.system(size: 20, weight: .black, design: .rounded))
+                    .foregroundStyle(Color(hex: "#FADB5F"))
+                    .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
+                    .offset(y: floatingTextY)
+                    .opacity(floatingTextOpacity)
+                    .allowsHitTesting(false)
+                    .zIndex(4)
+            }
+
             // ── Game Over overlay ─────────────────────────────────────────
             if energy <= 0 {
                 gameOverOverlay
@@ -408,6 +504,7 @@ struct HomeView: View {
             appState.syncToWidget(km: health.todayKm)
         }
         .onChange(of: appState.completedDays) { _, _ in
+            guard !celebrationPending else { return }
             checkForAchievement()
         }
         .onReceive(
@@ -478,6 +575,33 @@ struct HomeView: View {
     }
 
     // MARK: – Achievement check
+
+    // MARK: – Day completion celebration
+
+    @MainActor
+    private func triggerDayCelebration() async {
+        guard !showDayCelebration else { return }
+        SoundManager.shared.play(.achievement, enabled: appState.soundsEnabled)
+        // Golden flash
+        withAnimation(.easeOut(duration: 0.1)) { goldFlashOpacity = 0.4 }
+        try? await Task.sleep(for: .seconds(0.22))
+        withAnimation(.easeIn(duration: 0.4)) { goldFlashOpacity = 0 }
+        // Pet celebration
+        currentPose = .hype
+        // Confetti + floating text
+        showDayCelebration = true
+        floatingTextY = 60
+        floatingTextOpacity = 1
+        withAnimation(.easeOut(duration: 1.8)) { floatingTextY = -40 }
+        withAnimation(.easeIn(duration: 0.4).delay(1.4)) { floatingTextOpacity = 0 }
+        try? await Task.sleep(for: .seconds(2.0))
+        currentPose = normalPose
+        try? await Task.sleep(for: .seconds(0.4))
+        withAnimation(.easeOut(duration: 0.4)) { showDayCelebration = false }
+        try? await Task.sleep(for: .seconds(0.5))
+        celebrationPending = false
+        checkForAchievement()
+    }
 
     // Called after a run completes — only checks for milestone achievements.
     private func checkForAchievement() {
@@ -550,8 +674,15 @@ struct HomeView: View {
         let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
         let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
         let maxDays = min(66, elapsed + 1)
-        appState.updateCompletedDays(min(health.totalRuns + todayBonus, maxDays))
-        checkForAchievement()
+        let newCompletedDays = min(health.totalRuns + todayBonus, maxDays)
+        let justCompletedDay = todayBonus == 1 && newCompletedDays > appState.completedDays
+        if justCompletedDay { celebrationPending = true }
+        appState.updateCompletedDays(newCompletedDays)
+        if justCompletedDay {
+            Task { await triggerDayCelebration() }
+        } else {
+            checkForAchievement()
+        }
     }
 
     // MARK: – Top bar

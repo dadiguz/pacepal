@@ -160,6 +160,17 @@ struct SettingsView: View {
                     ) {
                         showResetConfirm = true
                     }
+
+                    #if DEBUG
+                    settingsRow(
+                        icon: "ladybug.fill",
+                        iconColor: "#6366F1",
+                        title: "Debug",
+                        subtitle: "Herramientas de prueba"
+                    ) {
+                        showDebug = true
+                    }
+                    #endif
                 }
                 .padding(.horizontal, 24)
 
