@@ -917,10 +917,10 @@ struct HomeView: View {
             if !appState.medalEarned {
                 ZStack {
                     Circle()
-                        .stroke(trackColor, lineWidth: 4)
+                        .stroke(trackColor, lineWidth: 6)
                     Circle()
                         .trim(from: 0, to: CGFloat(progress))
-                        .stroke(ringColor, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                        .stroke(ringColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .animation(.spring(duration: 0.5), value: progress)
                     if goalMet {
@@ -929,7 +929,7 @@ struct HomeView: View {
                             .foregroundStyle(ringColor)
                     }
                 }
-                .frame(width: 38, height: 38)
+                .frame(width: 32, height: 32)
                 .shadow(color: hasPhotoBackground ? .black.opacity(0.2) : .clear, radius: 3)
             }
 
