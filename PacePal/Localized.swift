@@ -166,6 +166,10 @@ private let _paywall: [String: [AppLang: String]] = [
     "paywall.start_trial":             [.es: "Comenzar prueba gratuita", .en: "Start free trial"],
     "paywall.restoring":               [.es: "Buscando compra...", .en: "Looking for purchase..."],
     "paywall.restore":                 [.es: "Restaurar compra",  .en: "Restore purchase"],
+    "paywall.err_purchase":            [.es: "No se pudo completar la compra.", .en: "The purchase could not be completed."],
+    "paywall.err_generic":             [.es: "Ocurrió un error. Inténtalo de nuevo.", .en: "Something went wrong. Please try again."],
+    "paywall.err_restore_none":        [.es: "No encontramos una suscripción activa.", .en: "No active subscription found."],
+    "paywall.err_restore_failed":      [.es: "No se pudo restaurar la compra.", .en: "Could not restore purchase."],
 ]
 
 // MARK: - Health Permission

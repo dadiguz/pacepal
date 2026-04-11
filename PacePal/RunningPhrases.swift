@@ -2,7 +2,7 @@ import Foundation
 
 struct RunningPhrase {
     let es: String
-    let en: String  // TODO: fill when localizing to English
+    let en: String
 
     var localized: String {
         return AppLang.current == .en && !en.isEmpty ? en : es

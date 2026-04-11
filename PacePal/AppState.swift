@@ -453,18 +453,9 @@ final class AppState {
 
     /// Writes all widget-relevant data to the shared App Group and reloads timelines.
     func syncToWidget(km: Double) {
-        guard let dna = selectedCharacter else {
-            print("⚠️ syncToWidget: selectedCharacter es nil")
-            return
-        }
-        guard let dnaData = try? JSONEncoder().encode(dna) else {
-            print("⚠️ syncToWidget: fallo al encodear PetDNA")
-            return
-        }
-        guard let d = Self.widgetDefaults else {
-            print("❌ syncToWidget: App Group no disponible — verifica entitlements")
-            return
-        }
+        guard let dna = selectedCharacter else { return }
+        guard let dnaData = try? JSONEncoder().encode(dna) else { return }
+        guard let d = Self.widgetDefaults else { return }
         let currentEnergy = energy(at: Date())
         d.set(energyResetDate, forKey: "w_energyResetDate")
         d.set(decaySeconds, forKey: "w_decaySeconds")
@@ -478,10 +469,8 @@ final class AppState {
             .appendingPathComponent("petSprite.png")
         if let pngData = renderPetPNG(dna: dna, energy: currentEnergy), let url = spriteURL {
             try? pngData.write(to: url, options: .atomic)
-            print("✅ syncToWidget: escrito — energía \(Int(currentEnergy * 100))%, km \(km), día \(completedDays), dna \(dna.name), imagen \(pngData.count)b → \(url.lastPathComponent)")
         } else {
             if let url = spriteURL { try? FileManager.default.removeItem(at: url) }
-            print("⚠️ syncToWidget: escrito — sin imagen — energía \(Int(currentEnergy * 100))%, dna \(dna.name)")
         }
         d.synchronize()
         WidgetCenter.shared.reloadAllTimelines()

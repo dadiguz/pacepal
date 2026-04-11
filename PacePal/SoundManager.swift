@@ -43,22 +43,15 @@ final class SoundManager {
     // MARK: - Sound effects
 
     func play(_ sound: AppSound, enabled: Bool, loop: Bool = false) {
-        guard enabled else { print("🔇 sounds disabled"); return }
-        guard let url = resolveURL(name: sound.rawValue, folder: "sounds") else {
-            print("❌ SFX not found: \(sound.rawValue)")
-            print("📦 Bundle contents: \(Bundle.main.bundlePath)")
-            return
-        }
+        guard enabled else { return }
+        guard let url = resolveURL(name: sound.rawValue, folder: "sounds") else { return }
         do {
             sfxPlayer = try AVAudioPlayer(contentsOf: url)
             sfxPlayer?.volume = 0.75
             sfxPlayer?.numberOfLoops = loop ? -1 : 0
             sfxPlayer?.prepareToPlay()
             sfxPlayer?.play()
-            print("✅ Playing SFX: \(sound.rawValue)\(loop ? " (loop)" : "")")
-        } catch {
-            print("❌ AVAudioPlayer error: \(error)")
-        }
+        } catch {}
     }
 
     // MARK: - Music
@@ -71,10 +64,7 @@ final class SoundManager {
     func playMusic(name: String, enabled: Bool, loop: Bool = true) {
         cancelDeathSequence()
         guard enabled else { return }
-        guard let url = resolveURL(name: name, folder: "songs") else {
-            print("❌ Music not found: \(name)")
-            return
-        }
+        guard let url = resolveURL(name: name, folder: "songs") else { return }
         do {
             musicPlayer = try AVAudioPlayer(contentsOf: url)
             musicPlayer?.numberOfLoops = loop ? -1 : 0
@@ -82,10 +72,7 @@ final class SoundManager {
             musicPlayer?.prepareToPlay()
             musicPlayer?.play()
             currentMusicName = name
-            print("✅ Playing music: \(name)")
-        } catch {
-            print("❌ Music player error: \(error)")
-        }
+        } catch {}
     }
 
     func playRandomHappy(enabled: Bool, loop: Bool = false) {
@@ -99,8 +86,6 @@ final class SoundManager {
         stopSFX()   // Kill any looping sfx (crying, dizzy) immediately
         guard enabled else { return }
         guard let url = resolveURL(name: AppSound.death.rawValue, folder: "sounds") else {
-            print("❌ Death sound not found")
-            // Still start continue? music after a delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 self?.playMusic(name: "continue?", enabled: enabled, loop: true)
             }
@@ -115,15 +100,12 @@ final class SoundManager {
             musicPlayer?.prepareToPlay()
             musicPlayer?.play()
             let duration = musicPlayer?.duration ?? 1.5
-            print("✅ Death sound playing, duration: \(duration)s")
             let work = DispatchWorkItem { [weak self] in
                 self?.playMusic(name: "continue?", enabled: enabled, loop: true)
             }
             deathSequenceWork = work
             DispatchQueue.main.asyncAfter(deadline: .now() + duration + 0.2, execute: work)
-        } catch {
-            print("❌ Death sequence error: \(error)")
-        }
+        } catch {}
     }
 
     var isMusicPlaying: Bool { musicPlayer?.isPlaying == true }
@@ -156,9 +138,7 @@ final class SoundManager {
     // MARK: - Helpers
 
     private func resolveURL(name: String, folder: String) -> URL? {
-        let url = Bundle.main.url(forResource: name, withExtension: "mp3", subdirectory: folder)
-               ?? Bundle.main.url(forResource: name, withExtension: "mp3")
-        print("🔍 resolveURL '\(name)' → \(url?.path ?? "nil")")
-        return url
+        Bundle.main.url(forResource: name, withExtension: "mp3", subdirectory: folder)
+            ?? Bundle.main.url(forResource: name, withExtension: "mp3")
     }
 }

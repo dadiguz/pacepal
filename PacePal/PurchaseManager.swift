@@ -47,10 +47,10 @@ final class PurchaseManager {
             case .userCancelled:
                 break
             default:
-                purchaseError = "No se pudo completar la compra."
+                purchaseError = L("paywall.err_purchase")
             }
         } catch {
-            purchaseError = "Ocurrió un error. Inténtalo de nuevo."
+            purchaseError = L("paywall.err_generic")
         }
     }
 
@@ -62,10 +62,10 @@ final class PurchaseManager {
             try await AppStore.sync()
             await refreshStatus()
             if !isPremium {
-                purchaseError = "No encontramos una suscripción activa."
+                purchaseError = L("paywall.err_restore_none")
             }
         } catch {
-            purchaseError = "No se pudo restaurar la compra."
+            purchaseError = L("paywall.err_restore_failed")
         }
     }
 
