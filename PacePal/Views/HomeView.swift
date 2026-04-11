@@ -903,16 +903,34 @@ struct HomeView: View {
             ))
     }
 
-    // MARK: – KM section (no card)
+    // MARK: – KM section
     private var kmSection: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Button { health.fetchToday() } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color(hex: "#F9703E"))
-                    .frame(width: 34, height: 34)
-                    .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
-                    .clipShape(Circle())
+        let threshold = appState.challengeLevel.runThreshold
+        let progress  = threshold > 0 ? min(1.0, displayedKm / threshold) : 1.0
+        let goalMet   = displayedKm >= threshold
+        let ringColor: Color = goalMet ? Color(hex: "#4ADE80") : Color(hex: "#F9703E")
+        let trackColor: Color = hasPhotoBackground
+            ? Color.white.opacity(0.22)
+            : Color(hex: "#E8DDD5")
+
+        return HStack(alignment: .center, spacing: 12) {
+            if !appState.medalEarned {
+                ZStack {
+                    Circle()
+                        .stroke(trackColor, lineWidth: 4)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(progress))
+                        .stroke(ringColor, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(.spring(duration: 0.5), value: progress)
+                    if goalMet {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 11, weight: .black))
+                            .foregroundStyle(ringColor)
+                    }
+                }
+                .frame(width: 38, height: 38)
+                .shadow(color: hasPhotoBackground ? .black.opacity(0.2) : .clear, radius: 3)
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 4) {
