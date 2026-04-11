@@ -25,6 +25,38 @@ private struct RedPulseOverlay: View {
 }
 
 // MARK: - Confetti overlay (day completion celebration)
+
+private struct ConfettiParticle: Identifiable {
+    let id = UUID()
+    let xFrac: CGFloat
+    let color: Color
+    let size: CGFloat
+    let delay: Double
+    let duration: Double
+}
+
+private struct FallingParticle: View {
+    let p: ConfettiParticle
+    let geoSize: CGSize
+    @State private var yFrac: CGFloat = -0.04
+
+    var body: some View {
+        let fade: Double = yFrac > 0.82 ? 1.0 - (yFrac - 0.82) / 0.18 : 1.0
+        Rectangle()
+            .fill(p.color)
+            .frame(width: p.size, height: p.size)
+            .rotationEffect(.degrees(yFrac * 720))
+            .position(x: p.xFrac * geoSize.width,
+                      y: yFrac * (geoSize.height + 60) - 30)
+            .opacity(fade)
+            .onAppear {
+                withAnimation(.linear(duration: p.duration).delay(p.delay)) {
+                    yFrac = 1.04
+                }
+            }
+    }
+}
+
 private struct ConfettiOverlay: View {
     private static let palette: [Color] = [
         Color(hex: "#FADB5F"), Color(hex: "#F9703E"),
@@ -32,22 +64,12 @@ private struct ConfettiOverlay: View {
         Color(hex: "#C084FC"), Color(hex: "#F472B6"),
     ]
 
-    private struct Particle: Identifiable {
-        let id = UUID()
-        let xFrac: CGFloat
-        let color: Color
-        let size: CGFloat
-        let delay: Double
-        let duration: Double
-    }
-
-    private let particles: [Particle]
-    @State private var yFrac: [CGFloat]
+    private let particles: [ConfettiParticle]
 
     init() {
-        var ps: [Particle] = []
+        var ps: [ConfettiParticle] = []
         for _ in 0..<26 {
-            ps.append(Particle(
+            ps.append(ConfettiParticle(
                 xFrac:    CGFloat.random(in: 0.05...0.95),
                 color:    Self.palette.randomElement()!,
                 size:     CGFloat.random(in: 5...10),
@@ -56,37 +78,15 @@ private struct ConfettiOverlay: View {
             ))
         }
         particles = ps
-        _yFrac = State(initialValue: Array(repeating: -0.04, count: ps.count))
-    }
-
-    @ViewBuilder
-    private func particleView(_ p: Particle, index i: Int, in geo: GeometryProxy) -> some View {
-        let y = yFrac[i]
-        let fade: Double = y > 0.82 ? 1.0 - (y - 0.82) / 0.18 : 1.0
-        Rectangle()
-            .fill(p.color)
-            .frame(width: p.size, height: p.size)
-            .rotationEffect(.degrees(y * 720))
-            .position(x: p.xFrac * geo.size.width,
-                      y: y * (geo.size.height + 60) - 30)
-            .opacity(fade)
     }
 
     var body: some View {
         GeometryReader { geo in
-            ForEach(Array(particles.enumerated()), id: \.element.id) { i, p in
-                particleView(p, index: i, in: geo)
+            ForEach(particles) { p in
+                FallingParticle(p: p, geoSize: geo.size)
             }
         }
         .allowsHitTesting(false)
-        .onAppear {
-            for i in particles.indices {
-                withAnimation(.linear(duration: particles[i].duration)
-                    .delay(particles[i].delay)) {
-                    yFrac[i] = 1.04
-                }
-            }
-        }
     }
 }
 
