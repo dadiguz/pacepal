@@ -57,6 +57,9 @@ struct HomeView: View {
     @State private var showTracker = false
     @State private var showLocationPerm = false
     @State private var showLocationDeniedAlert = false
+    @State private var showRunner = false
+    @State private var eggTapCount = 0
+    @State private var eggTimer: Timer?
 
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
@@ -689,12 +692,27 @@ struct HomeView: View {
                 .id(dna.id)
                 .onTapGesture {
                     guard !isAnimating && currentPose != .dead else { return }
+                    // Triple-tap Easter egg
+                    eggTapCount += 1
+                    eggTimer?.invalidate()
+                    if eggTapCount >= 3 {
+                        eggTapCount = 0
+                        showRunner = true
+                        return
+                    }
+                    eggTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { _ in
+                        eggTapCount = 0
+                    }
+                    // Normal hurt animation on single/double tap
                     let saved = currentPose
                     currentPose = .hurt
                     SoundManager.shared.play(.hurt, enabled: appState.soundsEnabled)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                         if currentPose == .hurt { currentPose = saved }
                     }
+                }
+                .fullScreenCover(isPresented: $showRunner) {
+                    RunnerGameView(dna: dna) { showRunner = false }
                 }
         }
         // Hide visually when dead (layout space is preserved)
