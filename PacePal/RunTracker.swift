@@ -72,6 +72,8 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         if isIndoor {
             startPedometer()
         } else {
+            locationManager.allowsBackgroundLocationUpdates = true
+            locationManager.pausesLocationUpdatesAutomatically = false
             locationManager.startUpdatingLocation()
         }
         state = .running

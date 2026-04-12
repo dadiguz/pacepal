@@ -465,15 +465,16 @@ struct HomeView: View {
                 let alreadyCounted = appState.kmCountedForEnergy
                 // Use realKm (HealthKit) for the initial delta — avoids counting residual
                 // sessionKm from a previous character as uncounted km for the new one.
-                let baseKm = max(health.realKm, appState.kmCountedForEnergy)
+                let baseKm = max(health.todayKm, appState.kmCountedForEnergy)
                 let delta = baseKm - alreadyCounted
                 if delta > 0.01 {
-                    // Uncounted km: ran while app was closed, animate + add energy.
-                    // Only count toward completedDays if the challenge was already underway —
-                    // prevents HealthKit data on day 1 from incorrectly setting completedDays = 1.
+                    // Uncounted km: either ran while app was closed (HealthKit) or just
+                    // returned from RunTrackerView (sessionKm). Count progress if challenge
+                    // started OR there's fresh sessionKm from this run.
                     displayedKm = alreadyCounted
                     lastKnownKm = alreadyCounted
-                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: baseKm, countForProgress: appState.challengeStarted) }
+                    let countProgress = appState.challengeStarted || health.sessionKm > 0
+                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: baseKm, countForProgress: countProgress) }
                 } else {
                     // All km already counted in a previous session
                     displayedKm = newVal

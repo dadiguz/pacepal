@@ -186,10 +186,10 @@ struct RunTrackerView: View {
             }
         }
         .onDisappear {
-            // Apply km credit here so HomeView's animation triggers on arrival
+            // addManualKm updates sessionKm → HomeView onChange → runKmAnimation
+            // handles energy + completedDays (single source of truth, avoids double-add)
             if pendingKm > 0 {
                 health.addManualKm(pendingKm)
-                appState.addEnergy(km: pendingKm, at: Date())
                 appState.syncToWidget(km: health.todayKm)
                 pendingKm = 0
             }
