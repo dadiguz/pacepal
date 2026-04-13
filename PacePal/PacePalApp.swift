@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import TelemetryDeck
 
 @main
 struct PacepalApp: App {
@@ -43,6 +44,7 @@ struct PacepalApp: App {
                 if oldID != nil { health.resetSession() }
             }
             .task {
+                TelemetryDeck.initialize(config: .init(appID: "C2CA2E43-8EAA-44D2-B6C3-AFFAA9877208"))
                 // Set delegate so foreground banners work for returning users.
                 // New users go through NotificationPermissionView which calls requestPermission().
                 if appState.notificationPermissionDone {

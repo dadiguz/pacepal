@@ -1,4 +1,5 @@
 import SwiftUI
+import TelemetryDeck
 
 struct OnboardingView: View {
     @Environment(AppState.self) private var appState
@@ -105,6 +106,7 @@ struct OnboardingView: View {
                 Spacer()
 
                 Button {
+                    TelemetryDeck.signal("onboarding_completed")
                     withAnimation(.easeInOut(duration: 0.35)) {
                         appState.completeOnboarding()
                     }

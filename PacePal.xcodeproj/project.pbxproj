@@ -35,6 +35,8 @@
 		B84C032BA049C564474CF8AB /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECB56EF581B42616F072F3A /* HealthManager.swift */; };
 		B9767B0083E3BF45192CF36F /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87722B94D0D1737F52EC447F /* PaywallView.swift */; };
 		BE73B3E42F8B02F1001C2935 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE73B3E32F8B02F1001C2935 /* Launch Screen.storyboard */; };
+		BE87CEF22F8D81EC006FADC3 /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF12F8D81EC006FADC3 /* TelemetryClient */; };
+		BE87CEF42F8D81EC006FADC3 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF32F8D81EC006FADC3 /* TelemetryDeck */; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		C5E6A1D4F087B3920E4C7F85 /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */; };
@@ -152,7 +154,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				1EAD1E1908DA981BFDBDF376 /* HealthKit.framework in Frameworks */,
+				BE87CEF22F8D81EC006FADC3 /* TelemetryClient in Frameworks */,
 				FDD4105AE853DA1FA962DB9B /* CoreLocation.framework in Frameworks */,
+				BE87CEF42F8D81EC006FADC3 /* TelemetryDeck in Frameworks */,
 				39EB2C9DAEE8006737980274 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -331,6 +335,8 @@
 			);
 			name = Pacepal;
 			packageProductDependencies = (
+				BE87CEF12F8D81EC006FADC3 /* TelemetryClient */,
+				BE87CEF32F8D81EC006FADC3 /* TelemetryDeck */,
 			);
 			productName = Pacepal;
 			productReference = 9D24656B4F85773EF6FC7FE9 /* Pacepal.app */;
@@ -354,6 +360,9 @@
 			);
 			mainGroup = 57BA43114174DCC6140B2A26;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BE87CEF02F8D81EC006FADC3 /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1F8196361619EFCEDABE7135 /* Products */;
 			projectDirPath = "";
@@ -704,6 +713,30 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BE87CEF02F8D81EC006FADC3 /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BE87CEF12F8D81EC006FADC3 /* TelemetryClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BE87CEF02F8D81EC006FADC3 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryClient;
+		};
+		BE87CEF32F8D81EC006FADC3 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BE87CEF02F8D81EC006FADC3 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D0BABAF8E8445F76C71591D0 /* Project object */;
 }

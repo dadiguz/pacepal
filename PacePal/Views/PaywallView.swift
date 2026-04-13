@@ -1,4 +1,5 @@
 import SwiftUI
+import TelemetryDeck
 
 struct PaywallView: View {
     @Environment(AppState.self) private var appState
@@ -193,6 +194,7 @@ struct PaywallView: View {
             }
         }
         .onAppear {
+            TelemetryDeck.signal("paywall_viewed")
             appeared = true
             floatTick = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
@@ -361,6 +363,7 @@ struct PaywallView: View {
             Task {
                 await store.purchase()
                 if store.isPremium {
+                    TelemetryDeck.signal("purchase_completed")
                     purchased = true
                     SoundManager.shared.play(.hype, enabled: appState.soundsEnabled)
                     try? await Task.sleep(for: .seconds(1.4))

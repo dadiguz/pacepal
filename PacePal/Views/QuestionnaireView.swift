@@ -1,4 +1,5 @@
 import SwiftUI
+import TelemetryDeck
 
 // MARK: - Data
 
@@ -357,7 +358,7 @@ struct QuestionnaireView: View {
                     Spacer()
 
                     // Confirm
-                    Button { appState.completeQuestionnaire(level: finalLevel) } label: {
+                    Button { TelemetryDeck.signal("questionnaire_completed"); appState.completeQuestionnaire(level: finalLevel) } label: {
                         Text(L("q.result_confirm"))
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
                             .frame(maxWidth: .infinity)

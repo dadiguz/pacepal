@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import TelemetryDeck
 
 private let maxNicknameLength = 10
 
@@ -294,6 +295,7 @@ struct CharacterSelectView: View {
     private func saveAndSelect(_ dna: PetDNA) {
         saveCharacter(dna)
         appState.selectedCharacter = dna   // set first so syncToWidget can read it
+        TelemetryDeck.signal("character_selected")
         appState.onCharacterSelected()
         SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
         withAnimation(.spring(duration: 0.4)) {
