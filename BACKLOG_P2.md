@@ -7,8 +7,8 @@
 | 1 | Editor foto + stickers para compartir | Media | Pendiente |
 | 2 | Soporte millas (km/mi) | Media | Pendiente |
 | 3 | Estado Sleep del monito | Media | Pendiente |
-| 4 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
-| 5 | Mini-juego easter egg (estilo dino Chrome) | Baja | Pendiente |
+| 4 | Mapa de progreso 66 dias (sustituye heatmap) | Media | Pendiente |
+| 5 | Mini-juego easter egg (estilo dino Chrome) | Baja | ✅ Completado |
 
 ---
 
@@ -48,8 +48,27 @@ Segunda opcion de compartir: tomar una foto y agregar stickers del monito y stat
 
 ---
 
-## 4. Mini-juego Easter Egg (estilo Dino de Chrome)
-**Prioridad:** Baja | **Complejidad:** Media-Alta
+## 4. Mapa de Progreso 66 Días (sustituye heatmap)
+**Prioridad:** Media | **Complejidad:** Media
+
+Reemplazar la cuadrícula de 66 días (heatmap) por un mapa visual estilo pixel art donde el monito avanza a lo largo de una ruta conforme el usuario completa días.
+
+- [ ] Diseñar ruta en pixel art (camino serpenteante con checkpoints cada ~10 días: bosque, montaña, ciudad, meta)
+- [ ] El monito aparece en la posición correspondiente a sus días completados (no calendario)
+- [ ] Días completados: tramo del camino iluminado/coloreado
+- [ ] Días pendientes: tramo gris/oscuro
+- [ ] Checkpoints especiales en días 10, 20, 30, 40, 50, 66 con pequeño ícono/reward visual
+- [ ] Tap en un checkpoint muestra el logro asociado a ese hito
+- [ ] El monito se anima en su posición actual (pose `.idle` con parpadeo)
+- [ ] Transición animada cuando el monito avanza a una nueva posición (nuevo día completado)
+- [ ] Strings en es/en
+
+> **Depende de:** Tarea 4 (lógica de días completados vs calendario) ✅
+
+---
+
+## 5. Mini-juego Easter Egg (estilo Dino de Chrome) ✅
+**Prioridad:** Baja | **Complejidad:** Media-Alta | **Estado:** Completado
 
 Juego oculto tipo endless runner con el monito del usuario, similar al dinosaurio de Chrome cuando no hay internet.
 
@@ -65,8 +84,8 @@ Juego oculto tipo endless runner con el monito del usuario, similar al dinosauri
 
 ---
 
-## 4. Apple Watch App
-**Prioridad:** Alta | **Complejidad:** Alta
+## 6. Apple Watch App (movido a backlog principal)
+**Prioridad:** Alta | **Complejidad:** Alta | **Estado:** Movido a backlog principal
 
 App companion para Apple Watch que replica funcionalidad clave del iPhone.
 

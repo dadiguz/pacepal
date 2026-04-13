@@ -4,12 +4,14 @@
 
 | # | Tarea | Prioridad | Estado |
 |---|-------|-----------|--------|
-| 1 | Fix boton HealthKit (5a) | Critica | Pendiente |
-| 2 | Revisar logica 66 dias (4) | Alta | Pendiente |
-| 3 | Tracker de carrera in-app (5b) | Critica | Pendiente |
-| 4 | Cuestionario inicial pre-compra (6) | Alta | Pendiente |
-| 17 | Mapa de progreso 66 dias (sustituye heatmap) | Media | Pendiente |
-| 16 | Apple Watch app (energia, monito, tracking) | Alta | Movido a P2 |
+| 1 | Fix boton HealthKit (5a) | Critica | ✅ Completado |
+| 2 | Revisar logica 66 dias (4) | Alta | ✅ Completado |
+| 3 | Tracker de carrera in-app (5b) | Critica | ✅ Completado |
+| 4 | Cuestionario inicial pre-compra (6) | Alta | ✅ Completado |
+| 17 | Mapa de progreso 66 dias (sustituye heatmap) | Media | Movido a P2 |
+| 16 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
+| 18 | Bug: contador 00/66 tras correr + no dispara logro/animacion | Critica | Pendiente |
+| 19 | Prueba visual: ojos tipo Pokemon en el monito | Baja | Pendiente |
 | 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 6 | Estado Sleep del monito (3) | Media | Movido a P2 |
 | 7 | Medalla 66 dias (2) | Media | ✅ Done |
@@ -67,8 +69,8 @@
 
 ---
 
-## 4. Revision Logica de 66 Dias + Skip Days
-**Prioridad:** Alta | **Complejidad:** Media
+## 4. Revision Logica de 66 Dias + Skip Days ✅
+**Prioridad:** Alta | **Complejidad:** Media | **Estado:** Completado
 
 ### Resultado de la auditoria
 
@@ -96,8 +98,8 @@ Se encontraron 6 problemas. Todo el sistema cuenta dias **calendario** desde `ch
 
 ---
 
-## 6. Cuestionario Inicial Pre-Compra
-**Prioridad:** Alta | **Complejidad:** Media
+## 6. Cuestionario Inicial Pre-Compra ✅
+**Prioridad:** Alta | **Complejidad:** Media | **Estado:** Completado
 
 Cuestionario corto que se muestra antes de la compra para personalizar las reglas del challenge segun el nivel del usuario.
 
@@ -115,26 +117,26 @@ Cuestionario corto que se muestra antes de la compra para personalizar las regla
 
 ---
 
-## 5. Fix App Store Rejection + Tracking de Carrera In-App
+## 5. Fix App Store Rejection + Tracking de Carrera In-App ✅
 
 ### 5a. Fix Guideline 5.1.1(iv)
-**Prioridad:** Critica | **Complejidad:** Baja
+**Prioridad:** Critica | **Complejidad:** Baja | **Estado:** Completado
 
-- [ ] Cambiar boton "Activar Apple Health" por "Continuar" o "Siguiente"
-- [ ] Hacer que HealthKit sea opcional (skip permitido)
+- [x] Cambiar boton "Activar Apple Health" por "Continuar" o "Siguiente"
+- [x] Hacer que HealthKit sea opcional (skip permitido)
 
 ### 5b. Tracker de carrera in-app
-**Prioridad:** Critica | **Complejidad:** Alta
+**Prioridad:** Critica | **Complejidad:** Alta | **Estado:** Completado
 
-- [ ] Agregar boton "Track Run" en HomeView
-- [ ] Pantalla fullscreen al presionar con:
-  - [ ] KM corridos en grande (tipografia bold, centrado)
-  - [ ] Monito corriendo animado si se registran KM
-  - [ ] Monito cansado/sudando si se detiene
-  - [ ] Boton para finalizar carrera
-- [ ] Usar CoreLocation para tracking de distancia (no depende de HealthKit)
-- [ ] Los KM trackeados se suman a la energia igual que los de HealthKit
-- [ ] Permite que la app funcione sin permisos de HealthKit
+- [x] Agregar boton "Track Run" en HomeView
+- [x] Pantalla fullscreen al presionar con:
+  - [x] KM corridos en grande (tipografia bold, centrado)
+  - [x] Monito corriendo animado si se registran KM
+  - [x] Monito cansado/sudando si se detiene
+  - [x] Boton para finalizar carrera
+- [x] Usar CoreLocation para tracking de distancia (no depende de HealthKit)
+- [x] Los KM trackeados se suman a la energia igual que los de HealthKit
+- [x] Permite que la app funcione sin permisos de HealthKit
 
 ---
 
@@ -213,28 +215,27 @@ Cuando el monito esta colapsando (energia = 0 / pose `.dead`), el fondo parpadea
 ---
 
 ## 17. Mapa de Progreso 66 Días (sustituye heatmap)
-**Prioridad:** Media | **Complejidad:** Media
+**Prioridad:** Media | **Complejidad:** Media | **Estado:** Movido a P2
 
-Reemplazar la cuadrícula de 66 días (heatmap) por un mapa visual estilo pixel art donde el monito avanza a lo largo de una ruta conforme el usuario completa días.
-
-- [ ] Diseñar ruta en pixel art (camino serpenteante con checkpoints cada ~10 días: bosque, montaña, ciudad, meta)
-- [ ] El monito aparece en la posición correspondiente a sus días completados (no calendario)
-- [ ] Días completados: tramo del camino iluminado/coloreado
-- [ ] Días pendientes: tramo gris/oscuro
-- [ ] Checkpoints especiales en días 10, 20, 30, 40, 50, 66 con pequeño ícono/reward visual
-- [ ] Tap en un checkpoint muestra el logro asociado a ese hito
-- [ ] El monito se anima en su posición actual (pose `.idle` con parpadeo)
-- [ ] Transición animada cuando el monito avanza a una nueva posición (nuevo día completado)
-- [ ] Strings en es/en
-
-> **Depende de:** Tarea 4 (lógica de días completados vs calendario)
+> Ver BACKLOG_P2.md
 
 ---
 
 ## 16. Apple Watch App
-**Prioridad:** Alta | **Complejidad:** Alta | **Estado:** Movido a P2
+**Prioridad:** Alta | **Complejidad:** Alta | **Estado:** Pendiente
 
-> Ver BACKLOG_P2.md
+App companion para Apple Watch que replica funcionalidad clave del iPhone.
+
+- [ ] Target watchOS en el proyecto (WatchKit App + Extension)
+- [ ] Mostrar energia actual del monito
+- [ ] Monito pixel art animado (pose segun energia)
+- [ ] Boton para iniciar/detener tracking de carrera
+- [ ] Tracking de distancia via CoreLocation en watch
+- [ ] Sincronizar datos de carrera con la app de iPhone (WatchConnectivity)
+- [ ] Complicaciones: energia del monito, km del dia
+- [ ] Strings en es/en
+
+> **Depende de:** Tracker de carrera in-app (5b) ✅
 
 ---
 
@@ -249,3 +250,40 @@ Segunda opcion de compartir: tomar una foto y agregar stickers del monito y stat
 - [ ] Stickers arrastrables: monito (pose actual), badge de km corridos, badge del dia
 - [ ] Render del composite a imagen final
 - [ ] Compartir via share sheet
+
+---
+
+## 18. Bug: Contador 00/66 Tras Correr + No Dispara Logro ni Animacion
+**Prioridad:** Critica | **Complejidad:** Media
+
+### Descripcion del bug
+El usuario inicio el reto en domingo sin correr. El lunes (dia 1 calendario) corrio.
+- La barra de energia se marco correctamente como completada
+- El historico mostro el dia 1 con check y "1 completado"
+- Los tips se mostraron correctamente
+- Pero el contador principal mostro **00/66** en vez de 01/66
+- No se disparo la animacion de felicitacion
+- No aparecio el logro del primer dia completado
+
+### Causa probable
+El `dayNum` o `completedCount` en HomeView/AppState se calcula en algun momento anterior a que el run se sincronice, o hay un problema de timing entre cuando HealthKit/CoreLocation reporta el run y cuando AppState actualiza el estado de UI.
+
+### Fixes necesarios
+- [ ] Identificar donde se calcula `completedCount` / el valor que alimenta el contador `XX/66`
+- [ ] Asegurarse de que el conteo se recalcule despues de que un run queda guardado (tanto HealthKit como tracker in-app)
+- [ ] Verificar que `pendingAchievement` se evalua despues del recalculo, no antes
+- [ ] Verificar que la animacion de felicitacion se dispara cuando `completedCount` sube de N a N+1
+- [ ] Caso edge: primer dia del reto (0 → 1 completado) debe disparar logro "Dia 1"
+
+---
+
+## 19. Prueba Visual: Ojos Tipo Pokemon en el Monito
+**Prioridad:** Baja | **Complejidad:** Baja
+
+Explorar como se ve el monito con ojos estilo Pokemon (grandes, expresivos, con pupila y brillo).
+
+- [ ] Implementar variante de ojos en `PetCanvasView` (o struct separado `PokemonEyes`)
+- [ ] Ojos grandes con pupila negra circular, iris de color, brillo blanco en esquina superior
+- [ ] Probar en al menos 2-3 personajes para ver consistencia visual
+- [ ] Agregar toggle en Settings (debug o permanente segun resultado)
+- [ ] Decidir si se adopta o se descarta segun resultado visual
