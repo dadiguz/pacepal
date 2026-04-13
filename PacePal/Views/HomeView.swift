@@ -756,7 +756,7 @@ struct HomeView: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Color(hex: "#FFD700"))
                     }
-                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : min(66, health.todayKm >= appState.challengeLevel.runThreshold ? appState.completedDays : appState.completedDays + 1))))
+                    Text(L("home.day_counter", String(format: "%02d", appState.medalEarned ? 66 : max(1, min(66, health.todayKm >= appState.challengeLevel.runThreshold ? appState.completedDays : appState.completedDays + 1)))))
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundStyle(.white.opacity(0.55))
                 }

@@ -45,7 +45,7 @@ struct RunTrackerView: View {
     private var displayDNA: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
     private var currentDay: Int {
         let alreadyRanToday = health.todayKm >= appState.challengeLevel.runThreshold
-        return min(66, alreadyRanToday ? appState.completedDays : appState.completedDays + 1)
+        return max(1, min(66, alreadyRanToday ? appState.completedDays : appState.completedDays + 1))
     }
 
     private var currentPose: PetPose {
