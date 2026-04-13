@@ -10,7 +10,7 @@
 | 4 | Cuestionario inicial pre-compra (6) | Alta | ✅ Completado |
 | 17 | Mapa de progreso 66 dias (sustituye heatmap) | Media | Movido a P2 |
 | 16 | Apple Watch app (energia, monito, tracking) | Alta | Pendiente |
-| 18 | Bug: contador 00/66 tras correr + no dispara logro/animacion | Critica | Pendiente |
+| 18 | Bug: contador 00/66 tras correr + no dispara logro/animacion | Critica | ✅ Completado |
 | 19 | Prueba visual: ojos tipo Pokemon en el monito | Baja | Pendiente |
 | 5 | Internacionalizacion ingles (1) | Alta | ✅ Completado |
 | 6 | Estado Sleep del monito (3) | Media | Movido a P2 |

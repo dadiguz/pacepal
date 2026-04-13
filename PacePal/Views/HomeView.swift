@@ -473,7 +473,7 @@ struct HomeView: View {
                     // started OR there's fresh sessionKm from this run.
                     displayedKm = alreadyCounted
                     lastKnownKm = alreadyCounted
-                    let countProgress = appState.challengeStarted || health.sessionKm > 0
+                    let countProgress = appState.challengeStarted || health.sessionKm > 0 || baseKm >= appState.challengeLevel.runThreshold
                     Task { @MainActor in await runKmAnimation(delta: delta, newTotal: baseKm, countForProgress: countProgress) }
                 } else {
                     // All km already counted in a previous session
@@ -642,6 +642,24 @@ struct HomeView: View {
         if energy <= 0 && delta < 0.1 {
             lastKnownKm = newTotal; displayedKm = newTotal; return
         }
+
+        // ── Pre-fetch: update completedDays BEFORE animation so counter shows
+        //    the correct value from the first frame, not after the 3-second km animation.
+        var justCompletedDay = false
+        if countForProgress {
+            appState.confirmChallengeStart()
+            await health.fetchRunStats(since: appState.challengeStartDate)
+            let threshold = appState.challengeLevel.runThreshold
+            let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
+            let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
+            let maxDays = min(66, elapsed + 1)
+            let newCompletedDays = min(health.totalRuns + todayBonus, maxDays)
+            justCompletedDay = todayBonus == 1 && newCompletedDays > appState.completedDays
+            if justCompletedDay { celebrationPending = true }
+            appState.updateCompletedDays(newCompletedDays)
+        }
+
+        // ── KM counter animation ──
         isAnimating = true
         let startKm = displayedKm
         currentPose = .running
@@ -668,17 +686,9 @@ struct HomeView: View {
         }
         isAnimating = false
         currentPose = normalPose
+
+        // ── Post-animation: trigger celebration / achievement ──
         guard countForProgress else { return }
-        appState.confirmChallengeStart()
-        await health.fetchRunStats(since: appState.challengeStartDate)
-        let threshold = appState.challengeLevel.runThreshold
-        let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
-        let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
-        let maxDays = min(66, elapsed + 1)
-        let newCompletedDays = min(health.totalRuns + todayBonus, maxDays)
-        let justCompletedDay = todayBonus == 1 && newCompletedDays > appState.completedDays
-        if justCompletedDay { celebrationPending = true }
-        appState.updateCompletedDays(newCompletedDays)
         if justCompletedDay {
             Task { await triggerDayCelebration() }
         } else {
