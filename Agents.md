@@ -55,3 +55,14 @@ max(1, min(66, health.todayKm >= appState.challengeLevel.runThreshold
 ### Archivos afectados
 - `PacePal/Views/HomeView.swift` — línea ~759, dentro de `energySection`
 - `PacePal/Views/RunTrackerView.swift` — `currentDay` computed property (~línea 46)
+
+---
+
+## 2. Naming — siempre "Pacepal"
+
+El nombre correcto de la app es **Pacepal** — con P mayúscula y 'p' minúscula en 'pal'.
+
+- ✅ Correcto: `Pacepal`
+- ❌ Incorrecto: `PacePal`, `pacepal`, `PACEPAL`
+
+Aplica en: títulos de vistas, strings visibles al usuario, comentarios, nombres de archivo nuevos, y cualquier texto que genere un agente de IA. El bundle ID y targets de Xcode pueden mantener su casing original (`io.dallio.PacePal`) ya que cambiarlos rompería la identidad del app.

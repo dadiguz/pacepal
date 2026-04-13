@@ -37,6 +37,7 @@
 		BE73B3E42F8B02F1001C2935 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE73B3E32F8B02F1001C2935 /* Launch Screen.storyboard */; };
 		BE87CEF22F8D81EC006FADC3 /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF12F8D81EC006FADC3 /* TelemetryClient */; };
 		BE87CEF42F8D81EC006FADC3 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF32F8D81EC006FADC3 /* TelemetryDeck */; };
+		BE87CF202F8D8DEA006FADC3 /* PacepalWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = BE87CF002F8D8DE9006FADC3 /* PacepalWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		C5E6A1D4F087B3920E4C7F85 /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */; };
@@ -67,6 +68,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BE87CF0D2F8D8DEA006FADC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0BABAF8E8445F76C71591D0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE87CEFF2F8D8DE9006FADC3;
+			remoteInfo = "PacepalWatch Watch App";
+		};
+		BE87CF172F8D8DEA006FADC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0BABAF8E8445F76C71591D0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE87CEFF2F8D8DE9006FADC3;
+			remoteInfo = "PacepalWatch Watch App";
+		};
+		BE87CF1E2F8D8DEA006FADC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D0BABAF8E8445F76C71591D0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE87CEFF2F8D8DE9006FADC3;
+			remoteInfo = "PacepalWatch Watch App";
+		};
 		FFEE000000000000000010F1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D0BABAF8E8445F76C71591D0 /* Project object */;
@@ -77,6 +99,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		BE87CF242F8D8DEA006FADC3 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				BE87CF202F8D8DEA006FADC3 /* PacepalWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FFEE000000000000000010E1 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -123,6 +156,9 @@
 		A65F29BAC0D5243DCF956A0A /* RunTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunTracker.swift; sourceTree = "<group>"; };
 		AFD835D72E9DF62D0D502938 /* PetCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetCanvasView.swift; sourceTree = "<group>"; };
 		BE73B3E32F8B02F1001C2935 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		BE87CF002F8D8DE9006FADC3 /* PacepalWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PacepalWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE87CF0C2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PacepalWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE87CF162F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PacepalWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1918003EAED4B99DE32E955 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		C22508188270B367DA4BFC1D /* songs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = songs; sourceTree = SOURCE_ROOT; };
 		CBAB1B8890307335FAEB869D /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
@@ -148,6 +184,24 @@
 		FFEE00000000000000002009 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BE87CF012F8D8DE9006FADC3 /* PacepalWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PacepalWatch Watch App";
+			sourceTree = "<group>";
+		};
+		BE87CF0F2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PacepalWatch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		BE87CF192F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PacepalWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		3EA74D81E4184D4F19B62AB7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -158,6 +212,27 @@
 				FDD4105AE853DA1FA962DB9B /* CoreLocation.framework in Frameworks */,
 				BE87CEF42F8D81EC006FADC3 /* TelemetryDeck in Frameworks */,
 				39EB2C9DAEE8006737980274 /* CoreMotion.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CEFD2F8D8DE9006FADC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF092F8D8DEA006FADC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF132F8D8DEA006FADC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +260,9 @@
 			children = (
 				9D24656B4F85773EF6FC7FE9 /* Pacepal.app */,
 				FFEE000000000000000010A1 /* PacepalWidgetExtension.appex */,
+				BE87CF002F8D8DE9006FADC3 /* PacepalWatch Watch App.app */,
+				BE87CF0C2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests.xctest */,
+				BE87CF162F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -231,6 +309,9 @@
 				542A052198576C90FE009205 /* sounds */,
 				271D4FC64E22094343D201A3 /* PacePal */,
 				FFEE000000000000000010C1 /* PacePalWidget */,
+				BE87CF012F8D8DE9006FADC3 /* PacepalWatch Watch App */,
+				BE87CF0F2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests */,
+				BE87CF192F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests */,
 				34CBBD0FCB1732E8A740FD7B /* Frameworks */,
 				1F8196361619EFCEDABE7135 /* Products */,
 			);
@@ -300,6 +381,74 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BE87CEFF2F8D8DE9006FADC3 /* PacepalWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE87CF212F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch App" */;
+			buildPhases = (
+				BE87CEFC2F8D8DE9006FADC3 /* Sources */,
+				BE87CEFD2F8D8DE9006FADC3 /* Frameworks */,
+				BE87CEFE2F8D8DE9006FADC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BE87CF012F8D8DE9006FADC3 /* PacepalWatch Watch App */,
+			);
+			name = "PacepalWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "PacepalWatch Watch App";
+			productReference = BE87CF002F8D8DE9006FADC3 /* PacepalWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BE87CF0B2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE87CF252F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch AppTests" */;
+			buildPhases = (
+				BE87CF082F8D8DEA006FADC3 /* Sources */,
+				BE87CF092F8D8DEA006FADC3 /* Frameworks */,
+				BE87CF0A2F8D8DEA006FADC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BE87CF0E2F8D8DEA006FADC3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BE87CF0F2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests */,
+			);
+			name = "PacepalWatch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "PacepalWatch Watch AppTests";
+			productReference = BE87CF0C2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		BE87CF152F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE87CF282F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch AppUITests" */;
+			buildPhases = (
+				BE87CF122F8D8DEA006FADC3 /* Sources */,
+				BE87CF132F8D8DEA006FADC3 /* Frameworks */,
+				BE87CF142F8D8DEA006FADC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BE87CF182F8D8DEA006FADC3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BE87CF192F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests */,
+			);
+			name = "PacepalWatch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "PacepalWatch Watch AppUITests";
+			productReference = BE87CF162F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFEE000000000000000010D3 /* Build configuration list for PBXNativeTarget "PacepalWidgetExtension" */;
@@ -327,11 +476,13 @@
 				5C5673F1BE247A16771791E3 /* Resources */,
 				3EA74D81E4184D4F19B62AB7 /* Frameworks */,
 				FFEE000000000000000010E1 /* Embed Foundation Extensions */,
+				BE87CF242F8D8DEA006FADC3 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				FFEE000000000000000010F2 /* PBXTargetDependency */,
+				BE87CF1F2F8D8DEA006FADC3 /* PBXTargetDependency */,
 			);
 			name = Pacepal;
 			packageProductDependencies = (
@@ -349,7 +500,21 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					BE87CEFF2F8D8DE9006FADC3 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					BE87CF0B2F8D8DEA006FADC3 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = BE87CEFF2F8D8DE9006FADC3;
+					};
+					BE87CF152F8D8DEA006FADC3 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = BE87CEFF2F8D8DE9006FADC3;
+					};
+				};
 			};
 			buildConfigurationList = B9B58562F8A840BC11EF3DB6 /* Build configuration list for PBXProject "PacePal" */;
 			developmentRegion = en;
@@ -370,6 +535,9 @@
 			targets = (
 				E757EDD39E299A8EDF9C45ED /* Pacepal */,
 				BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */,
+				BE87CEFF2F8D8DE9006FADC3 /* PacepalWatch Watch App */,
+				BE87CF0B2F8D8DEA006FADC3 /* PacepalWatch Watch AppTests */,
+				BE87CF152F8D8DEA006FADC3 /* PacepalWatch Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -383,6 +551,27 @@
 				C9BC3403C94B0D8F94FF8F39 /* songs in Resources */,
 				BE73B3E42F8B02F1001C2935 /* Launch Screen.storyboard in Resources */,
 				86BD4AEBF10F47511326CA1F /* sounds in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CEFE2F8D8DE9006FADC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF0A2F8D8DEA006FADC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF142F8D8DEA006FADC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +629,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BE87CEFC2F8D8DE9006FADC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF082F8D8DEA006FADC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE87CF122F8D8DEA006FADC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FFEE000000000000000010B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -459,6 +669,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BE87CF0E2F8D8DEA006FADC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE87CEFF2F8D8DE9006FADC3 /* PacepalWatch Watch App */;
+			targetProxy = BE87CF0D2F8D8DEA006FADC3 /* PBXContainerItemProxy */;
+		};
+		BE87CF182F8D8DEA006FADC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE87CEFF2F8D8DE9006FADC3 /* PacepalWatch Watch App */;
+			targetProxy = BE87CF172F8D8DEA006FADC3 /* PBXContainerItemProxy */;
+		};
+		BE87CF1F2F8D8DEA006FADC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE87CEFF2F8D8DE9006FADC3 /* PacepalWatch Watch App */;
+			targetProxy = BE87CF1E2F8D8DEA006FADC3 /* PBXContainerItemProxy */;
+		};
 		FFEE000000000000000010F2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BEC0C01B2F7C6292002B9B64 /* PacepalWidgetExtension */;
@@ -612,6 +837,221 @@
 			};
 			name = Release;
 		};
+		BE87CF222F8D8DEA006FADC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "PacepalWatch Watch App/PacepalWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PacepalWatch-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = PacepalWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PacePal necesita tu ubicación para medir la distancia de tus carreras";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.dallio.PacePal;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacePal.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		BE87CF232F8D8DEA006FADC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "PacepalWatch Watch App/PacepalWatch Watch App.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PacepalWatch-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = PacepalWatch;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PacePal necesita tu ubicación para medir la distancia de tus carreras";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.dallio.PacePal;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacePal.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+		BE87CF262F8D8DEA006FADC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.dallio.PacepalWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PacepalWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PacepalWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		BE87CF272F8D8DEA006FADC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.dallio.PacepalWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PacepalWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PacepalWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+		BE87CF292F8D8DEA006FADC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacepalWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PacepalWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		BE87CF2A2F8D8DEA006FADC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DY5QSGW9RM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dallio.PacepalWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PacepalWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 		D66206E824D48367994C3F40 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -699,6 +1139,33 @@
 			buildConfigurations = (
 				23567FE84C0664D259653938 /* Debug */,
 				B49E165897C2EA2BC5501102 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE87CF212F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE87CF222F8D8DEA006FADC3 /* Debug */,
+				BE87CF232F8D8DEA006FADC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE87CF252F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE87CF262F8D8DEA006FADC3 /* Debug */,
+				BE87CF272F8D8DEA006FADC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BE87CF282F8D8DEA006FADC3 /* Build configuration list for PBXNativeTarget "PacepalWatch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE87CF292F8D8DEA006FADC3 /* Debug */,
+				BE87CF2A2F8D8DEA006FADC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
