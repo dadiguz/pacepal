@@ -181,8 +181,16 @@ struct RunTrackerView: View {
         .onChange(of: scenePhase) { _, newPhase in
             guard phase == .running || phase == .paused else { return }
             if newPhase == .background {
-                tracker.saveState()
-                if phase == .running { pauseRun() }
+                if phase == .running {
+                    // Suspend timer and persist state, but keep location updates running
+                    // so GPS tracking continues in the background.
+                    tracker.suspendForBackground()
+                } else {
+                    tracker.saveState()
+                }
+            } else if newPhase == .active && phase == .running {
+                // Restore elapsed time accumulated while backgrounded and restart timer.
+                tracker.resumeFromBackground()
             }
         }
         .onDisappear {

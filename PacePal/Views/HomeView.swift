@@ -444,6 +444,31 @@ struct HomeView: View {
                 SoundManager.shared.playRandomHappy(enabled: appState.soundsEnabled)
             }
             health.fetchToday()   // establece baseline al arrancar
+
+            // Fallback km initialization: onChange(of:todayKm) only fires when todayKm
+            // *changes*. After an app kill and relaunch, sessionKm is already loaded from
+            // UserDefaults and fetchToday() may not change todayKm (no HealthKit data),
+            // so onChange never fires and displayedKm would stay 0.
+            // This deferred check runs after fetchToday() has had time to respond;
+            // if onChange already handled initialization (isInitialLoad = false) or an
+            // animation is already running, this is a no-op.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                guard isInitialLoad, !isAnimating, health.todayKm > 0 else { return }
+                isInitialLoad = false
+                let km = health.todayKm
+                let counted = appState.kmCountedForEnergy
+                let delta = km - counted
+                if delta > 0.01 {
+                    displayedKm = counted
+                    lastKnownKm = counted
+                    let countProgress = appState.challengeStarted || health.sessionKm > 0
+                    Task { @MainActor in await runKmAnimation(delta: delta, newTotal: km, countForProgress: countProgress) }
+                } else {
+                    displayedKm = km
+                    lastKnownKm = km
+                }
+            }
+
             let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {

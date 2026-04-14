@@ -168,6 +168,33 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
         return true
     }
 
+    /// Called when the app goes to background during an active run.
+    /// Stops the timer (avoid unreliable background ticks) and records a timestamp
+    /// so elapsed time can be reconciled when the app returns to the foreground.
+    /// Location updates continue in background (allowsBackgroundLocationUpdates = true).
+    func suspendForBackground() {
+        guard state == .running else { return }
+        stopTimer()
+        let ud = UserDefaults.standard
+        ud.set(elapsedSeconds, forKey: Self.udElapsedSecs)
+        ud.set(distanceKm,     forKey: Self.udDistanceKm)
+        ud.set("running",      forKey: Self.udStateStr)
+        ud.set(isIndoor,       forKey: Self.udIsIndoor)
+        ud.set(Date().timeIntervalSince1970, forKey: Self.udBgTimestamp)
+    }
+
+    /// Called when the app returns to the foreground after a background suspension.
+    /// Adds the time elapsed while backgrounded to elapsedSeconds and restarts the timer.
+    func resumeFromBackground() {
+        guard state == .running else { return }
+        let ud = UserDefaults.standard
+        if let ts = ud.object(forKey: Self.udBgTimestamp) as? Double {
+            elapsedSeconds += max(0, Int(Date().timeIntervalSince1970 - ts))
+            ud.removeObject(forKey: Self.udBgTimestamp)
+        }
+        startTimer()
+    }
+
     /// Clears persisted run state (call after finish or intentional reset).
     func clearSavedState() {
         let ud = UserDefaults.standard
