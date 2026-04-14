@@ -37,7 +37,6 @@
 		BE73B3E42F8B02F1001C2935 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE73B3E32F8B02F1001C2935 /* Launch Screen.storyboard */; };
 		BE87CEF22F8D81EC006FADC3 /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF12F8D81EC006FADC3 /* TelemetryClient */; };
 		BE87CEF42F8D81EC006FADC3 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = BE87CEF32F8D81EC006FADC3 /* TelemetryDeck */; };
-		BE87CF202F8D8DEA006FADC3 /* PacepalWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = BE87CF002F8D8DE9006FADC3 /* PacepalWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BF20987174C762E3AF063381 /* PacePalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21204707A39D2F5D0852F039 /* PacePalApp.swift */; };
 		BF2516C5EA25E25E5778FA9E /* SavedCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAFDFDAD8E10B93F80F101B /* SavedCharacter.swift */; };
 		C5E6A1D4F087B3920E4C7F85 /* ProfanityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3D7F2C8B19E054F6D3A8B21 /* ProfanityFilter.swift */; };
@@ -99,17 +98,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BE87CF242F8D8DEA006FADC3 /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				BE87CF202F8D8DEA006FADC3 /* PacepalWatch Watch App.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		FFEE000000000000000010E1 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -476,7 +464,6 @@
 				5C5673F1BE247A16771791E3 /* Resources */,
 				3EA74D81E4184D4F19B62AB7 /* Frameworks */,
 				FFEE000000000000000010E1 /* Embed Foundation Extensions */,
-				BE87CF242F8D8DEA006FADC3 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
@@ -880,7 +867,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
 			};
 			name = Debug;
 		};
@@ -922,7 +909,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+				WATCHOS_DEPLOYMENT_TARGET = 11.6;
 			};
 			name = Release;
 		};
