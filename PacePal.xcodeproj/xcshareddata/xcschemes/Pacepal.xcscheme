@@ -17,7 +17,7 @@
                BlueprintIdentifier = "E757EDD39E299A8EDF9C45ED"
                BuildableName = "Pacepal.app"
                BlueprintName = "Pacepal"
-               ReferencedContainer = "container:PacePal.xcodeproj">
+               ReferencedContainer = "container:Pacepal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,7 +46,7 @@
             BlueprintIdentifier = "E757EDD39E299A8EDF9C45ED"
             BuildableName = "Pacepal.app"
             BlueprintName = "Pacepal"
-            ReferencedContainer = "container:PacePal.xcodeproj">
+            ReferencedContainer = "container:Pacepal.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -63,7 +63,7 @@
             BlueprintIdentifier = "E757EDD39E299A8EDF9C45ED"
             BuildableName = "Pacepal.app"
             BlueprintName = "Pacepal"
-            ReferencedContainer = "container:PacePal.xcodeproj">
+            ReferencedContainer = "container:Pacepal.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
