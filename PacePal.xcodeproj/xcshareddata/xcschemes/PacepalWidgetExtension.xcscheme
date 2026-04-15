@@ -17,7 +17,7 @@
                BlueprintIdentifier = "BEC0C01B2F7C6292002B9B64"
                BuildableName = "PacepalWidgetExtension.appex"
                BlueprintName = "PacepalWidgetExtension"
-               ReferencedContainer = "container:Pacepal.xcodeproj">
+               ReferencedContainer = "container:PacePal.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
