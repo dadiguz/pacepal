@@ -679,9 +679,12 @@ struct HomeView: View {
             let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
             let maxDays = min(66, elapsed + 1)
             let newCompletedDays = min(health.totalRuns + todayBonus, maxDays)
-            justCompletedDay = todayBonus == 1 && newCompletedDays > appState.completedDays
+            // Never decrease completedDays — protects existing users whose localRunLog
+            // is still building up after the update, and guards against any data inconsistency.
+            let safeCompletedDays = max(appState.completedDays, newCompletedDays)
+            justCompletedDay = todayBonus == 1 && safeCompletedDays > appState.completedDays
             if justCompletedDay { celebrationPending = true }
-            appState.updateCompletedDays(newCompletedDays)
+            appState.updateCompletedDays(safeCompletedDays)
         }
 
         // ── KM counter animation ──
@@ -1214,7 +1217,8 @@ private struct PetStatusSheet: View {
             let todayBonus = (!health.todayCountedInStats && health.todayKm >= threshold) ? 1 : 0
             let elapsed = Calendar.current.dateComponents([.day], from: appState.challengeStartDate, to: Date()).day ?? 0
             let maxDays = min(66, elapsed + 1)
-            appState.updateCompletedDays(min(health.totalRuns + todayBonus, maxDays))
+            let newCount = min(health.totalRuns + todayBonus, maxDays)
+            appState.updateCompletedDays(max(appState.completedDays, newCount))
         }
     }
 
