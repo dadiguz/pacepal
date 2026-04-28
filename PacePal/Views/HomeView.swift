@@ -682,7 +682,9 @@ struct HomeView: View {
             // Never decrease completedDays — protects existing users whose localRunLog
             // is still building up after the update, and guards against any data inconsistency.
             let safeCompletedDays = max(appState.completedDays, newCompletedDays)
-            justCompletedDay = todayBonus == 1 && safeCompletedDays > appState.completedDays
+            // Fire celebration whenever the count actually increases, regardless of whether
+            // today was counted via HealthKit (todayBonus==1) or via localRunLog (totalRuns).
+            justCompletedDay = safeCompletedDays > appState.completedDays
             if justCompletedDay { celebrationPending = true }
             appState.updateCompletedDays(safeCompletedDays)
         }
