@@ -456,7 +456,7 @@ struct HomeView: View {
                 guard isInitialLoad, !isAnimating, health.todayKm > 0 else { return }
                 isInitialLoad = false
                 let km = health.todayKm
-                let counted = appState.kmCountedForEnergy
+                let counted = appState.effectiveKmCountedForEnergy
                 let delta = km - counted
                 if delta > 0.01 {
                     displayedKm = counted
@@ -487,10 +487,10 @@ struct HomeView: View {
             if isInitialLoad {
                 isInitialLoad = false
                 appState.isFirstRunForCharacter = false
-                let alreadyCounted = appState.kmCountedForEnergy
+                let alreadyCounted = appState.effectiveKmCountedForEnergy
                 // Use realKm (HealthKit) for the initial delta — avoids counting residual
                 // sessionKm from a previous character as uncounted km for the new one.
-                let baseKm = max(health.todayKm, appState.kmCountedForEnergy)
+                let baseKm = max(health.todayKm, appState.effectiveKmCountedForEnergy)
                 let delta = baseKm - alreadyCounted
                 if delta > 0.01 {
                     // Uncounted km: either ran while app was closed (HealthKit) or just

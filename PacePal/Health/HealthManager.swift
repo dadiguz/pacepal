@@ -10,8 +10,15 @@ final class HealthManager {
     var todayKm: Double { max(realKm, sessionKm) + testKmOffset }
     var isAuthorized = false
 
+    /// Permanent per-day log of in-app run km. Key = Int(startOfDay.timeIntervalSince1970) as String.
+    /// Never cleared between app launches so past in-app runs survive HealthKit-only recalculations.
+    private(set) var localRunLog: [String: Double] = [:]
+    private static let localRunLogKey = "pacepal.localRunLog"
+
     init() {
         sessionKm = UserDefaults.standard.double(forKey: HealthManager.sessionKmKey())
+        let savedLog = UserDefaults.standard.dictionary(forKey: Self.localRunLogKey) as? [String: Double] ?? [:]
+        localRunLog = savedLog
     }
 
     /// Set from AppState.challengeLevel.runThreshold — synced on launch and level change.
@@ -76,7 +83,9 @@ final class HealthManager {
         let cal = Calendar.current
         let start = cal.startOfDay(for: date)
         guard let end = cal.date(byAdding: .day, value: 1, to: start) else { return 0 }
-        return await fetchRunningKm(from: start, to: end)
+        let healthKm = await fetchRunningKm(from: start, to: end)
+        let localKm = localRunLog[Self.dayKey(for: date)] ?? 0
+        return max(healthKm, localKm)
     }
 
     // MARK: - Aggregate stats (used by PetStatusSheet)
@@ -91,6 +100,7 @@ final class HealthManager {
         let workouts = await queryRunningWorkouts(from: start, to: now)
 
         // Group total distance by calendar day
+        let today = cal.startOfDay(for: now)
         var dayKm: [Date: Double] = [:]
         var totalKm = 0.0
         for w in workouts {
@@ -101,9 +111,21 @@ final class HealthManager {
             totalKm += km
         }
 
+        // Merge in-app run log: for each day, take the max of HealthKit and local km.
+        // This ensures runs tracked in-app (never written to HealthKit) are counted.
+        for (key, km) in localRunLog {
+            guard let ts = Double(key) else { continue }
+            let entryDay = cal.startOfDay(for: Date(timeIntervalSince1970: ts))
+            guard entryDay >= start && entryDay <= today else { continue }
+            let existing = dayKm[entryDay] ?? 0
+            if km > existing {
+                totalKm += km - existing
+                dayKm[entryDay] = km
+            }
+        }
+
         // Walk each day to count runs and compute best streak
         var day = start
-        let today = cal.startOfDay(for: now)
         var runs = 0, currentStreak = 0, best = 0
         while day <= today {
             if (dayKm[day] ?? 0) >= runThreshold {
@@ -135,9 +157,13 @@ final class HealthManager {
 
     /// Credits km from an in-app tracking session. Persisted per day in UserDefaults
     /// so repeated calls accumulate instead of being overwritten by HealthKit fetches.
+    /// Also writes to localRunLog so the run survives day rollovers and app restarts.
     func addManualKm(_ km: Double) {
         sessionKm += km
         UserDefaults.standard.set(sessionKm, forKey: HealthManager.sessionKmKey())
+        let key = Self.dayKey(for: Date())
+        localRunLog[key] = sessionKm
+        UserDefaults.standard.set(localRunLog, forKey: Self.localRunLogKey)
     }
 
     func resetKm() { testKmOffset = 0; realKm = 0 }
@@ -150,8 +176,12 @@ final class HealthManager {
     }
 
     private static func sessionKmKey() -> String {
-        let day = Calendar.current.startOfDay(for: Date())
-        return "pacepal.sessionKm.\(Int(day.timeIntervalSince1970))"
+        return "pacepal.sessionKm.\(dayKey(for: Date()))"
+    }
+
+    private static func dayKey(for date: Date) -> String {
+        let day = Calendar.current.startOfDay(for: date)
+        return "\(Int(day.timeIntervalSince1970))"
     }
 
     // Returns total km from running workouts in the given interval

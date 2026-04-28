@@ -136,6 +136,8 @@ final class AppState {
 
     // Km already credited to energy for the current character (persisted across launches)
     private(set) var kmCountedForEnergy: Double
+    // Calendar day on which kmCountedForEnergy was last recorded (startOfDay)
+    private(set) var kmCountedDate: Date
 
     // Date when the 66-day challenge started
     private(set) var challengeStartDate: Date
@@ -185,6 +187,7 @@ final class AppState {
     init() {
         self.energyResetDate = UserDefaults.standard.object(forKey: "energyResetDate") as? Date ?? Date()
         self.kmCountedForEnergy = UserDefaults.standard.double(forKey: "kmCountedForEnergy")
+        self.kmCountedDate = UserDefaults.standard.object(forKey: "kmCountedDate") as? Date ?? Date.distantPast
         self.challengeStartDate = UserDefaults.standard.object(forKey: "challengeStartDate") as? Date ?? Calendar.current.startOfDay(for: Date())
         let lvlStr = UserDefaults.standard.string(forKey: "challengeLevel") ?? ChallengeLevel.habito.rawValue
         self.challengeLevel = ChallengeLevel(rawValue: lvlStr) ?? .habito
@@ -285,9 +288,20 @@ final class AppState {
     /// knows to count today's existing km as fresh energy (not suppress them).
     var isFirstRunForCharacter = false
 
+    /// Returns kmCountedForEnergy only if it was recorded today; 0 otherwise.
+    /// Prevents yesterday's counted km from blocking today's energy gain when the
+    /// user runs the same (or fewer) km on a new day.
+    var effectiveKmCountedForEnergy: Double {
+        let today = Calendar.current.startOfDay(for: Date())
+        let countedDay = Calendar.current.startOfDay(for: kmCountedDate)
+        return today == countedDay ? kmCountedForEnergy : 0
+    }
+
     func recordKmCounted(_ km: Double) {
         kmCountedForEnergy = km
         UserDefaults.standard.set(km, forKey: "kmCountedForEnergy")
+        kmCountedDate = Calendar.current.startOfDay(for: Date())
+        UserDefaults.standard.set(kmCountedDate, forKey: "kmCountedDate")
     }
 
     func grantMedal() {
@@ -389,6 +403,8 @@ final class AppState {
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
         kmCountedForEnergy = 0
         UserDefaults.standard.set(0.0, forKey: "kmCountedForEnergy")
+        kmCountedDate = Date.distantPast
+        UserDefaults.standard.set(Date.distantPast, forKey: "kmCountedDate")
         completedDays = 0
         UserDefaults.standard.set(0, forKey: "completedDays")
         seenAchievements = []
