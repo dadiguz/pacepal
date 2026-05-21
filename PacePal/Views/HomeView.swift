@@ -99,6 +99,7 @@ struct HomeView: View {
 
     @State private var showHistory = false
     @State private var showSettings = false
+    @State private var showDebugSheet = false
     @State private var langRefresh = UUID()
     @State private var now: Date = Date()
 
@@ -704,6 +705,31 @@ struct HomeView: View {
         }
     }
 
+    #if DEBUG
+    /// Simulates N days passing without running, then evaluates heart loss.
+    private func simulateDays(_ count: Int) {
+        appState.debugSimulateDays(count)
+        evaluateHeartLoss()
+    }
+
+    /// Adds 1 km and triggers the run animation + heart gain if threshold met.
+    private func simulateAdd1Km() {
+        health.addManualKm(1.0)
+        let newTotal = health.todayKm
+        Task { @MainActor in
+            await runKmAnimation(delta: 1.0, newTotal: newTotal, countForProgress: true)
+        }
+    }
+
+    /// Resets everything to day 1 with full hearts and 0 km.
+    private func simulateReset() {
+        appState.debugResetChallenge()
+        health.debugClearAllKm()
+        now = Date()
+        currentPose = normalPose
+    }
+    #endif
+
     // Called after a run completes — only checks for milestone achievements.
     private func checkForAchievement() {
         guard pendingAchievement == nil, !showPetStatus else { return }
@@ -832,6 +858,27 @@ struct HomeView: View {
                     .environment(appState)
                     .environment(health)
             }
+
+            #if DEBUG
+            Button { showDebugSheet = true } label: {
+                Image(systemName: "ant.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color(hex: "#E12D39"))
+                    .padding(10)
+                    .background(hasPhotoBackground ? Color.white : Color(hex: "#F5ECE4"))
+                    .clipShape(Circle())
+            }
+            .sheet(isPresented: $showDebugSheet) {
+                HomeDebugSheet(
+                    onSimulateDays: { count in simulateDays(count) },
+                    onAdd1Km: { simulateAdd1Km() },
+                    onReset: { simulateReset() }
+                )
+                .environment(appState)
+                .environment(health)
+                .presentationDetents([.medium])
+            }
+            #endif
 
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape")
@@ -1785,6 +1832,119 @@ private struct MedalTutorialOverlay: View {
         .onAppear { withAnimation { appeared = true } }
     }
 }
+
+// MARK: - Home Debug Sheet
+
+#if DEBUG
+private struct HomeDebugSheet: View {
+    let onSimulateDays: (Int) -> Void
+    let onAdd1Km: () -> Void
+    let onReset: () -> Void
+
+    @Environment(AppState.self) private var appState
+    @Environment(HealthManager.self) private var health
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                // Status
+                VStack(spacing: 6) {
+                    if appState.challengeLevel.usesHearts {
+                        Text("Hearts: \(appState.hearts)/\(appState.challengeLevel.maxHearts)")
+                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        Text("Last check: \(appState.lastHeartCheckDate.formatted(date: .abbreviated, time: .omitted))")
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                    Text("Energy: \(Int(appState.effectiveEnergy(at: Date()) * 100))%")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                    Text("Today km: \(String(format: "%.2f", health.todayKm))")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                    Text("Start: \(appState.challengeStartDate.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(hex: "#F5F8FC"))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                // Simulate days
+                HStack(spacing: 10) {
+                    ForEach([1, 2, 3, 5], id: \.self) { n in
+                        Button {
+                            dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                onSimulateDays(n)
+                            }
+                        } label: {
+                            Text("+\(n)d")
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color(hex: "#FFF0EE"))
+                                .foregroundStyle(Color(hex: "#E12D39"))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                    }
+                }
+
+                Text("Simula días sin correr (pierde corazones)")
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundStyle(.secondary)
+
+                // Add km
+                Button {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        onAdd1Km()
+                    }
+                } label: {
+                    Label("Sumar 1 km", systemImage: "figure.run")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color(hex: "#E6F9EE"))
+                        .foregroundStyle(Color(hex: "#27AB83"))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                Divider()
+
+                // Reset
+                Button {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        onReset()
+                    }
+                } label: {
+                    Label("Reset (día 1, hearts max, 0 km)", systemImage: "arrow.counterclockwise")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color(hex: "#FFF8E1"))
+                        .foregroundStyle(Color(hex: "#B8860B"))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+
+                Spacer()
+            }
+            .padding(20)
+            .navigationTitle("Debug")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cerrar") { dismiss() }
+                        .font(.system(size: 15, weight: .semibold))
+                }
+            }
+        }
+    }
+}
+#endif
 
 #Preview {
     HomeView()

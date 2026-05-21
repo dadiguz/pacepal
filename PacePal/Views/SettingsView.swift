@@ -805,7 +805,7 @@ private struct DebugSheet: View {
                     // MARK: Días
                     section("DÍAS COMPLETADOS: \(appState.completedDays)")
                     HStack(spacing: 6) {
-                        btn("0", color: "#E12D39") { appState.resetChallengeToToday() }
+                        btn("0", color: "#E12D39") { appState.debugResetChallenge() }
                         btn("+1") { appState.shiftChallengeDay(by: 1) }
                         btn("+3") { appState.shiftChallengeDay(by: 3) }
                         btn("+10") { appState.shiftChallengeDay(by: 10) }

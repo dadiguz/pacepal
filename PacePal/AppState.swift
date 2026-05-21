@@ -501,12 +501,42 @@ final class AppState {
         UserDefaults.standard.set(false, forKey: "medalEarned")
     }
 
-    /// Resets the challenge to day 1 and clears all seen achievements.
-    func resetChallengeToToday() {
-        challengeStartDate = Calendar.current.startOfDay(for: Date())
+    /// Simulates N days passing without running.
+    /// Moves challengeStartDate and lastHeartCheckDate back so evaluateMissedDays
+    /// sees N unrun days to evaluate.
+    func debugSimulateDays(_ count: Int) {
+        let cal = Calendar.current
+        // Move start date back
+        challengeStartDate = cal.date(byAdding: .day, value: -count, to: challengeStartDate) ?? challengeStartDate
         UserDefaults.standard.set(challengeStartDate, forKey: "challengeStartDate")
+        // Move lastHeartCheckDate back so the missed days get evaluated
+        let newCheck = cal.date(byAdding: .day, value: -count, to: cal.startOfDay(for: lastHeartCheckDate)) ?? lastHeartCheckDate
+        lastHeartCheckDate = newCheck
+        UserDefaults.standard.set(newCheck, forKey: "lastHeartCheckDate")
+    }
+
+    /// Full debug reset: day 1, full hearts, clears achievements.
+    func debugResetChallenge() {
+        let today = Calendar.current.startOfDay(for: Date())
+        challengeStartDate = today
+        UserDefaults.standard.set(today, forKey: "challengeStartDate")
+        completedDays = 0
+        UserDefaults.standard.set(0, forKey: "completedDays")
         seenAchievements = []
         UserDefaults.standard.set([] as [Int], forKey: "seenAchievements")
+        seenTips = []
+        UserDefaults.standard.removeObject(forKey: "seenTips")
+        if challengeLevel.usesHearts {
+            setHearts(challengeLevel.maxHearts)
+            lastHeartCheckDate = today
+            UserDefaults.standard.set(today, forKey: "lastHeartCheckDate")
+        } else {
+            setEnergy(0.60)
+        }
+        kmCountedForEnergy = 0
+        UserDefaults.standard.set(0.0, forKey: "kmCountedForEnergy")
+        kmCountedDate = Date.distantPast
+        UserDefaults.standard.set(Date.distantPast, forKey: "kmCountedDate")
     }
     #endif
 

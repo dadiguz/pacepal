@@ -197,6 +197,18 @@ final class HealthManager {
 
     func resetKm() { testKmOffset = 0; realKm = 0 }
 
+    #if DEBUG
+    /// Clears all km: session, local run log, test offset, and real km.
+    func debugClearAllKm() {
+        testKmOffset = 0
+        realKm = 0
+        sessionKm = 0
+        UserDefaults.standard.set(0.0, forKey: HealthManager.sessionKmKey())
+        localRunLog = [:]
+        UserDefaults.standard.removeObject(forKey: Self.localRunLogKey)
+    }
+    #endif
+
     /// Clears the in-app session km for today. Call when switching characters so
     /// the previous character's in-app km doesn't bleed into the new one.
     func resetSession() {
