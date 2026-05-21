@@ -402,10 +402,12 @@ final class AppState {
 
         let threshold = challengeLevel.runThreshold
         var lost = 0
-        var day = cal.date(byAdding: .day, value: 1, to: lastCheck)!
+        var day = lastCheck
 
-        // Check each day from the day after last check up to yesterday.
-        // Today is NOT evaluated yet — the user still has time to run today.
+        // Check each day from lastCheck up to yesterday (today excluded —
+        // the user still has time to run today).
+        // lastCheck itself was "today" when it was stored, so it was never
+        // evaluated; we must evaluate it now that it is in the past.
         while day < today && hearts > 0 {
             let dayKey = "\(Int(cal.startOfDay(for: day).timeIntervalSince1970))"
             let km = runLog[dayKey] ?? 0

@@ -121,6 +121,7 @@ struct HomeView: View {
     @State private var showMedalTutorial = false
     @State private var pendingTipDay: Int? = nil
     @State private var showRedPulse = false
+    @State private var heartBounceIndex: Int? = nil
     @State private var showTracker = false
     @State private var showLocationPerm = false
     @State private var showLocationDeniedAlert = false
@@ -458,12 +459,20 @@ struct HomeView: View {
             let e = appState.effectiveEnergy(at: Date())
             showRedPulse = e > 0 && e < 0.10
         }
-        .onChange(of: appState.hearts) { _, _ in
+        .onChange(of: appState.hearts) { oldVal, newVal in
             if appState.challengeLevel.usesHearts {
                 let e = appState.effectiveEnergy(at: Date())
                 showRedPulse = e > 0 && e < 0.20
                 now = Date()
                 if !isAnimating { currentPose = normalPose }
+                // Bounce the heart that changed
+                let idx = newVal > oldVal
+                    ? max(0, newVal - 1)   // gained: bounce the newly filled heart
+                    : max(0, oldVal - 1)   // lost: bounce the one that just emptied
+                heartBounceIndex = idx
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    heartBounceIndex = nil
+                }
             }
         }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
@@ -709,6 +718,10 @@ struct HomeView: View {
     /// Simulates N days passing without running, then evaluates heart loss.
     private func simulateDays(_ count: Int) {
         appState.debugSimulateDays(count)
+        health.debugClearAllKm()
+        health.fetchToday()
+        // Reset completedDays so today's km can count as a new day
+        appState.updateCompletedDays(0)
         evaluateHeartLoss()
     }
 
@@ -961,8 +974,8 @@ struct HomeView: View {
                     .interpolation(.none)
                     .scaledToFit()
                     .frame(height: 28)
-                    .transition(.scale.combined(with: .opacity))
-                    .animation(.spring(duration: 0.4), value: appState.hearts)
+                    .scaleEffect(heartBounceIndex == i ? 1.45 : 1.0)
+                    .animation(.spring(duration: 0.35, bounce: 0.5), value: heartBounceIndex)
             }
             Spacer()
         }
