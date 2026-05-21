@@ -704,7 +704,11 @@ struct LevelPickerSheet: View {
                                 let km = level.runThreshold
                                 let kmStr = km == km.rounded(.towardZero) && km >= 1 ? String(Int(km)) : String(format: "%.1g", km)
                                 Label("\(kmStr) km \(L("q.stat_min_day"))", systemImage: "figure.run")
-                                Label("\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km", systemImage: "bolt.fill")
+                                if level.usesHearts {
+                                    Label(L("q.stat_hearts", level.maxHearts), systemImage: "heart.fill")
+                                } else {
+                                    Label("\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km", systemImage: "bolt.fill")
+                                }
                             }
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .foregroundStyle(Color(hex: "#9AA5B4"))

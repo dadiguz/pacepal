@@ -453,14 +453,21 @@ private struct LevelStatsBullets: View {
         return "\(s) km \(L("q.stat_min_day"))"
     }
 
-    private var energyLabel: String {
-        "\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km"
+    private var secondaryLabel: String {
+        if level.usesHearts {
+            return L("q.stat_hearts", level.maxHearts)
+        }
+        return "\(Int(level.energyPerKm * 100))% \(L("q.stat_energy")) / km"
+    }
+
+    private var secondaryIcon: String {
+        level.usesHearts ? "heart.fill" : "bolt.fill"
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Label(kmLabel,     systemImage: "figure.run")
-            Label(energyLabel, systemImage: "bolt.fill")
+            Label(kmLabel,        systemImage: "figure.run")
+            Label(secondaryLabel, systemImage: secondaryIcon)
         }
         .font(.system(size: 13, weight: .semibold, design: .rounded))
         .foregroundStyle(color)
