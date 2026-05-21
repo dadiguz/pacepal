@@ -126,11 +126,17 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
 
     // MARK: - State Persistence
 
-    private static let udDistanceKm  = "rt.distanceKm"
-    private static let udElapsedSecs = "rt.elapsedSeconds"
-    private static let udStateStr    = "rt.state"
-    private static let udIsIndoor    = "rt.isIndoor"
-    private static let udBgTimestamp = "rt.backgroundedAt"
+    private static let udDistanceKm    = "rt.distanceKm"
+    private static let udElapsedSecs   = "rt.elapsedSeconds"
+    private static let udStateStr      = "rt.state"
+    private static let udIsIndoor      = "rt.isIndoor"
+    private static let udBgTimestamp   = "rt.backgroundedAt"
+    private static let udPedSegStart   = "rt.pedometerSegmentStart"
+    private static let udPedBaseline   = "rt.preSegmentBaseline"
+    /// Timestamp when the pedometer segment started (used to query missed distance on resume).
+    private var pedometerSegmentStart: Date?
+    /// distanceKm before the current pedometer segment began (baseline for queries).
+    private var preSegmentBaseline: Double = 0
 
     /// Saves current run state so it survives app kill or background.
     func saveState() {
@@ -164,6 +170,22 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
             secs += max(0, Int(Date().timeIntervalSince1970 - ts))
         }
         elapsedSeconds = secs
+
+        // For indoor runs, query pedometer for distance accumulated since the segment
+        // started (covers time while app was suspended/killed).
+        if isIndoor, let segStart = ud.object(forKey: Self.udPedSegStart) as? Date {
+            let baseline = ud.double(forKey: Self.udPedBaseline)
+            preSegmentBaseline = baseline
+            pedometerSegmentStart = segStart
+            pedometer.queryPedometerData(from: segStart, to: Date()) { [weak self] data, _ in
+                guard let self else { return }
+                let meters = data?.distance?.doubleValue ?? 0
+                DispatchQueue.main.async {
+                    self.distanceKm = max(self.distanceKm, baseline + meters / 1000.0)
+                }
+            }
+        }
+
         state = .paused   // always restore as paused — user taps to resume consciously
         return true
     }
@@ -175,22 +197,43 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     func suspendForBackground() {
         guard state == .running else { return }
         stopTimer()
+        if isIndoor { pedometer.stopUpdates() }
         let ud = UserDefaults.standard
         ud.set(elapsedSeconds, forKey: Self.udElapsedSecs)
         ud.set(distanceKm,     forKey: Self.udDistanceKm)
         ud.set("running",      forKey: Self.udStateStr)
         ud.set(isIndoor,       forKey: Self.udIsIndoor)
         ud.set(Date().timeIntervalSince1970, forKey: Self.udBgTimestamp)
+        if isIndoor, let segStart = pedometerSegmentStart {
+            ud.set(segStart, forKey: Self.udPedSegStart)
+            ud.set(preSegmentBaseline, forKey: Self.udPedBaseline)
+        }
     }
 
     /// Called when the app returns to the foreground after a background suspension.
     /// Adds the time elapsed while backgrounded to elapsedSeconds and restarts the timer.
+    /// For indoor runs, queries the pedometer for distance accumulated while suspended
+    /// and restarts live updates from that point forward.
     func resumeFromBackground() {
         guard state == .running else { return }
         let ud = UserDefaults.standard
         if let ts = ud.object(forKey: Self.udBgTimestamp) as? Double {
             elapsedSeconds += max(0, Int(Date().timeIntervalSince1970 - ts))
             ud.removeObject(forKey: Self.udBgTimestamp)
+        }
+        if isIndoor, let segStart = pedometerSegmentStart {
+            let baseline = preSegmentBaseline
+            // Query total distance the pedometer recorded since the segment started,
+            // including anything accumulated while the app was suspended.
+            pedometer.queryPedometerData(from: segStart, to: Date()) { [weak self] data, _ in
+                guard let self else { return }
+                let meters = data?.distance?.doubleValue ?? 0
+                DispatchQueue.main.async {
+                    self.distanceKm = max(self.distanceKm, baseline + meters / 1000.0)
+                }
+            }
+            // Restart live updates so new steps are tracked going forward.
+            startPedometer()
         }
         startTimer()
     }
@@ -199,7 +242,10 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     func clearSavedState() {
         let ud = UserDefaults.standard
         [Self.udDistanceKm, Self.udElapsedSecs, Self.udStateStr,
-         Self.udIsIndoor, Self.udBgTimestamp].forEach { ud.removeObject(forKey: $0) }
+         Self.udIsIndoor, Self.udBgTimestamp,
+         Self.udPedSegStart, Self.udPedBaseline].forEach { ud.removeObject(forKey: $0) }
+        pedometerSegmentStart = nil
+        preSegmentBaseline = 0
     }
 
     // MARK: - Indoor (pedometer)
@@ -207,7 +253,10 @@ final class RunTracker: NSObject, CLLocationManagerDelegate {
     private func startPedometer() {
         guard CMPedometer.isDistanceAvailable() else { return }
         let baseline = distanceKm   // preserve km from previous segments (e.g. after resume)
-        pedometer.startUpdates(from: Date()) { [weak self] data, error in
+        preSegmentBaseline = baseline
+        let start = Date()
+        pedometerSegmentStart = start
+        pedometer.startUpdates(from: start) { [weak self] data, error in
             guard let self, let data, error == nil, state == .running else { return }
             let meters = data.distance?.doubleValue ?? 0
             DispatchQueue.main.async {
