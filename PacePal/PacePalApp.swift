@@ -33,6 +33,7 @@ struct PacepalApp: App {
             .environment(store)
             .animation(.easeInOut(duration: 0.45), value: showSplash)
             .onAppear {
+                TelemetryDeck.initialize(config: .init(appID: "C2CA2E43-8EAA-44D2-B6C3-AFFAA9877208"))
                 health.runThreshold = appState.challengeLevel.runThreshold
             }
             .onChange(of: appState.challengeLevel) { _, level in
@@ -44,7 +45,6 @@ struct PacepalApp: App {
                 if oldID != nil { health.resetSession() }
             }
             .task {
-                TelemetryDeck.initialize(config: .init(appID: "C2CA2E43-8EAA-44D2-B6C3-AFFAA9877208"))
                 // Set delegate so foreground banners work for returning users.
                 // New users go through NotificationPermissionView which calls requestPermission().
                 if appState.notificationPermissionDone {

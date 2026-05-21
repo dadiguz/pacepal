@@ -159,6 +159,19 @@ struct PaywallView: View {
                     .opacity(appeared ? 1 : 0)
                     .animation(.easeIn(duration: 0.3).delay(0.5), value: appeared)
 
+                    #if DEBUG
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.35)) {
+                            appState.dismissPaywall()
+                        }
+                    } label: {
+                        Text("⚙️ Skip (debug)")
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color(hex: "#E12D39"))
+                    }
+                    .padding(.top, 8)
+                    #endif
+
                     // Subscription description (required by Apple)
                     Text(isES
                          ? "Pacepal Premium desbloquea el acceso completo a la app para completar el reto de 66 días: sincronización con Apple Health, widget, notificaciones y fondos. Suscripción anual · 7 días gratis, después \(store.displayPrice)/año · Cancela en Ajustes de Apple."

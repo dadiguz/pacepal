@@ -66,6 +66,9 @@ struct PacepalEntry: TimelineEntry {
     let energy: Double
     let todayKm: Double
     let challengeDay: Int
+    let usesHearts: Bool
+    let hearts: Int
+    let maxHearts: Int
 }
 
 extension PacepalEntry {
@@ -93,7 +96,8 @@ extension PacepalEntry {
 struct PacepalProvider: TimelineProvider {
     func placeholder(in context: Context) -> PacepalEntry {
         PacepalEntry(date: Date(), dna: nil, petImageData: nil,
-                     energy: 0.72, todayKm: 3.2, challengeDay: 14)
+                     energy: 0.72, todayKm: 3.2, challengeDay: 14,
+                     usesHearts: false, hearts: 0, maxHearts: 0)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (PacepalEntry) -> Void) {
@@ -115,8 +119,20 @@ struct PacepalProvider: TimelineProvider {
         let challengeDay = rawDay > 0 ? rawDay : 1
 
         let medalEarned  = def?.bool(forKey: "w_medalEarned") ?? false
+        let usesHearts   = def?.bool(forKey: "w_usesHearts") ?? false
+        let hearts       = def?.integer(forKey: "w_hearts") ?? 0
+        let maxHearts    = def?.integer(forKey: "w_maxHearts") ?? 0
+
         let elapsed = date.timeIntervalSince(resetDate)
-        let energy  = medalEarned ? 1.0 : max(0, min(1, 1.0 - elapsed / decaySeconds))
+        let barEnergy = medalEarned ? 1.0 : max(0, min(1, 1.0 - elapsed / decaySeconds))
+        let energy: Double
+        if medalEarned {
+            energy = 1.0
+        } else if usesHearts && maxHearts > 0 {
+            energy = Double(hearts) / Double(maxHearts)
+        } else {
+            energy = barEnergy
+        }
 
         let dna: PetDNA? = (def?.data(forKey: kPetDNA))
             .flatMap { try? JSONDecoder().decode(PetDNA.self, from: $0) }
@@ -127,7 +143,8 @@ struct PacepalProvider: TimelineProvider {
         let petImageData = spriteURL.flatMap { try? Data(contentsOf: $0) }
 
         return PacepalEntry(date: date, dna: dna, petImageData: petImageData,
-                            energy: energy, todayKm: todayKm, challengeDay: challengeDay)
+                            energy: energy, todayKm: todayKm, challengeDay: challengeDay,
+                            usesHearts: usesHearts, hearts: hearts, maxHearts: maxHearts)
     }
 }
 
@@ -144,6 +161,25 @@ private struct EnergyBar: View {
         }
         .frame(height: 5)
         .clipped()
+    }
+}
+
+// MARK: - Widget hearts row
+private struct WidgetHeartsRow: View {
+    let hearts: Int
+    let maxHearts: Int
+    let size: CGFloat
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(0..<maxHearts, id: \.self) { i in
+                Image(i < hearts ? "life-complete" : "life-uncomplete")
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(height: size)
+            }
+        }
     }
 }
 
@@ -187,12 +223,19 @@ struct SmallWidgetView: View {
 
     private var bottomStats: some View {
         VStack(spacing: 5) {
-            HStack(spacing: 6) {
-                EnergyBar(energy: entry.energy, color: entry.energyColor)
-                Text("\(Int(entry.energy * 100))%")
-                    .font(.system(size: 9, weight: .bold, design: .rounded))
-                    .foregroundStyle(entry.energyColor)
-                    .frame(width: 26, alignment: .trailing)
+            if entry.usesHearts && entry.maxHearts > 0 {
+                HStack(spacing: 4) {
+                    WidgetHeartsRow(hearts: entry.hearts, maxHearts: entry.maxHearts, size: 14)
+                    Spacer()
+                }
+            } else {
+                HStack(spacing: 6) {
+                    EnergyBar(energy: entry.energy, color: entry.energyColor)
+                    Text("\(Int(entry.energy * 100))%")
+                        .font(.system(size: 9, weight: .bold, design: .rounded))
+                        .foregroundStyle(entry.energyColor)
+                        .frame(width: 26, alignment: .trailing)
+                }
             }
             HStack {
                 Text(String(format: WL("widget.day"), entry.challengeDay))
@@ -226,16 +269,20 @@ struct MediumWidgetView: View {
                 }
                 // Stats
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text(WL("widget.energy"))
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundStyle(Color(hex: "#9AA5B4"))
-                        Spacer()
-                        Text("\(Int(entry.energy * 100))%")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(entry.energyColor)
+                    if entry.usesHearts && entry.maxHearts > 0 {
+                        WidgetHeartsRow(hearts: entry.hearts, maxHearts: entry.maxHearts, size: 18)
+                    } else {
+                        HStack {
+                            Text(WL("widget.energy"))
+                                .font(.system(size: 10, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color(hex: "#9AA5B4"))
+                            Spacer()
+                            Text("\(Int(entry.energy * 100))%")
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .foregroundStyle(entry.energyColor)
+                        }
+                        EnergyBar(energy: entry.energy, color: entry.energyColor)
                     }
-                    EnergyBar(energy: entry.energy, color: entry.energyColor)
                     Label(String(format: WL("widget.day_of_66"), entry.challengeDay), systemImage: "calendar")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color(hex: "#616E7C"))

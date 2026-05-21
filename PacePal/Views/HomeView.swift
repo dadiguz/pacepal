@@ -136,11 +136,17 @@ struct HomeView: View {
     @State private var floatingTextOpacity: Double = 0
     @State private var floatingTextY: CGFloat = 60
 
+    // Hearts loss animation
+    @State private var heartsLostPending = false
+    @State private var heartsLostCount = 0
+    @State private var showHeartLossAnimation = false
+    @State private var heartLossAnimatingIndex = -1
+
     private var dna: PetDNA { appState.selectedCharacter ?? PetDNA.presets()[0] }
 
     private var hasPhotoBackground: Bool { appState.selectedBackground != nil && appState.selectedBackground != "pattern" }
 
-    private var energy: Double { appState.energy(at: now) }
+    private var energy: Double { appState.effectiveEnergy(at: now) }
 
     private var energyColor: Color {
         if energy <= 0    { return Color(hex: "#E12D39") }
@@ -154,6 +160,7 @@ struct HomeView: View {
 
     private var energyTimeLabel: String {
         if appState.medalEarned { return L("medal.energy_permanent") }
+        if appState.challengeLevel.usesHearts { return "" }  // hearts don't show time
         let minutes = Int(appState.decaySeconds / 60.0 * energy)
         guard minutes > 0 else { return L("home.no_energy") }
         let h = minutes / 60
@@ -179,6 +186,34 @@ struct HomeView: View {
 
     private var normalPose: PetPose {
         if appState.medalEarned { return .idle }
+
+        if appState.challengeLevel.usesHearts {
+            // Hearts-based pose mapping
+            let h = appState.hearts
+            let max = appState.challengeLevel.maxHearts
+            if h <= 0      { return .dead }
+            if h == max    { return .idle }  // full hearts = normal (~80%)
+            switch appState.challengeLevel {
+            case .habito:
+                // 5: idle, 4: idle, 3: angry, 2: sad, 1: dizzy
+                switch h {
+                case 4:  return .idle
+                case 3:  return .angry
+                case 2:  return .sad
+                default: return .dizzy  // 1
+                }
+            case .resistencia:
+                // 3: idle, 2: angry, 1: sad
+                switch h {
+                case 2:  return .angry
+                default: return .sad    // 1
+                }
+            case .rendimiento:
+                return .idle  // unreachable
+            }
+        }
+
+        // Energy bar pose (rendimiento / hard mode)
         if energy <= 0    { return .dead  }
         if energy >= 0.99 { return .hype  }
         if energy > 0.95  { return .happy }
@@ -348,7 +383,7 @@ struct HomeView: View {
                     step: tutorialStep,
                     frames: tutorialFrames,
                     onNext: {
-                        if tutorialStep < tutorialSteps.count - 1 {
+                        if tutorialStep < tutorialSteps(usesHearts: appState.challengeLevel.usesHearts, maxHearts: appState.challengeLevel.maxHearts).count - 1 {
                             withAnimation { tutorialStep += 1 }
                         } else {
                             finishTutorial()
@@ -392,6 +427,12 @@ struct HomeView: View {
                 DailyTipModal(day: tipDay, dna: dna) {
                     appState.markTipSeen(tipDay)
                     withAnimation(.spring(duration: 0.35)) { pendingTipDay = nil }
+                    // After tip dismissal: evaluate missed days for hearts mode
+                    if appState.challengeLevel.usesHearts && !appState.medalEarned {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                            evaluateHeartLoss()
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
@@ -413,8 +454,16 @@ struct HomeView: View {
             RedPulseOverlay(visible: showRedPulse)
         }
         .onChange(of: appState.energyResetDate) { _, _ in
-            let e = appState.energy(at: Date())
+            let e = appState.effectiveEnergy(at: Date())
             showRedPulse = e > 0 && e < 0.10
+        }
+        .onChange(of: appState.hearts) { _, _ in
+            if appState.challengeLevel.usesHearts {
+                let e = appState.effectiveEnergy(at: Date())
+                showRedPulse = e > 0 && e < 0.20
+                now = Date()
+                if !isAnimating { currentPose = normalPose }
+            }
         }
         .animation(.easeInOut(duration: 0.3), value: pendingAchievement?.day)
         .animation(.easeInOut(duration: 0.3), value: replayAchievement?.day)
@@ -429,7 +478,7 @@ struct HomeView: View {
         .onAppear {
             isInitialLoad = true
             currentPose = normalPose
-            lastTrackedEnergy = appState.energy(at: Date())
+            lastTrackedEnergy = appState.effectiveEnergy(at: Date())
             showRedPulse = energy > 0 && energy < 0.10
             appState.syncToWidget(km: health.todayKm)
             SoundManager.shared.stopMusic(fadeDuration: 1.2)
@@ -473,6 +522,12 @@ struct HomeView: View {
             appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 checkForTip()
+                // If no tip is pending, evaluate heart loss directly
+                if pendingTipDay == nil && appState.challengeLevel.usesHearts && !appState.medalEarned {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        evaluateHeartLoss()
+                    }
+                }
             }
             if !UserDefaults.standard.bool(forKey: "hasSeenTutorial") {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
@@ -522,7 +577,7 @@ struct HomeView: View {
         .onChange(of: appState.energyResetDate) { _, _ in
             now = Date()
             if !isAnimating { currentPose = normalPose }
-            let newEnergy = appState.energy(at: Date())
+            let newEnergy = appState.effectiveEnergy(at: Date())
             let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
             NotificationManager.fireIfThresholdCrossed(petName: dna.name, oldEnergy: lastTrackedEnergy, newEnergy: newEnergy, attachmentURL: imgURL)
             lastTrackedEnergy = newEnergy
@@ -629,6 +684,26 @@ struct HomeView: View {
         checkForAchievement()
     }
 
+    // Evaluates missed days and triggers heart loss animation for hearts mode.
+    // Fetches HealthKit data first so we don't penalize runs tracked externally.
+    private func evaluateHeartLoss() {
+        Task { @MainActor in
+            // Build a merged run log: HealthKit workouts + local in-app log
+            let mergedLog = await health.mergedRunLog(since: appState.challengeStartDate)
+            let lost = appState.evaluateMissedDays(runLog: mergedLog)
+            guard lost > 0 else { return }
+            heartsLostCount = lost
+            now = Date()  // refresh energy/pose
+            if !isAnimating { currentPose = normalPose }
+            SoundManager.shared.play(.hurt, enabled: appState.soundsEnabled)
+            // Sync widget after hearts change
+            appState.syncToWidget(km: health.todayKm)
+            // Reschedule notifications
+            let imgURL = renderPetAttachmentURL(dna: dna, pose: currentPose)
+            appState.scheduleNotifications(petName: dna.name, attachmentURL: imgURL)
+        }
+    }
+
     // Called after a run completes — only checks for milestone achievements.
     private func checkForAchievement() {
         guard pendingAchievement == nil, !showPetStatus else { return }
@@ -689,6 +764,9 @@ struct HomeView: View {
             appState.updateCompletedDays(safeCompletedDays)
         }
 
+        // ── Hearts: gain a heart if this is the first time today we hit the threshold ──
+        let shouldGainHeart = appState.challengeLevel.usesHearts && justCompletedDay
+
         // ── KM counter animation ──
         isAnimating = true
         let startKm = displayedKm
@@ -702,7 +780,14 @@ struct HomeView: View {
         }
         displayedKm = newTotal
         lastKnownKm = newTotal
-        appState.addEnergy(km: delta)
+        if appState.challengeLevel.usesHearts {
+            // Hearts mode: gain one heart when day is completed for the first time
+            if shouldGainHeart {
+                appState.gainHeart()
+            }
+        } else {
+            appState.addEnergy(km: delta)
+        }
         appState.recordKmCounted(newTotal)
         now = Date()
         if energy >= 0.99 {
@@ -792,44 +877,19 @@ struct HomeView: View {
                 }
             }
 
-            // ── HP bar row ────────────────────────────────────────────────
-            HStack(spacing: 10) {
-                Text(L("home.hp"))
-                    .font(.system(size: 14, weight: .black, design: .monospaced))
-                    .foregroundStyle(energyColor)
+            if appState.challengeLevel.usesHearts {
+                // ── Hearts row (easy / medium) ────────────────────────────
+                heartsRow
+            } else {
+                // ── HP bar row (hard mode) ────────────────────────────────
+                hpBarRow
 
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.12))
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(
-                                LinearGradient(
-                                    colors: [energyColor.opacity(0.75), energyColor],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geo.size.width * energy)
-                            .animation(.spring(duration: 0.9), value: energy)
-                        RoundedRectangle(cornerRadius: 4)
-                            .strokeBorder(Color.white.opacity(0.70), lineWidth: 2)
-                    }
-                }
-                .frame(height: 13)
-
-                Text("\(Int(energy * 100))%")
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    .foregroundStyle(energyColor)
-                    .frame(width: 40, alignment: .trailing)
+                // ── Time remaining ────────────────────────────────────────
+                Text(energyTimeLabel)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundStyle(energy <= 0 ? Color(hex: "#FF6B6B") : .white.opacity(0.38))
                     .animation(.easeInOut(duration: 0.4), value: energy)
             }
-
-            // ── Time remaining ────────────────────────────────────────────
-            Text(energyTimeLabel)
-                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                .foregroundStyle(energy <= 0 ? Color(hex: "#FF6B6B") : .white.opacity(0.38))
-                .animation(.easeInOut(duration: 0.4), value: energy)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 16)
@@ -842,6 +902,58 @@ struct HomeView: View {
                 )
                 .shadow(color: Color.black.opacity(0.18), radius: 10, y: 4)
         )
+    }
+
+    // MARK: – Hearts row (pixel heart images)
+    private var heartsRow: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<appState.challengeLevel.maxHearts, id: \.self) { i in
+                let filled = i < appState.hearts
+                Image(filled ? "life-complete" : "life-uncomplete")
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(height: 28)
+                    .transition(.scale.combined(with: .opacity))
+                    .animation(.spring(duration: 0.4), value: appState.hearts)
+            }
+            Spacer()
+        }
+    }
+
+    // MARK: – HP bar (hard mode only)
+    private var hpBarRow: some View {
+        HStack(spacing: 10) {
+            Text(L("home.hp"))
+                .font(.system(size: 14, weight: .black, design: .monospaced))
+                .foregroundStyle(energyColor)
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.white.opacity(0.12))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            LinearGradient(
+                                colors: [energyColor.opacity(0.75), energyColor],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * energy)
+                        .animation(.spring(duration: 0.9), value: energy)
+                    RoundedRectangle(cornerRadius: 4)
+                        .strokeBorder(Color.white.opacity(0.70), lineWidth: 2)
+                }
+            }
+            .frame(height: 13)
+
+            Text("\(Int(energy * 100))%")
+                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                .foregroundStyle(energyColor)
+                .frame(width: 40, alignment: .trailing)
+                .animation(.easeInOut(duration: 0.4), value: energy)
+        }
     }
 
     // MARK: – Pet section (no card)

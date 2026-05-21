@@ -15,6 +15,9 @@ struct ContentView: View {
     @State private var challengeDay: Int = 1
     @State private var petImage: UIImage? = nil
     @State private var showRun = false
+    @State private var usesHearts = false
+    @State private var hearts = 0
+    @State private var maxHearts = 0
 
     var body: some View {
         NavigationStack {
@@ -110,23 +113,36 @@ struct ContentView: View {
 
     // MARK: - Energy section
     private var energySection: some View {
-        VStack(spacing: 3) {
-            HStack {
-                Text("Energía")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("\(Int(energy * 100))%")
-                    .font(.caption2.bold())
-                    .foregroundStyle(energyColor)
-            }
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(Color.gray.opacity(0.25)).frame(height: 5)
-                    Capsule().fill(energyColor).frame(width: geo.size.width * CGFloat(max(0.001, energy)), height: 5)
+        Group {
+            if usesHearts && maxHearts > 0 {
+                HStack(spacing: 3) {
+                    ForEach(0..<maxHearts, id: \.self) { i in
+                        Image(systemName: i < hearts ? "heart.fill" : "heart")
+                            .font(.system(size: 12))
+                            .foregroundStyle(i < hearts ? Color(red: 0.98, green: 0.44, blue: 0.24) : Color.gray.opacity(0.5))
+                    }
+                    Spacer()
+                }
+            } else {
+                VStack(spacing: 3) {
+                    HStack {
+                        Text("Energía")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("\(Int(energy * 100))%")
+                            .font(.caption2.bold())
+                            .foregroundStyle(energyColor)
+                    }
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.gray.opacity(0.25)).frame(height: 5)
+                            Capsule().fill(energyColor).frame(width: geo.size.width * CGFloat(max(0.001, energy)), height: 5)
+                        }
+                    }
+                    .frame(height: 5)
                 }
             }
-            .frame(height: 5)
         }
     }
 
@@ -160,7 +176,17 @@ struct ContentView: View {
         let medalEarned  = def?.bool(forKey: kMedalEarned) ?? false
         let elapsed      = Date().timeIntervalSince(resetDate)
 
-        energy       = medalEarned ? 1.0 : max(0, min(1, 1.0 - elapsed / decaySeconds))
+        usesHearts   = def?.bool(forKey: "w_usesHearts") ?? false
+        hearts       = def?.integer(forKey: "w_hearts") ?? 0
+        maxHearts    = def?.integer(forKey: "w_maxHearts") ?? 0
+
+        if medalEarned {
+            energy = 1.0
+        } else if usesHearts && maxHearts > 0 {
+            energy = Double(hearts) / Double(maxHearts)
+        } else {
+            energy = max(0, min(1, 1.0 - elapsed / decaySeconds))
+        }
         todayKm      = def?.double(forKey: kTodayKm) ?? 0
         let rawDay   = def?.integer(forKey: kChallengeDay) ?? 0
         challengeDay = max(1, min(66, rawDay))

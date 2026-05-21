@@ -151,6 +151,35 @@ final class HealthManager {
         }
     }
 
+    /// Builds a merged run log combining HealthKit workouts and localRunLog.
+    /// Used by the hearts system to accurately evaluate missed days.
+    func mergedRunLog(since startDate: Date) async -> [String: Double] {
+        let cal = Calendar.current
+        let start = cal.startOfDay(for: startDate)
+        let now = Date()
+        let today = cal.startOfDay(for: now)
+        var merged = localRunLog
+
+        guard HKHealthStore.isHealthDataAvailable() else { return merged }
+        let workouts = await queryRunningWorkouts(from: start, to: now)
+
+        // Sum HealthKit km per day (multiple workouts in one day)
+        var hkDayKm: [String: Double] = [:]
+        for w in workouts {
+            let day = cal.startOfDay(for: w.startDate)
+            guard day >= start && day <= today else { continue }
+            let km = (w.totalDistance?.doubleValue(for: .meter()) ?? 0) / 1000.0
+            let key = Self.dayKey(for: day)
+            hkDayKm[key, default: 0] += km
+        }
+
+        // Merge: for each day, take the max of HealthKit total and local log
+        for (key, km) in hkDayKm {
+            merged[key] = max(merged[key] ?? 0, km)
+        }
+        return merged
+    }
+
     // MARK: - Helpers
 
     func addTestKm() { testKmOffset += 1.0 }

@@ -105,6 +105,23 @@ enum ChallengeLevel: String, CaseIterable {
         }
     }
 
+    /// Whether this level uses the discrete hearts system (easy/medium) vs energy bar (hard)
+    var usesHearts: Bool {
+        switch self {
+        case .habito, .resistencia: return true
+        case .rendimiento:          return false
+        }
+    }
+
+    /// Maximum hearts for levels that use the hearts system
+    var maxHearts: Int {
+        switch self {
+        case .habito:      return 5
+        case .resistencia: return 3
+        case .rendimiento: return 0  // not used
+        }
+    }
+
     var label: String { L("level.\(rawValue).label") }
     var subtitle: String { L("level.\(rawValue).subtitle") }
 
@@ -181,6 +198,13 @@ final class AppState {
     // True once the 66-day challenge is completed — stops energy decay permanently
     private(set) var medalEarned: Bool
 
+    // MARK: - Hearts system (easy/medium only)
+    /// Current number of hearts (0…maxHearts). Only meaningful when challengeLevel.usesHearts.
+    private(set) var hearts: Int
+    /// Calendar day (startOfDay) when the last daily heart check was performed.
+    /// Used to evaluate missed days and deduct hearts on app open.
+    private(set) var lastHeartCheckDate: Date
+
     /// Seconds from 100% to 0% — fixed at 48 hours for all levels
     let decaySeconds: Double = 48 * 3600
 
@@ -209,6 +233,19 @@ final class AppState {
         self.challengeStarted = UserDefaults.standard.bool(forKey: "challengeStarted")
         self.medalEarned = UserDefaults.standard.bool(forKey: "medalEarned")
         self.selectedBackground = UserDefaults.standard.string(forKey: "selectedBackground")
+
+        // Hearts system: migrate existing users safely — they start at max hearts
+        // Use local variable because self.challengeLevel can't be accessed before all stored properties are initialized.
+        let level = ChallengeLevel(rawValue: lvlStr) ?? .habito
+        if level.usesHearts {
+            let storedHearts = UserDefaults.standard.object(forKey: "hearts") as? Int
+            self.hearts = storedHearts ?? level.maxHearts  // new/existing users default to full
+            self.lastHeartCheckDate = UserDefaults.standard.object(forKey: "lastHeartCheckDate") as? Date
+                ?? Calendar.current.startOfDay(for: Date())  // default to today = no retroactive penalty
+        } else {
+            self.hearts = 0
+            self.lastHeartCheckDate = Date.distantPast
+        }
     }
 
     func completeOnboarding() {
@@ -274,7 +311,12 @@ final class AppState {
     }
 
     /// Reschedules energy-drop notifications with the pet's current name and sprite image.
+    /// For hearts mode, cancels scheduled notifications since energy doesn't decay over time.
     func scheduleNotifications(petName: String, attachmentURL: URL? = nil) {
+        if challengeLevel.usesHearts {
+            NotificationManager.cancelAll()
+            return
+        }
         NotificationManager.scheduleEnergyNotifications(
             petName: petName,
             energyResetDate: energyResetDate,
@@ -308,6 +350,77 @@ final class AppState {
         medalEarned = true
         UserDefaults.standard.set(true, forKey: "medalEarned")
         resetEnergy()
+    }
+
+    // MARK: - Hearts helpers
+
+    /// Converts current hearts into a 0–1 energy fraction for pose/color compatibility.
+    /// Only meaningful when challengeLevel.usesHearts == true.
+    var heartsEnergyFraction: Double {
+        let max = Double(challengeLevel.maxHearts)
+        guard max > 0 else { return 1.0 }
+        return Double(hearts) / max
+    }
+
+    /// Unified energy accessor: returns heart-based fraction for easy/medium, time-decay for hard.
+    func effectiveEnergy(at date: Date) -> Double {
+        if medalEarned { return 1.0 }
+        if challengeLevel.usesHearts { return heartsEnergyFraction }
+        return energy(at: date)
+    }
+
+    /// Awards one heart (after completing a run). Capped at maxHearts.
+    func gainHeart() {
+        guard challengeLevel.usesHearts else { return }
+        hearts = min(challengeLevel.maxHearts, hearts + 1)
+        UserDefaults.standard.set(hearts, forKey: "hearts")
+    }
+
+    /// Removes one heart (missed day penalty).
+    func loseHeart() {
+        guard challengeLevel.usesHearts else { return }
+        hearts = max(0, hearts - 1)
+        UserDefaults.standard.set(hearts, forKey: "hearts")
+    }
+
+    /// Sets hearts to a specific count (for testing / migration).
+    func setHearts(_ count: Int) {
+        hearts = max(0, min(challengeLevel.maxHearts, count))
+        UserDefaults.standard.set(hearts, forKey: "hearts")
+    }
+
+    /// Evaluates missed days since `lastHeartCheckDate` and deducts one heart per missed day.
+    /// Returns the number of hearts lost (0 if none). Should be called on app open, after the daily tip.
+    @discardableResult
+    func evaluateMissedDays(runLog: [String: Double]) -> Int {
+        guard challengeLevel.usesHearts, !medalEarned, hearts > 0 else { return 0 }
+
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let lastCheck = cal.startOfDay(for: lastHeartCheckDate)
+        guard lastCheck < today else { return 0 }  // already checked today
+
+        let threshold = challengeLevel.runThreshold
+        var lost = 0
+        var day = cal.date(byAdding: .day, value: 1, to: lastCheck)!
+
+        // Check each day from the day after last check up to yesterday.
+        // Today is NOT evaluated yet — the user still has time to run today.
+        while day < today && hearts > 0 {
+            let dayKey = "\(Int(cal.startOfDay(for: day).timeIntervalSince1970))"
+            let km = runLog[dayKey] ?? 0
+            if km < threshold {
+                loseHeart()
+                lost += 1
+            }
+            day = cal.date(byAdding: .day, value: 1, to: day)!
+        }
+
+        // Update the check date to today
+        lastHeartCheckDate = today
+        UserDefaults.standard.set(today, forKey: "lastHeartCheckDate")
+
+        return lost
     }
 
     func confirmChallengeStart() {
@@ -418,6 +531,13 @@ final class AppState {
         isFirstRunForCharacter = true
         selectedBackground = nil
         UserDefaults.standard.removeObject(forKey: "selectedBackground")
+        // Hearts: reset to full for the new character
+        if challengeLevel.usesHearts {
+            hearts = challengeLevel.maxHearts
+            UserDefaults.standard.set(hearts, forKey: "hearts")
+            lastHeartCheckDate = Calendar.current.startOfDay(for: Date())
+            UserDefaults.standard.set(lastHeartCheckDate, forKey: "lastHeartCheckDate")
+        }
         // questionnaireCompleted intentionally kept — user keeps their level when switching characters
         syncToWidget(km: 0)
     }
@@ -428,16 +548,17 @@ final class AppState {
 
     /// Renders the pet sprite as PNG data using UIGraphicsImageRenderer (main app process only).
     private func renderPetPNG(dna: PetDNA, energy: Double) -> Data? {
+        let eff = effectiveEnergy(at: Date())
         let pose: PetPose
-        if medalEarned              { pose = .idle  }
-        else if energy <= 0         { pose = .dead  }
-        else if energy <= 0.14      { pose = .dizzy }
-        else if energy <= 0.25      { pose = .sad   }
-        else if energy <= 0.50      { pose = .angry }
-        else if energy <= 0.90      { pose = .idle  }
-        else if energy <= 0.95      { pose = .happy }
-        else if energy <  0.99      { pose = .jump  }
-        else                        { pose = .hype  }
+        if medalEarned           { pose = .idle  }
+        else if eff <= 0         { pose = .dead  }
+        else if eff <= 0.14      { pose = .dizzy }
+        else if eff <= 0.25      { pose = .sad   }
+        else if eff <= 0.50      { pose = .angry }
+        else if eff <= 0.90      { pose = .idle  }
+        else if eff <= 0.95      { pose = .happy }
+        else if eff <  0.99      { pose = .jump  }
+        else                     { pose = .hype  }
 
         let accessories: [PetAccessory] = medalEarned ? [.medal66] : []
         let grid = buildCharacterGrid(dna: dna, pose: pose, frame: 0)
@@ -479,6 +600,9 @@ final class AppState {
         d.set(km, forKey: "w_todayKm")
         d.set(completedDays, forKey: "w_challengeDay")
         d.set(medalEarned, forKey: "w_medalEarned")
+        d.set(challengeLevel.usesHearts, forKey: "w_usesHearts")
+        d.set(hearts, forKey: "w_hearts")
+        d.set(challengeLevel.maxHearts, forKey: "w_maxHearts")
         // Write PNG to shared file (more reliable than UserDefaults for binary data)
         let spriteURL = FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: "group.io.dallio.PacePal")?

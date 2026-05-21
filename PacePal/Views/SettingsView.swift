@@ -823,6 +823,23 @@ private struct DebugSheet: View {
                         dismiss()
                     }
 
+                    // MARK: Hearts
+                    if appState.challengeLevel.usesHearts {
+                        section("CORAZONES: \(appState.hearts)/\(appState.challengeLevel.maxHearts)")
+                        HStack(spacing: 6) {
+                            btn("0") { appState.setHearts(0) }
+                            btn("1") { appState.setHearts(1) }
+                            btn("MAX") { appState.setHearts(appState.challengeLevel.maxHearts) }
+                            btn("+1") { appState.gainHeart() }
+                            btn("-1") { appState.loseHeart() }
+                        }
+                    }
+
+                    // MARK: Paywall
+                    section("PAYWALL")
+                    btn("💰 Skip paywall") { appState.dismissPaywall() }
+                    btn("🔒 Reset paywall", color: "#E12D39") { appState.resetPaywall() }
+
                     // MARK: Misc
                     section("MISC")
                     btn("📲 Sync widget") { appState.syncToWidget(km: health.todayKm) }

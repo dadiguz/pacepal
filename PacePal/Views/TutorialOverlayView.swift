@@ -19,18 +19,20 @@ struct TutorialStep {
     var body: String { L(bodyKey) }
 }
 
-let tutorialSteps: [TutorialStep] = [
-    TutorialStep(
-        frameKey: "energy",
-        titleKey: "tutorial.energy_title",
-        bodyKey: "tutorial.energy_body"
-    ),
-    TutorialStep(
-        frameKey: "km",
-        titleKey: "tutorial.km_title",
-        bodyKey: "tutorial.km_body"
-    ),
-]
+func tutorialSteps(usesHearts: Bool, maxHearts: Int) -> [TutorialStep] {
+    [
+        TutorialStep(
+            frameKey: "energy",
+            titleKey: usesHearts ? "tutorial.hearts_title" : "tutorial.energy_title",
+            bodyKey: usesHearts ? "tutorial.hearts_body" : "tutorial.energy_body"
+        ),
+        TutorialStep(
+            frameKey: "km",
+            titleKey: "tutorial.km_title",
+            bodyKey: usesHearts ? "tutorial.km_body_hearts" : "tutorial.km_body"
+        ),
+    ]
+}
 
 // MARK: – Overlay
 
@@ -42,16 +44,24 @@ struct TutorialOverlayView: View {
 
     @Environment(AppState.self) private var appState
 
-    private var current: TutorialStep { tutorialSteps[step] }
+    private var steps: [TutorialStep] {
+        tutorialSteps(usesHearts: appState.challengeLevel.usesHearts,
+                      maxHearts: appState.challengeLevel.maxHearts)
+    }
+
+    private var current: TutorialStep { steps[step] }
 
     private var currentBody: String {
         if current.bodyKey == "tutorial.km_body" {
             let pct = Int(appState.challengeLevel.energyPerKm * 100)
             return L("tutorial.km_body", pct)
         }
+        if current.bodyKey == "tutorial.hearts_body" {
+            return L("tutorial.hearts_body", appState.challengeLevel.maxHearts)
+        }
         return current.body
     }
-    private var isLast: Bool { step == tutorialSteps.count - 1 }
+    private var isLast: Bool { step == steps.count - 1 }
 
     private var highlight: CGRect {
         let base = frames[current.frameKey] ?? .zero
@@ -126,7 +136,7 @@ struct TutorialOverlayView: View {
         VStack(alignment: .leading, spacing: 10) {
             // Step dots
             HStack(spacing: 5) {
-                ForEach(0..<tutorialSteps.count, id: \.self) { i in
+                ForEach(0..<steps.count, id: \.self) { i in
                     Circle()
                         .fill(i == step ? Color(hex: "#F9703E") : Color(hex: "#CBD2D9"))
                         .frame(width: i == step ? 7 : 5, height: i == step ? 7 : 5)
